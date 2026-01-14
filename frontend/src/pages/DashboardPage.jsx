@@ -4,7 +4,7 @@ import GameControls from '../components/Game/GameControls';
 
 const DashboardPage = () => {
   // Danh sách các màn hình
-  const screens = ['HEART', 'SNAKE', 'CARO5', 'CARO4', 'TICTACTOE'];
+  const screens = ['HEART', 'SNAKE', 'CARO5', 'CARO4', 'TICTACTOE', 'MATCH3', 'MEMORY'];
   // State lưu chỉ số màn hình hiện tại (0 là HEART)
   const [currentScreenIndex, setCurrentScreenIndex] = useState(0);
 
@@ -27,9 +27,9 @@ const DashboardPage = () => {
             {/* CỘT TRÁI: MÀN HÌNH GAME */}
             <div className="flex-1 bg-black border-2 border-t-black border-l-black border-b-white border-r-white relative flex flex-col items-center justify-center overflow-hidden p-4">
                  <div className="absolute top-4 left-4 text-green-500 font-mono text-xs z-10 opacity-70">
-                    <div>SYS.86 READY</div>
                     {/* Hiển thị tên màn hình hiện tại */}
-                    <div>MODE: {screens[currentScreenIndex]}</div>
+                    <div>Game:</div>
+                    <div>{screens[currentScreenIndex]}</div>
                  </div>
 
                  <div className="scale-75 md:scale-100 lg:scale-110 transition-transform">

@@ -5,6 +5,8 @@ import { getSnakePixel } from './screens/SnakeScreen';
 import { getTicTacToePixel } from './screens/TicTacToeScreen';
 import { getCaro5Pixel } from './screens/Caro5Screen';
 import { getCaro4Pixel } from './screens/Caro4Screen';
+import { getMatch3Pixel } from './screens/Match3Screen';
+import { getMemoryPixel } from './screens/MemoryScreen';
 
 const GameMatrix = ({ screen = 'HEART' }) => {
   const gridSize = 13; 
@@ -20,6 +22,10 @@ const GameMatrix = ({ screen = 'HEART' }) => {
               return getCaro5Pixel(r, c);
           case 'CARO4':
               return getCaro4Pixel(r, c);
+          case 'MATCH3': 
+              return getMatch3Pixel(r, c);
+          case 'MEMORY': 
+              return getMemoryPixel(r, c);
           case 'HEART':
           default:
               return getHeartPixel(r, c);
