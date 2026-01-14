@@ -2,14 +2,8 @@ import {Route, Routes} from 'react-router-dom';
 import Sidebar from './components/Layout/Sidebar';
 import { Bell, Search } from 'lucide-react';
 import { useState } from 'react';
-import Header from './components/Layout/Header'
-
-// --- 2. Component Footer Giả (Mock) ---
-const MockFooter = () => (
-  <footer className="h-12 bg-gray-50 dark:bg-[#1f2937] border-t border-gray-200 dark:border-gray-700 flex items-center justify-center text-xs text-gray-500 transition-colors">
-    © 2026 BoardGame Project - Dev Mode
-  </footer>
-);
+import Header from './components/Layout/Header';
+import Footer from './components/Layout/Footer';
 
 function App() {
 
@@ -47,7 +41,7 @@ function App() {
             </div>
           </div>
         </main>
-        <MockFooter />
+        <Footer/>
       </div>
     </div>
   );
