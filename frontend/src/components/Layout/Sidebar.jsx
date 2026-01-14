@@ -3,8 +3,7 @@ import React, {useState} from 'react';
 import MenuItem from './MenuItem';
 
 
-const Sidebar = () => {
-    const [activeItem, setActiveItem] = useState('Profile');
+const Sidebar = ({ activeItem, setActiveItem }) => {
 
     const menuItems = [
         {id: 'Profile', icon: <User size={20}/>, label: 'Profile'},

@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import {User, Logout, ChevronDown} from 'lucide-react';
+import {User, LogOut, ChevronDown} from 'lucide-react';
 import HeaderItem from './HeaderItem';
 
 const Header = ({onNavigate, onLogout}) => {
@@ -16,15 +16,8 @@ const Header = ({onNavigate, onLogout}) => {
     };
 
     return (
-    <header className="h-16 px-6 flex items-center justify-between bg-[#c0c0c0] dark:bg-[#2d2d2d] border-b-2 border-white dark:border-b-[#555] shadow-md z-20 relative">
+    <header className="h-16 px-6 flex items-center justify-end bg-[#c0c0c0] dark:bg-[#2d2d2d] border-b-2 border-white dark:border-b-[#555] shadow-md z-20 relative">
       
-      {/* Title / Breadcrumb (Bên trái) */}
-      <div className="flex items-center gap-2">
-         <h2 className="text-lg font-bold text-gray-700 dark:text-gray-200 font-mono uppercase tracking-widest">
-            Dashboard
-         </h2>
-      </div>
-
       {/* User Actions (Bên phải) */}
       <div className="relative">
         <HeaderItem 
