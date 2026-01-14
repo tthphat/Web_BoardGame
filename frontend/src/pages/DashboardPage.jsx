@@ -4,7 +4,7 @@ import GameControls from '../components/Game/GameControls';
 
 const DashboardPage = () => {
   // Danh sách các màn hình
-  const screens = ['HEART', 'SNAKE'];
+  const screens = ['HEART', 'SNAKE', 'CARO5', 'CARO4', 'TICTACTOE'];
   // State lưu chỉ số màn hình hiện tại (0 là HEART)
   const [currentScreenIndex, setCurrentScreenIndex] = useState(0);
 

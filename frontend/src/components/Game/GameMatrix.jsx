@@ -2,6 +2,9 @@ import React from 'react';
 // Import các "thợ vẽ" từ thư mục screens
 import { getHeartPixel } from './screens/HeartScreen';
 import { getSnakePixel } from './screens/SnakeScreen';
+import { getTicTacToePixel } from './screens/TicTacToeScreen';
+import { getCaro5Pixel } from './screens/Caro5Screen';
+import { getCaro4Pixel } from './screens/Caro4Screen';
 
 const GameMatrix = ({ screen = 'HEART' }) => {
   const gridSize = 13; 
@@ -11,6 +14,12 @@ const GameMatrix = ({ screen = 'HEART' }) => {
       switch (screen) {
           case 'SNAKE':
               return getSnakePixel(r, c);
+          case 'TICTACTOE':
+              return getTicTacToePixel(r, c);
+          case 'CARO5':
+              return getCaro5Pixel(r, c);
+          case 'CARO4':
+              return getCaro4Pixel(r, c);
           case 'HEART':
           default:
               return getHeartPixel(r, c);
