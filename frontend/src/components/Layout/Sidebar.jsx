@@ -38,7 +38,7 @@ const Sidebar = () => {
             </nav>
 
             {/* Dark Mode Button Area: Style Retro 3D */}
-            <div className="p-4 border-t-2 border-t-[#fff] dark:border-t-[#555]">
+            <div className="p-4 border-t-2 border-t-white dark:border-t-[#555]">
                 <button 
                     onClick={() => document.documentElement.classList.toggle('dark')}
                     className="flex items-center justify-center gap-3 w-full px-4 py-2 
@@ -49,7 +49,7 @@ const Sidebar = () => {
                     dark:border-t-[#606060] dark:border-l-[#606060] dark:border-b-[#202020] dark:border-r-[#202020] 
                     active:border-t-[#808080] active:border-l-[#808080] active:border-b-white active:border-r-white 
                     active:bg-[#d0d0d0] dark:active:bg-[#303030] 
-                    transition-all active:translate-y-[2px]"
+                    transition-all active:translate-y-0.5"
                 >
                     <Moon size={20} />
                     <span className="font-bold uppercase text-sm">Dark Mode</span>
