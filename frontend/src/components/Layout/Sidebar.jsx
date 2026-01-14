@@ -6,7 +6,7 @@ import MenuItem from './MenuItem';
 const Sidebar = () => {
     const [activeItem, setActiveItem] = useState('Profile');
 
-    const menuItem = [
+    const menuItems = [
         {id: 'Profile', icon: <User size={20}/>, label: 'Profile'},
         {id: 'Friends', icon: <Users size={20}/>, label: 'Friends'},
         {id: 'Messages', icon: <MessageSquare size={20}/>, label: 'Messages'},
