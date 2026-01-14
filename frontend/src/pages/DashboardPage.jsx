@@ -4,37 +4,61 @@ import GameControls from '../components/Game/GameControls';
 
 const DashboardPage = () => {
   return (
-    <div className="flex flex-col items-center justify-center min-h-full">
+    // CONTAINER CHÍNH: h-full để lấp đầy chiều cao, overflow-hidden để CẤM CUỘN
+    <div className="h-full w-full flex items-center justify-center p-4 overflow-hidden">
       
-      {/* CASE MÁY GAME: Vỏ nhựa màu kem, bo góc, đổ bóng nổi khối */}
-      <div className="bg-[#e8e4d9] dark:bg-[#4a4a4a] p-6 md:p-10 rounded-[30px] border-b-[8px] border-r-[8px] border-black/20 shadow-2xl relative max-w-2xl w-full flex flex-col items-center">
+      {/* PANEL CHÍNH: Kéo rộng ra (max-w-6xl) và dùng flex-row (ngang) */}
+      <div className="bg-[#c0c0c0] dark:bg-[#2d2d2d] p-1 
+          border-2 
+          border-t-white border-l-white 
+          border-b-black border-r-black 
+          shadow-xl w-full max-w-6xl h-full max-h-[90vh] flex flex-col">
         
-        {/* Logo máy game */}
-        <div className="w-full flex justify-between items-center mb-4 px-2">
-            <h2 className="font-mono font-black italic text-gray-400 text-lg md:text-2xl tracking-tighter">
-                <span className="text-blue-700 dark:text-blue-400">NINTENDO</span> 
-                <span className="text-red-600 ml-2">GAMEBOY</span>
-            </h2>
-            {/* Đèn báo pin */}
-            <div className="flex items-center gap-2">
-                <span className="w-3 h-3 bg-red-500 rounded-full shadow-[0_0_5px_red] animate-pulse"></span>
-                <span className="text-[10px] font-bold text-gray-500 uppercase">Battery</span>
+        {/* NỘI DUNG BÊN TRONG: Chia làm 2 cột Trái - Phải */}
+        <div className="flex-1 flex flex-row border-2 border-t-[#808080] border-l-[#808080] border-b-white border-r-white dark:border-t-black dark:border-l-black dark:border-b-[#555] dark:border-r-[#555] p-1 overflow-hidden">
+            
+            {/* --- CỘT TRÁI: MÀN HÌNH GAME (Chiếm phần lớn) --- */}
+            <div className="flex-1 bg-black border-2 border-t-black border-l-black border-b-white border-r-white relative flex flex-col items-center justify-center overflow-hidden p-4">
+                 
+                 
+
+                 {/* Matrix Game */}
+                 <div className="scale-75 md:scale-100 lg:scale-110 transition-transform">
+                    <GameMatrix />
+                 </div>
+
             </div>
-        </div>
 
-        {/* MÀN HÌNH: Khung viền xám bao quanh Matrix */}
-        <div className="bg-gray-500 p-4 md:p-6 rounded-t-[20px] rounded-bl-[40px] rounded-br-[20px] shadow-inner w-full flex justify-center border-4 border-gray-600">
-             {/* Component Bảng đèn */}
-             <GameMatrix />
-        </div>
+            {/* --- CỘT PHẢI: BẢNG ĐIỀU KHIỂN (Cố định chiều rộng) --- */}
+            <div className="w-64 bg-[#c0c0c0] dark:bg-[#2d2d2d] flex flex-col border-l-2 border-l-gray-400 dark:border-l-gray-700">
+                
+                {/* Trang trí Header cột phải */}
+                <div className="h-12 border-b-2 border-gray-400 flex items-center justify-center bg-gradient-to-r from-blue-800 to-blue-600">
+                    <span className="text-white font-bold font-mono tracking-widest">CONTROLS</span>
+                </div>
 
-        {/* THƯƠNG HIỆU */}
-        <div className="my-4 italic font-serif font-bold text-blue-800/40 text-lg">
-            Stereo Sound
-        </div>
+                {/* Khu vực chứa nút bấm (Căn giữa dọc) */}
+                <div className="flex-1 flex flex-col items-center justify-center gap-8 p-4">
+                    
+                    {/* Thông số phụ */}
+                    <div className="w-full bg-black border-2 border-gray-500 p-2 text-green-500 font-mono text-xs mb-4">
+                        <div className="flex justify-between"><span>SCORE</span><span>0000</span></div>
+                        <div className="flex justify-between"><span>HI-SC</span><span>9999</span></div>
+                        <div className="flex justify-between mt-2"><span>LEVEL</span><span>01</span></div>
+                    </div>
 
-        {/* CÁC NÚT BẤM */}
-        <GameControls />
+                    {/* Component Nút bấm */}
+                    <GameControls />
+
+                </div>
+
+                {/* Footer cột phải */}
+                <div className="p-2 text-center border-t-2 border-gray-400">
+                     <div className="text-[10px] text-gray-500 font-mono">INSERT COIN</div>
+                </div>
+            </div>
+
+        </div>
 
       </div>
 

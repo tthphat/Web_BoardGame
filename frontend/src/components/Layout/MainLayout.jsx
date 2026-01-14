@@ -32,7 +32,7 @@ const MainLayout = () => {
     
     let path = '';
     switch(itemId) {
-        case 'Game': path = ''; break; // Bấm Game -> Về trang chủ
+        case 'Game': path = ''; break; 
         case 'Friends': path = 'friends'; break;
         case 'Messages': path = 'messages'; break;
         case 'Achievements': path = 'trophy'; break;
