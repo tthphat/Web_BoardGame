@@ -1,7 +1,7 @@
 import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import MainLayout from './components/Layout/MainLayout'; // Import từ đường dẫn mới
-
+import DashboardPage from './pages/DashboardPage';
 // --- Component giả lập nội dung các trang (Để test giao diện) ---
 const DemoPage = ({ title, description }) => (
   <div className="max-w-4xl mx-auto space-y-6">
@@ -23,7 +23,8 @@ function App() {
     <Routes>
       {/* Route Cha: Sử dụng MainLayout */}
       <Route path="/" element={<MainLayout />}>
-        
+        <Route index element={<Navigate to="/dashboard" replace />} />
+        <Route path="dashboard" element={<DashboardPage />} />
         {/* Mặc định vào trang chủ (/) sẽ chuyển hướng sang /profile */}
         <Route index element={<Navigate to="/profile" replace />} />
         
