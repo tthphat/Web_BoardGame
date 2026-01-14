@@ -1,4 +1,4 @@
-import {User, Users, MessageSquare, Trophy, BarChart ,Moon, Sun} from 'lucide-react';
+import {User, Users, MessageSquare, Trophy, BarChart ,Moon, Gamepad2} from 'lucide-react';
 import React, {useState} from 'react';
 import MenuItem from './MenuItem';
 
@@ -6,6 +6,7 @@ import MenuItem from './MenuItem';
 const Sidebar = ({ activeItem, setActiveItem }) => {
 
     const menuItems = [
+        {id: 'Game', icon: <Gamepad2 size={20}/>, label: 'Game Console'},
         {id: 'Profile', icon: <User size={20}/>, label: 'Profile'},
         {id: 'Friends', icon: <Users size={20}/>, label: 'Friends'},
         {id: 'Messages', icon: <MessageSquare size={20}/>, label: 'Messages'},
