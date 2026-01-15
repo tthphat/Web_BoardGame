@@ -21,7 +21,7 @@ const FULLBOARD_GAMES = ['CARO4', 'CARO5', 'DRAWING'];
 const ORIGINAL_GAME_SIZE = 13;
 
 // --- THAY ĐỔI 2: Thêm activeGameState vào props ---
-const GameMatrix = ({ screen = 'HEART', isPlaying = false, onScoreUpdate, activeGameState }) => {
+const GameMatrix = ({ screen = 'HEART', isPlaying = false, onScoreUpdate, activeGameState, onCardClick }) => {
   const { cols, rows, dotSize, gap } = getBoardConfig();
 
   // Hook cho game Match 3
@@ -90,12 +90,12 @@ const GameMatrix = ({ screen = 'HEART', isPlaying = false, onScoreUpdate, active
         return getCaro4Pixel(gameR, gameC);
       case 'MATCH3':
         return getMatch3Pixel(gameR, gameC);
-      
+
       // --- THAY ĐỔI 3: Logic hiển thị Memory ---
       case 'MEMORY':
         // Nếu đang chơi và có state truyền từ ngoài vào -> Dùng Active Pixel
         if (isPlaying && activeGameState) {
-           return getActiveMemoryPixel(gameR, gameC, activeGameState);
+          return getActiveMemoryPixel(gameR, gameC, activeGameState);
         }
         // Nếu không -> Dùng Preview Pixel
         return getMemoryPixel(gameR, gameC);
@@ -155,23 +155,26 @@ const GameMatrix = ({ screen = 'HEART', isPlaying = false, onScoreUpdate, active
     if (screen === 'MATCH3' && isPlaying) {
       match3.handlePixelClick(r - 1, c - 1);
     }
-    else if (screen === 'MEMORY' && isPlaying && onCardClick) {
-      // 1. Chuyển toạ độ click thực tế (r, c) về toạ độ game căn giữa (gameR, gameC)
+    if (screen === 'MEMORY' && isPlaying && onCardClick) {
+
+      // 1. Tính toạ độ thực tế trên lưới game (đã trừ offset căn giữa)
       const gameR = r - offsetRow;
       const gameC = c - offsetCol;
 
-      // 2. Map toạ độ này sang Index của thẻ bài (0-15)
-      // Dựa trên logic vẽ của ActiveMemoryScreen: Hàng/Cột 3, 5, 7, 9 là thẻ
-      const rowMap = { 3: 0, 5: 1, 7: 2, 9: 3 };
-      const colMap = { 3: 0, 5: 1, 7: 2, 9: 3 };
+      // 2. Định nghĩa vị trí các lá bài (Khớp với logic vẽ trong ActiveMemoryScreen)
+      // Hàng/Cột: 4, 6, 8, 10 tương ứng với index 0, 1, 2, 3
+      const validPositions = { 4: 0, 6: 1, 8: 2, 10: 3 };
 
-      const cardRow = rowMap[gameR];
-      const cardCol = colMap[gameC];
+      const cardRow = validPositions[gameR];
+      const cardCol = validPositions[gameC];
 
-      // Nếu click trúng vào ô chứa thẻ (không phải khoảng trống)
+      // 3. Kiểm tra: Nếu click trúng vị trí có lá bài (không phải undefined)
       if (cardRow !== undefined && cardCol !== undefined) {
+        // Tính ra index mảng 1 chiều (0 - 15)
         const index = cardRow * 4 + cardCol;
-        onCardClick(index); // Gọi hàm xử lý từ cha
+
+        // Gọi hàm xử lý (Tương tự match3.handlePixelClick)
+        onCardClick(index);
       }
     }
   };

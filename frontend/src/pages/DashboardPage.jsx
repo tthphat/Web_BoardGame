@@ -66,6 +66,7 @@ const DashboardPage = () => {
                 isPlaying={isPlaying}
                 onScoreUpdate={setScore}
                 onCardClick={memoryGame.handleCardClick}
+                activeGameState={memoryGame} 
               />
             </div>
           </div>

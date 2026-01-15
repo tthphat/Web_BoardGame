@@ -17,14 +17,14 @@ const getColorClass = (type) => {
 
 export const getActiveMemoryPixel = (r, c, gameState) => {
     const { board, cursor } = gameState;
-    
+
     // Board Memory 4x4 sẽ được căn giữa trên lưới 13x13
     // Map toạ độ lưới 13x13 (visual) sang toạ độ logic (card index 0-15)
     // Các hàng chứa bài: 3, 5, 7, 9
     // Các cột chứa bài: 3, 5, 7, 9
-    
-    const rowMap = { 3: 0, 5: 1, 7: 2, 9: 3 };
-    const colMap = { 3: 0, 5: 1, 7: 2, 9: 3 };
+
+    const rowMap = { 4: 0, 6: 1, 8: 2, 10: 3 };
+    const colMap = { 4: 0, 6: 1, 8: 2, 10: 3 };
 
     const cardRow = rowMap[r];
     const cardCol = colMap[c];
@@ -37,7 +37,7 @@ export const getActiveMemoryPixel = (r, c, gameState) => {
     // Tính index trong mảng board (0-15)
     const index = cardRow * 4 + cardCol;
     const card = board[index];
-    
+
     // Nếu chưa khởi tạo board xong (tránh lỗi crash khi mới mount)
     if (!card) return 'bg-[#111] shadow-none opacity-0';
 
@@ -46,10 +46,9 @@ export const getActiveMemoryPixel = (r, c, gameState) => {
     // --- LOGIC MÀU SẮC ---
 
     let baseClass = 'scale-90 transition-all duration-200';
-    
-    // Hiệu ứng Cursor (Đang chọn): Có viền trắng sáng
+
     if (isCursor) {
-        baseClass += ' ring-2 ring-white scale-100 z-10';
+        baseClass += ' scale-100 z-10';
     }
 
     // 1. Nếu đã Match -> Màu của thẻ nhưng sáng hơn/nhấp nháy
