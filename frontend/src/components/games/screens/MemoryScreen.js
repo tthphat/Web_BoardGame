@@ -27,6 +27,6 @@ export const getMemoryPixel = (r, c) => {
         return 'bg-slate-600 shadow-none border border-slate-400 scale-90';
     }
 
-    // Nền tối (Khoảng cách giữa các lá bài)
-    return 'bg-[#111] shadow-none opacity-0';
+    // Nền bình thường (hiển thị giống các game khác)
+    return 'bg-[#333] shadow-none opacity-40 scale-[0.7]';
 };

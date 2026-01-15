@@ -30,5 +30,5 @@ export const getTicTacToePixel = (r, c) => {
          return `bg-red-500 shadow-[0_0_10px_red] ${isWinning ? 'animate-pulse bg-red-400' : ''}`;
     }
 
-    return 'bg-[#222] shadow-none opacity-20 scale-50';
+    return 'bg-[#333] shadow-none opacity-40 scale-[0.7]';
 };

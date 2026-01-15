@@ -46,9 +46,9 @@ const GameMatrix = ({ screen = 'HEART', isPlaying = false }) => {
       const gameR = r - offsetRow;
       const gameC = c - offsetCol;
       
-      // Nếu nằm ngoài vùng game 13x13, hiển thị dot mờ giống bên trong
+      // Nếu nằm ngoài vùng game 13x13, hiển thị dot mờ
       if (gameR < 1 || gameR > ORIGINAL_GAME_SIZE || gameC < 1 || gameC > ORIGINAL_GAME_SIZE) {
-          return 'bg-[#222] shadow-none opacity-20 scale-50';
+          return 'bg-[#333] shadow-none opacity-40 scale-[0.7]';
       }
       
       switch (screen) {
