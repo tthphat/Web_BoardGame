@@ -14,19 +14,7 @@ const AdminSidebar = ({ activeItem, setActiveItem }) => {
     return (
         <aside className="w-64 h-full bg-[#c0c0c0] dark:bg-[#2d2d2d] border-r-2 border-r-[#808080] dark:border-r-[#000] flex flex-col transition-colors duration-300 font-mono">
             
-            {/* Header: Admin Panel */}
-            <div className="h-16 flex items-center justify-center bg-[#c0c0c0] dark:bg-[#2d2d2d] border-b-2 border-b-[#808080] dark:border-b-[#000]">
-                <div className="px-4 py-1 bg-[#800000] dark:bg-[#4a0404] 
-                    border-2 
-                    border-t-black border-l-black
-                    border-b-white border-r-white
-                    dark:border-t-black dark:border-l-black dark:border-b-[#555] dark:border-r-[#555]">
-                        {/* Đổi màu chữ sang đỏ/trắng để phân biệt với User */}
-                        <h1 className="text-xl font-black uppercase text-white tracking-wider shadow-sm">
-                            SYS.ADMIN
-                        </h1>
-                </div>
-            </div>
+            
 
             {/* Menu List */}
             <nav className="flex-1 py-4 space-y-2 px-3">

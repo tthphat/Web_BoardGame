@@ -17,18 +17,7 @@ const Sidebar = ({ activeItem, setActiveItem }) => {
     return (
         <aside className="w-64 h-full bg-[#c0c0c0] dark:bg-[#2d2d2d] border-r-2 border-r-[#808080] dark:border-r-[#000] flex flex-col transition-colors duration-300 font-mono">
             
-            {/* Header: Hiệu ứng lõm vào */}
-            <div className="h-16 flex items-center justify-center bg-[#c0c0c0] dark:bg-[#2d2d2d] border-b-2 border-b-[#808080] dark:border-b-[#000]">
-                <div className="px-4 py-1 bg-[#008080] dark:bg-[#1a1a1a] 
-                    border-2 
-                    border-t-black border-l-black    {/* QUAN TRỌNG: Đổi sang màu đen để tạo bóng lõm sâu */}
-                    border-b-white border-r-white    {/* Màu trắng hắt sáng ở cạnh dưới */}
-                    dark:border-t-black dark:border-l-black dark:border-b-[#555] dark:border-r-[#555]">
-                        <h1 className="text-xl font-black uppercase text-white dark:text-yellow-500 tracking-wider shadow-sm">
-                            BoardGame
-                        </h1>
-                </div>
-            </div>
+            
 
             {/* Menu List */}
             <nav className="flex-1 py-4 space-y-2 px-3">

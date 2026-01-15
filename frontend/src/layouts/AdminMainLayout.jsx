@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import Header from '../components/common/Header'; // Import từ folder common của bạn
+import AdminHeader from '../components/admin/AdminHeader'; // Import từ folder common của bạn
 import Footer from '../components/common/Footer'; // Import từ folder common của bạn
 import AdminSidebar from '../components/admin/AdminSidebar';
 import AdminDashboardMock from '../components/admin/AdminDashboardMock';
@@ -39,7 +39,7 @@ const AdminMainLayout = () => {
             
             {/* 1. Common Header */}
             {/* Header nằm trên cùng, chiếm full chiều rộng */}
-            <Header />
+            <AdminHeader />
 
             {/* 2. Main Body Area */}
             {/* Flex row để Sidebar nằm trái, Content nằm phải */}
