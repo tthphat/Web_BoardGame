@@ -1,17 +1,17 @@
 export const getCaro5Pixel = (r, c) => {
-    // 1. Quân Xanh (Đội A) - Rải rác
+    // 1. Quân Xanh (Đội A) - Rải rác (đã +1 vào cột)
     const blueStones = [
-        [2,3], [3,8], [5,2], [8,10], [9,3], [11,9], [12,2]
+        [2,4], [3,9], [5,3], [8,11], [9,4], [11,10], [12,3]
     ];
     
-    // 2. Quân Đỏ (Đội B) - Rải rác
+    // 2. Quân Đỏ (Đội B) - Rải rác (đã +1 vào cột)
     const redStones = [
-        [3,3], [4,9], [6,2], [9,10], [10,4], [2,10]
+        [3,4], [4,10], [6,3], [9,11], [10,5], [2,11]
     ];
 
-    // 3. ĐƯỜNG THẮNG 5 QUÂN (Màu Xanh) - Chéo từ góc trái trên xuống phải dưới
+    // 3. ĐƯỜNG THẮNG 5 QUÂN (Màu Xanh) - Chéo từ góc trái trên xuống phải dưới (đã +1 vào cột)
     const winningLine = [
-        [4,4], [5,5], [6,6], [7,7], [8,8]
+        [4,5], [5,6], [6,7], [7,8], [8,9]
     ];
 
     // Logic kiểm tra
