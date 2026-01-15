@@ -10,6 +10,7 @@ import { getMemoryPixel } from './screens/MemoryScreen';
 import { useMatch3 } from '../../hooks/useMatch3';
 import { useEffect, useRef, useState } from 'react';
 
+
 // --- THAY ĐỔI 1: Import hàm vẽ Active của Memory ---
 import { getActiveMemoryPixel } from './screens/ActiveMemoryScreen';
 
@@ -153,6 +154,25 @@ const GameMatrix = ({ screen = 'HEART', isPlaying = false, onScoreUpdate, active
     // Click chỉ dành cho Match 3 (Memory dùng GameControls)
     if (screen === 'MATCH3' && isPlaying) {
       match3.handlePixelClick(r - 1, c - 1);
+    }
+    else if (screen === 'MEMORY' && isPlaying && onCardClick) {
+      // 1. Chuyển toạ độ click thực tế (r, c) về toạ độ game căn giữa (gameR, gameC)
+      const gameR = r - offsetRow;
+      const gameC = c - offsetCol;
+
+      // 2. Map toạ độ này sang Index của thẻ bài (0-15)
+      // Dựa trên logic vẽ của ActiveMemoryScreen: Hàng/Cột 3, 5, 7, 9 là thẻ
+      const rowMap = { 3: 0, 5: 1, 7: 2, 9: 3 };
+      const colMap = { 3: 0, 5: 1, 7: 2, 9: 3 };
+
+      const cardRow = rowMap[gameR];
+      const cardCol = colMap[gameC];
+
+      // Nếu click trúng vào ô chứa thẻ (không phải khoảng trống)
+      if (cardRow !== undefined && cardCol !== undefined) {
+        const index = cardRow * 4 + cardCol;
+        onCardClick(index); // Gọi hàm xử lý từ cha
+      }
     }
   };
 

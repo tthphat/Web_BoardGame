@@ -60,21 +60,19 @@ export const useMemoryGame = () => {
     });
   };
 
-  // Xử lý khi nhấn Enter (Lật thẻ)
-  const flipCard = () => {
+  const performFlip = (index) => {
     if (gameState !== 'playing' || isProcessing) return;
     
-    const currentCard = board[cursor];
-
+    const currentCard = board[index];
     // Nếu thẻ đã lật hoặc đã match thì bỏ qua
     if (currentCard.isFlipped || currentCard.isMatched) return;
 
     // Lật thẻ
     const newBoard = [...board];
-    newBoard[cursor].isFlipped = true;
+    newBoard[index].isFlipped = true;
     setBoard(newBoard);
     
-    const newFlipped = [...flippedIndices, cursor];
+    const newFlipped = [...flippedIndices, index];
     setFlippedIndices(newFlipped);
 
     // Nếu đã lật 2 thẻ -> Kiểm tra Match
@@ -82,6 +80,16 @@ export const useMemoryGame = () => {
       setIsProcessing(true);
       checkMatch(newFlipped, newBoard);
     }
+  };
+  // Xử lý khi nhấn Enter (Lật thẻ)
+  const flipCard = () => {
+    performFlip(cursor);
+  };
+  const handleCardClick = (index) => {
+    // Cập nhật cursor đến vị trí vừa click (để đồng bộ giao diện)
+    setCursor(index);
+    // Thực hiện lật
+    performFlip(index);
   };
 
   // Logic kiểm tra khớp
@@ -126,6 +134,7 @@ export const useMemoryGame = () => {
     gameState,
     initGame,
     moveCursor,
-    flipCard
+    flipCard,
+    handleCardClick,
   };
 };
