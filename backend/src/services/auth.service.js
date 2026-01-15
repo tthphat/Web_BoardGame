@@ -1,4 +1,4 @@
-import User from "../models/user.model.js";
+import { UserModel } from "../models/user.model.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
@@ -7,7 +7,7 @@ export const AuthService = {
     async login(email, password) {
         try {
             // check existed user
-            const { data: user, error } = await User.findUserByEmail(email);
+            const { data: user, error } = await UserModel.findUserByEmail(email);
             if (error || !user) {
                 throw new Error("User not found");
             }
@@ -25,7 +25,7 @@ export const AuthService = {
             // generate token
             const token = jwt.sign(
                 {
-                    id: user._id,
+                    id: user.id,
                     email: user.email,
                     role: user.role
                 },
@@ -34,11 +34,13 @@ export const AuthService = {
             );
 
             return {
-                token,
-                user: {
-                    id: user._id,
-                    email: user.email,
-                    role: user.role
+                data: {
+                    token,
+                    user: {
+                        id: user.id,
+                        email: user.email,
+                        role: user.role
+                    }
                 }
             };
         } catch (error) {

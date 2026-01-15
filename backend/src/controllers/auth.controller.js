@@ -1,4 +1,4 @@
-import AuthService from "../services/auth.service.js";
+import { AuthService } from "../services/auth.service.js";
 import dotenv from "dotenv";
 dotenv.config();
 
@@ -13,20 +13,21 @@ export const AuthController = {
                 throw new Error("Email and password are required");
             }
 
-            const { data: user, error } = await AuthService.login(email, password);
-            if (error) {
-                throw error;
-            }
+            const user = await AuthService.login(email, password);
 
-            res.cookie("token", user.token, {
+            res.cookie("token", user.data.token, {
                 httpOnly: true,
                 secure: process.env.NODE_ENV === "production",
                 sameSite: "lax",
                 maxAge: 24 * 60 * 60 * 1000
             });
 
+            console.log(user);
+
             res.json({
-                user: user.user
+                data: {
+                    user: user.data.user
+                }
             });
 
         } catch (error) {

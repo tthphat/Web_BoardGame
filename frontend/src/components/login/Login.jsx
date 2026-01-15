@@ -2,9 +2,11 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { loginSchema } from "@/lib/login.schema";
+import { useNavigate } from "react-router-dom";
 
 function Login() {
     const { login } = useAuth();
+    const navigate = useNavigate();
 
     const {
         register,
@@ -14,6 +16,15 @@ function Login() {
     } = useForm({
         resolver: zodResolver(loginSchema),
     });
+
+    const onSubmit = async (data) => {
+        try {
+            await login(data);
+            navigate("/");
+        } catch (error) {
+            setError("root", { message: error.message });
+        }
+    }
 
     return (
         <div className="h-screen w-screen flex items-center justify-center bg-retro-teal dark:bg-[#1a1a1a] font-mono">
@@ -36,7 +47,7 @@ function Login() {
                 </div>
 
                 <div className="p-6 pt-2">
-                    <form onSubmit={handleSubmit(login)} className="space-y-6">
+                    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
                         <div className="space-y-2">
                             <label className="block text-sm font-bold text-black dark:text-white uppercase">Email:</label>
                             <input

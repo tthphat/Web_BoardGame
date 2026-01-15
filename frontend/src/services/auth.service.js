@@ -1,7 +1,7 @@
 export async function loginApi(payload) {
     console.log("Fontend-Auth-Service: Login API input: ", payload);
 
-    const response = await fetch("api/auth/login", {
+    const response = await fetch("/api/auth/login", {
         method: "POST",
         headers: {
             "Content-Type": "application/json",

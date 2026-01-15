@@ -1,3 +1,4 @@
+import knex from "../../db/db.js";
 
 export const UserModel = {
 
