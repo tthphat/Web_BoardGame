@@ -7,15 +7,28 @@ const DashboardPage = () => {
   const screens = ['HEART', 'SNAKE', 'CARO5', 'CARO4', 'TICTACTOE', 'MATCH3', 'MEMORY'];
   // State lưu chỉ số màn hình hiện tại (0 là HEART)
   const [currentScreenIndex, setCurrentScreenIndex] = useState(0);
+  const [isPlaying, setIsPlaying] = useState(false);
 
   // Hàm chuyển màn hình sang TRÁI
   const handlePrevScreen = () => {
+    setIsPlaying(false); // Reset game logic khi đổi màn
     setCurrentScreenIndex((prev) => (prev - 1 + screens.length) % screens.length);
   };
 
   // Hàm chuyển màn hình sang PHẢI
   const handleNextScreen = () => {
+    setIsPlaying(false); // Reset game logic khi đổi màn
     setCurrentScreenIndex((prev) => (prev + 1) % screens.length);
+  };
+
+  const currentScreenName = screens[currentScreenIndex];
+
+  const handleEnter = () => {
+    if (currentScreenName === 'MATCH3') {
+      setIsPlaying(true);
+    } else {
+      alert("Enter pressed");
+    }
   };
 
   return (
@@ -23,19 +36,19 @@ const DashboardPage = () => {
       <div className="bg-[#c0c0c0] dark:bg-[#2d2d2d] p-1 border-2 border-t-white border-l-white border-b-black border-r-black shadow-xl w-full max-w-6xl h-full max-h-[90vh] flex flex-col">
 
         <div className="flex-1 flex flex-row border-2 border-t-[#808080] border-l-[#808080] border-b-white border-r-white dark:border-t-black dark:border-l-black dark:border-b-[#555] dark:border-r-[#555] p-1 overflow-hidden">
-            
-            
+
+
 
           <div className="flex-1 bg-black border-2 border-t-black border-l-black border-b-white border-r-white relative flex flex-col items-center justify-center overflow-hidden p-4">
             <div className="absolute top-4 left-4 text-green-500 font-mono text-xs z-10 opacity-70">
               {/* Hiển thị tên màn hình hiện tại */}
               <div>GAME:</div>
-              <div>{screens[currentScreenIndex]}</div>
+              <div>{currentScreenName} {isPlaying ? '(PLAYING)' : ''}</div>
             </div>
 
             <div className="scale-75 md:scale-100 lg:scale-110 transition-transform">
               {/* Truyền tên màn hình hiện tại vào Matrix */}
-              <GameMatrix screen={screens[currentScreenIndex]} />
+              <GameMatrix screen={currentScreenName} isPlaying={isPlaying} />
             </div>
           </div>
 
@@ -57,7 +70,7 @@ const DashboardPage = () => {
                 onLeft={handlePrevScreen}
                 onRight={handleNextScreen}
                 onBack={() => alert("Back pressed")}
-                onEnter={() => alert("Enter pressed")}
+                onEnter={handleEnter}
               />
             </div>
 
