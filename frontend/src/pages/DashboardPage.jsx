@@ -4,7 +4,7 @@ import GameControls from '../components/games/GameControls';
 
 const DashboardPage = () => {
   // Danh sách các màn hình
-  const screens = ['HEART', 'SNAKE'];
+  const screens = ['HEART', 'SNAKE', 'CARO5', 'CARO4', 'TICTACTOE', 'MATCH3', 'MEMORY'];
   // State lưu chỉ số màn hình hiện tại (0 là HEART)
   const [currentScreenIndex, setCurrentScreenIndex] = useState(0);
 
@@ -23,13 +23,14 @@ const DashboardPage = () => {
       <div className="bg-[#c0c0c0] dark:bg-[#2d2d2d] p-1 border-2 border-t-white border-l-white border-b-black border-r-black shadow-xl w-full max-w-6xl h-full max-h-[90vh] flex flex-col">
 
         <div className="flex-1 flex flex-row border-2 border-t-[#808080] border-l-[#808080] border-b-white border-r-white dark:border-t-black dark:border-l-black dark:border-b-[#555] dark:border-r-[#555] p-1 overflow-hidden">
+            
+            
 
-          {/* CỘT TRÁI: MÀN HÌNH GAME */}
           <div className="flex-1 bg-black border-2 border-t-black border-l-black border-b-white border-r-white relative flex flex-col items-center justify-center overflow-hidden p-4">
             <div className="absolute top-4 left-4 text-green-500 font-mono text-xs z-10 opacity-70">
-              <div>SYS.86 READY</div>
               {/* Hiển thị tên màn hình hiện tại */}
-              <div>MODE: {screens[currentScreenIndex]}</div>
+              <div>GAME:</div>
+              <div>{screens[currentScreenIndex]}</div>
             </div>
 
             <div className="scale-75 md:scale-100 lg:scale-110 transition-transform">
