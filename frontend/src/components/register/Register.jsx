@@ -1,4 +1,3 @@
-
 function Register() {
     return (
         <div>
@@ -6,5 +5,3 @@ function Register() {
         </div>
     );
 }
-
-export default Register;
