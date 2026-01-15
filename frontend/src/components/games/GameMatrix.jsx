@@ -10,38 +10,41 @@ import { getMemoryPixel } from './screens/MemoryScreen';
 import { useMatch3 } from '../../hooks/useMatch3';
 import { useEffect, useRef, useState } from 'react';
 
+// --- THAY ĐỔI 1: Import hàm vẽ Active của Memory ---
+import { getActiveMemoryPixel } from './screens/ActiveMemoryScreen';
+
 // Games sử dụng full board (kích thước động theo config) - CHỈ KHI CHƠI THẬT
-// Hiện tại preview screens đều căn giữa
 const FULLBOARD_GAMES = ['CARO4', 'CARO5', 'DRAWING'];
 
 // Kích thước gốc của các game screens (được thiết kế cho 13x13)
 const ORIGINAL_GAME_SIZE = 13;
 
-const GameMatrix = ({ screen = 'HEART', isPlaying = false, onScoreUpdate }) => {
+// --- THAY ĐỔI 2: Thêm activeGameState vào props ---
+const GameMatrix = ({ screen = 'HEART', isPlaying = false, onScoreUpdate, activeGameState }) => {
   const { cols, rows, dotSize, gap } = getBoardConfig();
 
   // Hook cho game Match 3
   const match3 = useMatch3(rows, cols, isPlaying && screen === 'MATCH3');
 
-  // Sync score with parent
+  // Sync score with parent (Dành cho Match 3)
   useEffect(() => {
     if (screen === 'MATCH3' && isPlaying && onScoreUpdate) {
       onScoreUpdate(match3.score);
-      console.log("Match 3 Score:", match3.score);
     }
   }, [match3.score, screen, isPlaying, onScoreUpdate]);
 
   // Chỉ dùng fullboard khi đang CHƠI game (không phải preview)
   const useFullboard = isPlaying && FULLBOARD_GAMES.includes(screen);
 
-  // Tính offset để căn giữa (cho tất cả preview và fixed-size games)
-  // Nếu là Match 3 đang chơi thì offset là 0 luôn (vì board được hook generate full size)
+  // Tính offset để căn giữa
+  // Match 3: Full size -> Offset 0
+  // Memory (Active): Vẫn dùng 13x13 căn giữa -> Có Offset
   const offsetCol = (useFullboard || (screen === 'MATCH3' && isPlaying)) ? 0 : Math.floor((cols - ORIGINAL_GAME_SIZE) / 2);
   const offsetRow = (useFullboard || (screen === 'MATCH3' && isPlaying)) ? 0 : Math.floor((rows - ORIGINAL_GAME_SIZE) / 2);
 
   // Hàm điều phối: chuyển đổi tọa độ và gọi screen tương ứng
   const getPixelColor = (r, c) => {
-    // 1. Nếu đang chơi Match 3: lấy màu từ hook
+    // 1. Ưu tiên: Match 3 (Logic nội bộ)
     if (screen === 'MATCH3' && isPlaying) {
       const cellColor = match3.board[r - 1]?.[c - 1];
       let classes = cellColor || 'bg-[#222] opacity-20';
@@ -52,7 +55,7 @@ const GameMatrix = ({ screen = 'HEART', isPlaying = false, onScoreUpdate }) => {
       return classes;
     }
 
-    // Với fullboard games khi ĐANG CHƠI: dùng tọa độ trực tiếp
+    // 2. Fullboard Games (Caro, Drawing...)
     if (useFullboard) {
       switch (screen) {
         case 'CARO5':
@@ -66,11 +69,11 @@ const GameMatrix = ({ screen = 'HEART', isPlaying = false, onScoreUpdate }) => {
       }
     }
 
-    // Với tất cả preview và fixed-size games: chuyển đổi tọa độ để căn giữa
+    // 3. Standard Games (Căn giữa 13x13) - Bao gồm MEMORY
     const gameR = r - offsetRow;
     const gameC = c - offsetCol;
 
-    // Nếu nằm ngoài vùng game 13x13, hiển thị dot mờ giống bên trong
+    // Nếu nằm ngoài vùng game 13x13, hiển thị dot mờ
     if (gameR < 1 || gameR > ORIGINAL_GAME_SIZE || gameC < 1 || gameC > ORIGINAL_GAME_SIZE) {
       return 'bg-[#222] shadow-none opacity-20 scale-50';
     }
@@ -86,8 +89,16 @@ const GameMatrix = ({ screen = 'HEART', isPlaying = false, onScoreUpdate }) => {
         return getCaro4Pixel(gameR, gameC);
       case 'MATCH3':
         return getMatch3Pixel(gameR, gameC);
+      
+      // --- THAY ĐỔI 3: Logic hiển thị Memory ---
       case 'MEMORY':
+        // Nếu đang chơi và có state truyền từ ngoài vào -> Dùng Active Pixel
+        if (isPlaying && activeGameState) {
+           return getActiveMemoryPixel(gameR, gameC, activeGameState);
+        }
+        // Nếu không -> Dùng Preview Pixel
         return getMemoryPixel(gameR, gameC);
+
       case 'HEART':
       default:
         return getHeartPixel(gameR, gameC);
@@ -102,7 +113,7 @@ const GameMatrix = ({ screen = 'HEART', isPlaying = false, onScoreUpdate }) => {
     }
   }
 
-  /* --- Logic Drag-to-Scroll --- */
+  /* --- Logic Drag-to-Scroll (Giữ nguyên của team member) --- */
   const scrollRef = useRef(null);
   const [isDragging, setIsDragging] = useState(false);
   const [startX, setStartX] = useState(0);
@@ -139,6 +150,7 @@ const GameMatrix = ({ screen = 'HEART', isPlaying = false, onScoreUpdate }) => {
 
   const onPixelClick = (r, c) => {
     if (isDragging) return;
+    // Click chỉ dành cho Match 3 (Memory dùng GameControls)
     if (screen === 'MATCH3' && isPlaying) {
       match3.handlePixelClick(r - 1, c - 1);
     }
