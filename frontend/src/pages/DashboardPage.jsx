@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import GameMatrix from '../components/games/GameMatrix';
 import GameControls from '../components/games/GameControls';
+import { useMemoryGame } from '../hooks/useMemoryGame';
 
 const DashboardPage = () => {
   // Danh sách các màn hình
@@ -9,7 +10,7 @@ const DashboardPage = () => {
   const [currentScreenIndex, setCurrentScreenIndex] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
   const [score, setScore] = useState(0);
-
+  const memoryGame = useMemoryGame();
   // Hàm chuyển màn hình sang TRÁI
   const handlePrevScreen = () => {
     setIsPlaying(false); // Reset game logic khi đổi màn
@@ -30,7 +31,16 @@ const DashboardPage = () => {
     if (currentScreenName === 'MATCH3') {
       setIsPlaying(true);
       setScore(0);
-    } else {
+    } 
+    else if (currentScreenName === 'MEMORY') {
+      if (!isPlaying) {
+        // Bắt đầu game:
+        setIsPlaying(true);
+        setScore(0);
+        memoryGame.initGame(); // <-- QUAN TRỌNG: Tạo bộ bài mới
+      }
+    }
+    else {
       alert("Enter pressed");
     }
   };
@@ -55,6 +65,8 @@ const DashboardPage = () => {
                 screen={currentScreenName}
                 isPlaying={isPlaying}
                 onScoreUpdate={setScore}
+                onCardClick={memoryGame.handleCardClick}
+                activeGameState={memoryGame} 
               />
             </div>
           </div>
