@@ -1,4 +1,3 @@
-import React from 'react';
 import { getBoardConfig } from '../../utils/boardConfig';
 // Import các "thợ vẽ" từ thư mục screens
 import { getHeartPixel } from './screens/HeartScreen';
@@ -9,6 +8,7 @@ import { getCaro4Pixel } from './screens/Caro4Screen';
 import { getMatch3Pixel } from './screens/Match3Screen';
 import { getMemoryPixel } from './screens/MemoryScreen';
 import { useMatch3 } from '../../hooks/useMatch3';
+import { useEffect, useRef, useState } from 'react';
 
 // Games sử dụng full board (kích thước động theo config) - CHỈ KHI CHƠI THẬT
 // Hiện tại preview screens đều căn giữa
@@ -17,11 +17,19 @@ const FULLBOARD_GAMES = ['CARO4', 'CARO5', 'DRAWING'];
 // Kích thước gốc của các game screens (được thiết kế cho 13x13)
 const ORIGINAL_GAME_SIZE = 13;
 
-const GameMatrix = ({ screen = 'HEART', isPlaying = false }) => {
+const GameMatrix = ({ screen = 'HEART', isPlaying = false, onScoreUpdate }) => {
   const { cols, rows, dotSize, gap } = getBoardConfig();
 
   // Hook cho game Match 3
   const match3 = useMatch3(rows, cols, isPlaying && screen === 'MATCH3');
+
+  // Sync score with parent
+  useEffect(() => {
+    if (screen === 'MATCH3' && isPlaying && onScoreUpdate) {
+      onScoreUpdate(match3.score);
+      console.log("Match 3 Score:", match3.score);
+    }
+  }, [match3.score, screen, isPlaying, onScoreUpdate]);
 
   // Chỉ dùng fullboard khi đang CHƠI game (không phải preview)
   const useFullboard = isPlaying && FULLBOARD_GAMES.includes(screen);
@@ -95,12 +103,12 @@ const GameMatrix = ({ screen = 'HEART', isPlaying = false }) => {
   }
 
   /* --- Logic Drag-to-Scroll --- */
-  const scrollRef = React.useRef(null);
-  const [isDragging, setIsDragging] = React.useState(false);
-  const [startX, setStartX] = React.useState(0);
-  const [startY, setStartY] = React.useState(0);
-  const [scrollLeft, setScrollLeft] = React.useState(0);
-  const [scrollTop, setScrollTop] = React.useState(0);
+  const scrollRef = useRef(null);
+  const [isDragging, setIsDragging] = useState(false);
+  const [startX, setStartX] = useState(0);
+  const [startY, setStartY] = useState(0);
+  const [scrollLeft, setScrollLeft] = useState(0);
+  const [scrollTop, setScrollTop] = useState(0);
 
   const onMouseDown = (e) => {
     setIsDragging(true);

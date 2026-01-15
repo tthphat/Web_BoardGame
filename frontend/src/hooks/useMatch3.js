@@ -48,6 +48,7 @@ export const useMatch3 = (rows, cols, isPlaying) => {
     const [board, setBoard] = useState([]);
     const [selected, setSelected] = useState(null); // {r, c}
     const [isAnimating, setIsAnimating] = useState(false);
+    const [score, setScore] = useState(0);
 
     // Initialize board when game starts
     useEffect(() => {
@@ -55,6 +56,7 @@ export const useMatch3 = (rows, cols, isPlaying) => {
             // Generate board efficiently without immediate matches
             const initialBoard = generateBoard(rows, cols);
             setBoard(initialBoard);
+            setScore(0);
         }
     }, [isPlaying, rows, cols]);
 
@@ -176,6 +178,9 @@ export const useMatch3 = (rows, cols, isPlaying) => {
                 break;
             }
 
+            // Increase score
+            setScore(prev => prev + matches.length);
+
             // Xóa matches
             newBoard = removeMatches(newBoard, matches);
             setBoard([...newBoard]);
@@ -250,6 +255,7 @@ export const useMatch3 = (rows, cols, isPlaying) => {
         board,
         selected,
         handlePixelClick,
-        isAnimating
+        isAnimating,
+        score
     };
 };
