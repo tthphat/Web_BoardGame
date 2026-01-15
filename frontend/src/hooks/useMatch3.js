@@ -14,7 +14,30 @@ const generateBoard = (rows, cols) => {
     for (let r = 0; r < rows; r++) {
         const row = [];
         for (let c = 0; c < cols; c++) {
-            row.push(COLORS[Math.floor(Math.random() * COLORS.length)]);
+            // Pick a random color that doesn't create a match
+            let validColors = [...COLORS];
+
+            // Avoid creating a horizontal match (check left 2)
+            if (c >= 2) {
+                const color1 = row[c - 1];
+                const color2 = row[c - 2];
+                if (color1 === color2) {
+                    validColors = validColors.filter(color => color !== color1);
+                }
+            }
+
+            // Avoid creating a vertical match (check up 2)
+            if (r >= 2) {
+                const color1 = board[r - 1][c];
+                const color2 = board[r - 2][c];
+                if (color1 === color2) {
+                    validColors = validColors.filter(color => color !== color1);
+                }
+            }
+
+            // If strictly needed, we could have a fallback if validColors is empty, 
+            // but with 4+ colors it's impossible to run out (max 2 constraints).
+            row.push(validColors[Math.floor(Math.random() * validColors.length)]);
         }
         board.push(row);
     }
@@ -24,34 +47,190 @@ const generateBoard = (rows, cols) => {
 export const useMatch3 = (rows, cols, isPlaying) => {
     const [board, setBoard] = useState([]);
     const [selected, setSelected] = useState(null); // {r, c}
+    const [isAnimating, setIsAnimating] = useState(false);
 
     // Initialize board when game starts
     useEffect(() => {
         if (isPlaying) {
-            setBoard(generateBoard(rows, cols));
+            // Generate board efficiently without immediate matches
+            const initialBoard = generateBoard(rows, cols);
+            setBoard(initialBoard);
         }
     }, [isPlaying, rows, cols]);
 
-    const handleSwap = (r1, c1, r2, c2) => {
-        const newBoard = [...board.map(row => [...row])];
+    // Kiểm tra có match 3+ ô cùng màu không
+    const hasMatches = (currentBoard) => {
+        const matches = findMatches(currentBoard);
+        return matches.length > 0;
+    };
+
+    // Tìm tất cả các match (ngang và dọc)
+    const findMatches = (currentBoard) => {
+        const matches = [];
+        const matched = Array(rows).fill(null).map(() => Array(cols).fill(false));
+
+        // Check horizontal matches
+        for (let r = 0; r < rows; r++) {
+            for (let c = 0; c < cols - 2; c++) {
+                const color = currentBoard[r][c];
+                if (!color) continue;
+
+                let matchLength = 1;
+                while (c + matchLength < cols && currentBoard[r][c + matchLength] === color) {
+                    matchLength++;
+                }
+
+                if (matchLength >= 3) {
+                    for (let i = 0; i < matchLength; i++) {
+                        matched[r][c + i] = true;
+                    }
+                    c += matchLength - 1;
+                }
+            }
+        }
+
+        // Check vertical matches
+        for (let c = 0; c < cols; c++) {
+            for (let r = 0; r < rows - 2; r++) {
+                const color = currentBoard[r][c];
+                if (!color) continue;
+
+                let matchLength = 1;
+                while (r + matchLength < rows && currentBoard[r + matchLength][c] === color) {
+                    matchLength++;
+                }
+
+                if (matchLength >= 3) {
+                    for (let i = 0; i < matchLength; i++) {
+                        matched[r + i][c] = true;
+                    }
+                    r += matchLength - 1;
+                }
+            }
+        }
+
+        // Collect all matched positions
+        for (let r = 0; r < rows; r++) {
+            for (let c = 0; c < cols; c++) {
+                if (matched[r][c]) {
+                    matches.push({ r, c });
+                }
+            }
+        }
+
+        return matches;
+    };
+
+    // Xóa các ô match
+    const removeMatches = (currentBoard, matches) => {
+        const newBoard = currentBoard.map(row => [...row]);
+        matches.forEach(({ r, c }) => {
+            newBoard[r][c] = null;
+        });
+        return newBoard;
+    };
+
+    // Áp dụng gravity - các ô rơi xuống
+    const applyGravity = (currentBoard) => {
+        const newBoard = Array(rows).fill(null).map(() => Array(cols).fill(null));
+
+        for (let c = 0; c < cols; c++) {
+            let writeRow = rows - 1;
+            // Duyệt từ dưới lên
+            for (let r = rows - 1; r >= 0; r--) {
+                if (currentBoard[r][c]) {
+                    newBoard[writeRow][c] = currentBoard[r][c];
+                    writeRow--;
+                }
+            }
+        }
+
+        return newBoard;
+    };
+
+    // Lấp đầy board bằng ô mới
+    const fillBoard = (currentBoard) => {
+        const newBoard = currentBoard.map(row => [...row]);
+
+        for (let c = 0; c < cols; c++) {
+            for (let r = 0; r < rows; r++) {
+                if (!newBoard[r][c]) {
+                    newBoard[r][c] = COLORS[Math.floor(Math.random() * COLORS.length)];
+                }
+            }
+        }
+
+        return newBoard;
+    };
+
+    // Xử lý cascade matches (liên tục kiểm tra và xóa)
+    const processCascade = async (currentBoard) => {
+        let newBoard = currentBoard;
+        let hasMoreMatches = true;
+
+        while (hasMoreMatches) {
+            const matches = findMatches(newBoard);
+
+            if (matches.length === 0) {
+                hasMoreMatches = false;
+                break;
+            }
+
+            // Xóa matches
+            newBoard = removeMatches(newBoard, matches);
+            setBoard([...newBoard]);
+            await delay(300);
+
+            // Áp dụng gravity
+            newBoard = applyGravity(newBoard);
+            setBoard([...newBoard]);
+            await delay(300);
+
+            // Lấp đầy
+            newBoard = fillBoard(newBoard);
+            setBoard([...newBoard]);
+            await delay(300);
+        }
+
+        return newBoard;
+    };
+
+    const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
+    const handleSwap = async (r1, c1, r2, c2) => {
+        if (isAnimating) return;
+
+        setIsAnimating(true);
+
+        // Swap
+        const newBoard = board.map(row => [...row]);
         const temp = newBoard[r1][c1];
         newBoard[r1][c1] = newBoard[r2][c2];
         newBoard[r2][c2] = temp;
         setBoard(newBoard);
+        await delay(200);
 
-        // TODO: Check for matches here and revert if no match, 
-        // handle gravity, etc. For now, simple swap.
+        // Kiểm tra có match không
+        const matches = findMatches(newBoard);
 
-        // Reset selection
+        if (matches.length === 0) {
+            // Không có match -> hoàn tác swap
+            const revertBoard = newBoard.map(row => [...row]);
+            revertBoard[r1][c1] = newBoard[r2][c2];
+            revertBoard[r2][c2] = newBoard[r1][c1];
+            setBoard(revertBoard);
+            await delay(200);
+        } else {
+            // Có match -> xử lý cascade
+            await processCascade(newBoard);
+        }
+
         setSelected(null);
+        setIsAnimating(false);
     };
 
     const handlePixelClick = (r, c) => {
-        if (!isPlaying) return;
-
-        // Convert from 1-based index (UI) to 0-based (Logic) if necessary, 
-        // but let's assume UI component passes 0-based or we adjust.
-        // The GameMatrix uses 1-based usually. Let's assume input is correct.
+        if (!isPlaying || isAnimating) return;
 
         if (!selected) {
             setSelected({ r, c });
@@ -70,6 +249,7 @@ export const useMatch3 = (rows, cols, isPlaying) => {
     return {
         board,
         selected,
-        handlePixelClick
+        handlePixelClick,
+        isAnimating
     };
 };
