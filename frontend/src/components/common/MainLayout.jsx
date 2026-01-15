@@ -48,19 +48,31 @@ const MainLayout = () => {
   };
 
   return (
-    <div className="flex h-screen w-full bg-gray-100 dark:bg-[#111827] overflow-hidden transition-colors duration-300">
-      <Sidebar activeItem={activeItem} setActiveItem={handleNavigation} />
+    // THAY ĐỔI 1: Outer Container dùng flex-col (Dọc) thay vì mặc định (Ngang)
+    <div className="flex flex-col h-screen w-full bg-gray-100 dark:bg-[#111827] overflow-hidden transition-colors duration-300">
       
-      <div className="flex-1 flex flex-col h-full relative">
-        <Header 
-            onNavigate={handleNavigation} 
-            onLogout={handleLogout}
-        />
-        <main className="flex-1 overflow-y-auto p-6 scroll-smooth bg-[#008080] dark:bg-[#111827]"> 
-           <Outlet />
-        </main>
-        <Footer/>
+      {/* THAY ĐỔI 2: Đưa Header ra ngoài cùng -> Full width */}
+      <Header 
+        onNavigate={handleNavigation} 
+        onLogout={handleLogout}
+      />
+      
+      {/* THAY ĐỔI 3: Tạo một Container ở giữa chứa Sidebar và Main Content (Ngang) */}
+      <div className="flex flex-1 overflow-hidden relative">
+          
+          {/* Sidebar nằm bên trái */}
+          <Sidebar activeItem={activeItem} setActiveItem={handleNavigation} />
+          
+          {/* Main Content nằm bên phải, chiếm hết phần còn lại */}
+          <main className="flex-1 overflow-y-auto p-6 scroll-smooth bg-[#008080] dark:bg-[#111827]"> 
+             <Outlet />
+          </main>
+
       </div>
+
+      {/* THAY ĐỔI 4: Đưa Footer ra ngoài cùng -> Full width */}
+      <Footer/>
+      
     </div>
   );
 };
