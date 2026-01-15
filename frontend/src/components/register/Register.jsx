@@ -1,12 +1,11 @@
 import { useAuth } from "@/contexts/AuthContext";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { loginSchema } from "@/lib/login.schema";
+import { registerSchema } from "@/lib/register.schema";
 import { useNavigate } from "react-router-dom";
-import { toast } from "sonner";
 
-function Login() {
-    const { login } = useAuth();
+function Register() {
+    const { signup } = useAuth();
     const navigate = useNavigate();
 
     const {
@@ -15,16 +14,14 @@ function Login() {
         formState: { errors, isSubmitting },
         setError,
     } = useForm({
-        resolver: zodResolver(loginSchema),
+        resolver: zodResolver(registerSchema),
     });
 
     const onSubmit = async (data) => {
         try {
-            await login(data);
-            toast.success("Login thành công");
-            navigate("/");
+            await signup(data);
+            navigate("/login");
         } catch (error) {
-            toast.error("Login thất bại");
             setError("root", { message: error.message });
         }
     }
@@ -41,7 +38,7 @@ function Login() {
                 {/* Title Bar: Style Retro Sunken Inset */}
                 <div className="bg-retro-navy dark:bg-[#1a1a1a] px-3 py-1 flex justify-between items-center mb-4 
                     border-b-2 border-b-retro-shadow dark:border-b-black">
-                    <h2 className="text-white dark:text-yellow-500 font-bold text-sm uppercase tracking-wider">Login.exe</h2>
+                    <h2 className="text-white dark:text-yellow-500 font-bold text-sm uppercase tracking-wider">Register.exe</h2>
                     <div className="flex gap-1">
                         <div className="w-4 h-4 bg-retro-silver border border-t-retro-highlight border-l-retro-highlight border-b-black border-r-black"></div>
                         <div className="w-4 h-4 bg-retro-silver border border-t-retro-highlight border-l-retro-highlight border-b-black border-r-black"></div>
@@ -51,6 +48,7 @@ function Login() {
 
                 <div className="p-6 pt-2">
                     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+                        {/* Email */}
                         <div className="space-y-2">
                             <label className="block text-sm font-bold text-black dark:text-white uppercase">Email:</label>
                             <input
@@ -65,6 +63,22 @@ function Login() {
                             {errors.email && <p className="text-red-700 dark:text-red-400 text-[10px] font-bold uppercase">{errors.email.message}</p>}
                         </div>
 
+                        {/* Username */}
+                        <div className="space-y-2">
+                            <label className="block text-sm font-bold text-black dark:text-white uppercase">Username:</label>
+                            <input
+                                type="text"
+                                {...register("username")}
+                                className="w-full bg-white dark:bg-[#404040] p-2 text-black dark:text-white
+                                border-2 
+                                border-t-retro-shadow border-l-retro-shadow border-b-retro-highlight border-r-retro-highlight
+                                dark:border-t-black dark:border-l-black dark:border-b-[#606060] dark:border-r-[#606060]
+                                outline-none focus:ring-1 focus:ring-retro-navy"
+                            />
+                            {errors.username && <p className="text-red-700 dark:text-red-400 text-[10px] font-bold uppercase">{errors.username.message}</p>}
+                        </div>
+
+                        {/* Password */}
                         <div className="space-y-2">
                             <label className="block text-sm font-bold text-black dark:text-white uppercase">Password:</label>
                             <input
@@ -77,6 +91,21 @@ function Login() {
                                 outline-none focus:ring-1 focus:ring-retro-navy"
                             />
                             {errors.password && <p className="text-red-700 dark:text-red-400 text-[10px] font-bold uppercase">{errors.password.message}</p>}
+                        </div>
+
+                        {/* Confirm Password */}
+                        <div className="space-y-2">
+                            <label className="block text-sm font-bold text-black dark:text-white uppercase">Confirm Password:</label>
+                            <input
+                                type="password"
+                                {...register("confirmPassword")}
+                                className="w-full bg-white dark:bg-[#404040] p-2 text-black dark:text-white
+                                border-2 
+                                border-t-retro-shadow border-l-retro-shadow border-b-retro-highlight border-r-retro-highlight
+                                dark:border-t-black dark:border-l-black dark:border-b-[#606060] dark:border-r-[#606060]
+                                outline-none focus:ring-1 focus:ring-retro-navy"
+                            />
+                            {errors.confirmPassword && <p className="text-red-700 dark:text-red-400 text-[10px] font-bold uppercase">{errors.confirmPassword.message}</p>}
                         </div>
 
                         <button
@@ -92,7 +121,7 @@ function Login() {
                             disabled:opacity-50
                             hover:bg-retro-navy hover:text-white dark:hover:bg-[#606060] dark:hover:text-yellow-500"
                         >
-                            {isSubmitting ? "Processing..." : "Submit"}
+                            {isSubmitting ? "Processing..." : "Register"}
                         </button>
                     </form>
 
@@ -107,4 +136,4 @@ function Login() {
     );
 }
 
-export default Login;
+export default Register;
