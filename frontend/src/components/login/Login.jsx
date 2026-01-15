@@ -75,7 +75,8 @@ function Login() {
                             dark:border-t-[#606060] dark:border-l-[#606060] dark:border-b-black dark:border-r-black
                             active:border-t-retro-shadow active:border-l-retro-shadow active:border-b-retro-highlight active:border-r-retro-highlight 
                             active:translate-y-0.5 transition-all
-                            disabled:opacity-50"
+                            disabled:opacity-50
+                            hover:bg-retro-navy hover:text-white dark:hover:bg-[#606060] dark:hover:text-yellow-500"
                         >
                             {isSubmitting ? "Processing..." : "Submit"}
                         </button>
