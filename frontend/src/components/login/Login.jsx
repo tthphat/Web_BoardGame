@@ -3,6 +3,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { loginSchema } from "@/lib/login.schema";
 import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 
 function Login() {
     const { login } = useAuth();
@@ -20,8 +21,10 @@ function Login() {
     const onSubmit = async (data) => {
         try {
             await login(data);
+            toast.success("Login thành công");
             navigate("/");
         } catch (error) {
+            toast.error("Login thất bại");
             setError("root", { message: error.message });
         }
     }
