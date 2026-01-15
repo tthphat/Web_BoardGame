@@ -50,21 +50,17 @@ export const useMatch3 = (rows, cols, isPlaying) => {
     const [isAnimating, setIsAnimating] = useState(false);
     const [score, setScore] = useState(0);
 
-    // Initialize board when game starts
+    // Initialize board when game starts - logic moved inside useEffect to avoid warning
     useEffect(() => {
-        if (isPlaying) {
-            // Generate board efficiently without immediate matches
-            const initialBoard = generateBoard(rows, cols);
-            setBoard(initialBoard);
-            setScore(0);
+        if (!isPlaying) {
+            setBoard([]);
+            return;
         }
-    }, [isPlaying, rows, cols]);
 
-    // Kiểm tra có match 3+ ô cùng màu không
-    const hasMatches = (currentBoard) => {
-        const matches = findMatches(currentBoard);
-        return matches.length > 0;
-    };
+        const initialBoard = generateBoard(rows, cols);
+        setBoard(initialBoard);
+        setScore(0);
+    }, [isPlaying, rows, cols]);
 
     // Tìm tất cả các match (ngang và dọc)
     const findMatches = (currentBoard) => {
