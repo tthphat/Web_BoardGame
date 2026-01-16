@@ -62,4 +62,37 @@ export const AuthController = {
         }
     },
 
+    // =============
+    // Verify Email
+    // =============
+    async verifyEmail(req, res, next) {
+        try {
+            const { email } = req.body;
+
+            if (!email) {
+                throw new Error("Email is required");
+            }
+
+            const user = await AuthService.verifyEmail(email);
+
+            res.cookie("token", user.data.token, {
+                httpOnly: true,
+                secure: process.env.NODE_ENV === "production",
+                sameSite: "lax",
+                maxAge: 24 * 60 * 60 * 1000
+            });
+
+            console.log(user);
+
+            res.json({
+                data: {
+                    user: user.data.user
+                }
+            });
+
+        } catch (error) {
+            next(error);
+        }
+    },
+
 }

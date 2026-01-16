@@ -146,5 +146,73 @@ export const AuthService = {
         }
     },
 
+    // =============
+    // Verify OTP
+    // =============
+    async verifyEmail(email, otp) {
+        try {
+            const { data: user, error } = await UserModel.findUserByEmail(email);
+            if (error || !user) {
+                throw new Error("User not found");
+            }
+
+            // check expired otp
+            if (user.otp_expires < new Date()) {
+                throw new Error("OTP expired");
+            }
+
+            const otp_hash = crypto
+                .createHash("sha256")
+                .update(otp)
+                .digest("hex");
+
+            if (user.otp_hash !== otp_hash) {
+                // Tăng số lần thử
+                const newAttempts = (user.otp_attempts || 0) + 1;
+                await UserModel.updateUser(user.id, { otp_attempts: newAttempts });
+
+                if (newAttempts >= 3) {
+                    await UserModel.deleteUser(user.id);
+                    throw new Error("Too many attempts. Please register again.");
+                }
+
+                throw new Error(`OTP invalid. You have ${3 - newAttempts} attempts left.`);
+            }
+
+            // reset otp attempts
+            const { error: updateError } = await UserModel.updateUser(user.id,
+                { otp_attempts: 0, otp_hash: null, otp_expires: null, state: "active" });
+
+            if (updateError) {
+                throw new Error("Lỗi khi cập nhật OTP");
+            }
+
+            // Tạo JWT
+            const token = jwt.sign(
+                {
+                    userid: user.userid,
+                    role: user.role,
+                    email: user.email,
+                },
+                process.env.JWT_SECRET,
+                { expiresIn: process.env.JWT_EXPIRES_IN }
+            );
+
+            return {
+                data: {
+                    token,
+                    user: {
+                        email: user.email,
+                        role: user.role,
+                        id: user.id,
+                        username: user.username,
+                    }
+                }
+            };
+        } catch (error) {
+            throw error;
+        }
+    },
+
 }
 
