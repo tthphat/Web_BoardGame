@@ -117,4 +117,20 @@ export const AuthController = {
             next(error);
         }
     },
+
+    // =============
+    // Get User Profile
+    // =============
+    async getProfile(req, res, next) {
+        try {
+            const user = await AuthService.getProfile(req.user.id);
+            res.json({
+                data: {
+                    user: user.data.user
+                }
+            });
+        } catch (error) {
+            next(error);
+        }
+    },
 }

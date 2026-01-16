@@ -190,7 +190,7 @@ export const AuthService = {
             // Tạo JWT
             const token = jwt.sign(
                 {
-                    userid: user.userid,
+                    id: user.id,
                     role: user.role,
                     email: user.email,
                 },
