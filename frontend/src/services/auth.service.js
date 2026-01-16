@@ -107,3 +107,26 @@ export async function getProfileApi() {
     console.log("Fontend-Auth-Service: Get profile API output: ", data);
     return data;
 }
+
+// Edit profile
+export async function editProfileApi(payload) {
+    console.log("Fontend-Auth-Service: Edit profile API input: ", payload);
+
+    const response = await fetch("/api/user/profile", {
+        method: "PATCH",
+        credentials: "include",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+        throw new Error(data.message || data.error || "Edit profile failed");
+    }
+
+    console.log("Fontend-Auth-Service: Edit profile API output: ", data);
+    return data;
+}
