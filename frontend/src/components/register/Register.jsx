@@ -22,7 +22,7 @@ function Register() {
             await signup(data);
             navigate("/verify-email");
         } catch (error) {
-            setError("root", { message: error.message });
+            setError("email", { message: error.message });
         }
     }
 

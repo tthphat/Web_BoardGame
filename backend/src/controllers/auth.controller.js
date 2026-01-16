@@ -51,6 +51,8 @@ export const AuthController = {
 
             const user = await AuthService.register(email, password, username);
 
+            console.log("Backend-Auth-Controller: Register API output: ", user);
+
             res.json({
                 data: {
                     user: user.data.user
@@ -67,13 +69,13 @@ export const AuthController = {
     // =============
     async verifyEmail(req, res, next) {
         try {
-            const { email } = req.body;
+            const { email, otp } = req.body;
 
-            if (!email) {
-                throw new Error("Email is required");
+            if (!email || !otp) {
+                throw new Error("Email and OTP are required");
             }
 
-            const user = await AuthService.verifyEmail(email);
+            const user = await AuthService.verifyEmail(email, otp);
 
             res.cookie("token", user.data.token, {
                 httpOnly: true,
@@ -82,7 +84,7 @@ export const AuthController = {
                 maxAge: 24 * 60 * 60 * 1000
             });
 
-            console.log(user);
+            console.log("Backend-Auth-Controller: Verify Email API output: ", user);
 
             res.json({
                 data: {

@@ -61,7 +61,7 @@ export const AuthService = {
             // check existed user
             const { data: user } = await UserModel.findUserByEmail(email);
             if (user) {
-                if (user.state === "peding") {
+                if (user.state === "pending") {
                     await UserModel.deleteUser(user.id);
                 } else {
                     throw new Error("User already exists");
@@ -195,7 +195,7 @@ export const AuthService = {
                     email: user.email,
                 },
                 process.env.JWT_SECRET,
-                { expiresIn: process.env.JWT_EXPIRES_IN }
+                { expiresIn: "1h" }
             );
 
             return {
