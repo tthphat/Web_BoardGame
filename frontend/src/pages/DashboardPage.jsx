@@ -101,7 +101,13 @@ const DashboardPage = () => {
               <GameControls
                 onLeft={handlePrevScreen}
                 onRight={handleNextScreen}
-                onBack={() => alert("Back pressed")}
+                onBack={() => {
+                  if (isPlaying) {
+                    setIsPlaying(false);
+                    setScore(0);
+                    setTicTacToeState({ currentPlayer: 'X', winner: null, resetGame: null });
+                  }
+                }}
                 onEnter={handleEnter}
               />
             </div>
