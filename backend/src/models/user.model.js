@@ -52,6 +52,19 @@ export const UserModel = {
         } catch (error) {
             return { data: null, error };
         }
+    },
+
+    // Find user by id
+    async findUserById(id) {
+        try {
+            const user = await knex("users")
+                .where({ id })
+                .first();
+
+            return { data: user, error: null };
+        } catch (error) {
+            return { data: null, error };
+        }
     }
 
 }

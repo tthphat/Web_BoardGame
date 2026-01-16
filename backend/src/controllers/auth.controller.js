@@ -18,7 +18,7 @@ export const AuthController = {
 
             const user = await AuthService.login(email, password);
 
-            res.cookie("token", user.data.token, {
+            res.cookie("access_token", user.data.token, {
                 httpOnly: true,
                 secure: process.env.NODE_ENV === "production",
                 sameSite: "lax",
@@ -77,7 +77,7 @@ export const AuthController = {
 
             const user = await AuthService.verifyEmail(email, otp);
 
-            res.cookie("token", user.data.token, {
+            res.cookie("access_token", user.data.token, {
                 httpOnly: true,
                 secure: process.env.NODE_ENV === "production",
                 sameSite: "lax",
