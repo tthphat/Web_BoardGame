@@ -5,6 +5,7 @@ import swaggerUi from "swagger-ui-express";
 import swaggerSpec from "./config/swagger.js";
 
 import authRoute from "./routes/auth.route.js";
+import achievementRoute from "./routes/achievement.route.js";
 import errorHandler from "./middlewares/error.middleware.js";
 import cookieParser from "cookie-parser";
 
@@ -16,6 +17,7 @@ app.use(express.json());
 app.use(cookieParser());
 
 app.use("/api/auth", authRoute);
+app.use("/api/achievements", achievementRoute);
 
 app.use(errorHandler);
 

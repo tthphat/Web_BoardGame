@@ -3,7 +3,8 @@ import {
 } from "../models/achievement.model.js";
 
 import {
-    addUserAchievement
+    addUserAchievement,
+    getUserAchievements
 } from "../models/userAchievement.model.js";
 
 export class AchievementService {
@@ -18,5 +19,9 @@ export class AchievementService {
         });
 
         return achievement;
+    }
+
+    static async getUserAchievements(knex, userId, gameSlug) {
+        return await getUserAchievements(knex, userId, gameSlug);
     }
 }
