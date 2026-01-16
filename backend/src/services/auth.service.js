@@ -4,7 +4,9 @@ import jwt from "jsonwebtoken";
 
 
 export const AuthService = {
-    // login
+    // =============
+    // Login
+    // =============
     async login(email, password) {
         try {
             // check existed user
@@ -49,7 +51,9 @@ export const AuthService = {
         }
     },
 
+    // =============
     // Register
+    // =============
     async register(email, password) {
         try {
             // check existed user
@@ -89,7 +93,7 @@ export const AuthService = {
             });
 
             // send otp
-            await sendOtp(email, otp);
+            await AuthService.sendOtpEmail(email, otp);
 
             return {
                 data: {
@@ -101,6 +105,40 @@ export const AuthService = {
         } catch (error) {
             next(error);
         }
-    }
+    },
+
+    // =============
+    // Send Email
+    // =============
+    async sendOtpEmail(email, otp) {
+        const res = await fetch("https://api.brevo.com/v3/smtp/email", {
+            method: "POST",
+            headers: {
+                "accept": "application/json",
+                "api-key": process.env.BREVO_API_KEY,
+                "content-type": "application/json",
+            },
+            body: JSON.stringify({
+                sender: {
+                    name: process.env.BREVO_SENDER_NAME,
+                    email: process.env.BREVO_SENDER_EMAIL,
+                },
+                to: [{ email }],
+                subject: "Mã xác nhận OTP",
+                htmlContent: `
+          <p>Bạn vừa yêu cầu đặt lại mật khẩu.</p>
+          <h2 style="letter-spacing:2px">${otp}</h2>
+          <p>Mã có hiệu lực trong <b>5 phút</b>.</p>
+          <p>Nếu không phải bạn, hãy bỏ qua email này.</p>
+        `,
+            }),
+        });
+
+        if (!res.ok) {
+            const err = await res.text();
+            throw new Error("Brevo send mail failed: " + err);
+        }
+    },
+
 }
 

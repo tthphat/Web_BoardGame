@@ -5,6 +5,9 @@ dotenv.config();
 
 export const AuthController = {
 
+    // =============
+    // Login
+    // =============
     async login(req, res, next) {
         try {
             const { email, password } = req.body;
@@ -33,7 +36,30 @@ export const AuthController = {
         } catch (error) {
             next(error);
         }
-    }
+    },
 
+    // =============
+    // Register
+    // =============
+    async register(req, res, next) {
+        try {
+            const { email, password } = req.body;
+
+            if (!email || !password) {
+                throw new Error("Email and password are required");
+            }
+
+            const user = await AuthService.register(email, password);
+
+            res.json({
+                data: {
+                    user: user.data.user
+                }
+            });
+
+        } catch (error) {
+            next(error);
+        }
+    },
 
 }
