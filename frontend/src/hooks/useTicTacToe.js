@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 
 // Winning combinations (indices 0-8 for 3x3 grid)
 const WINNING_LINES = [
@@ -63,7 +63,31 @@ const O_SHAPE = [
     { dr: 1, dc: 0 },
 ];
 
-export const useTicTacToe = (isPlaying) => {
+// Tìm các ô trống trên board
+const getEmptyCells = (board) => {
+    const emptyCells = [];
+    board.forEach((cell, index) => {
+        if (cell === null) emptyCells.push(index);
+    });
+    return emptyCells;
+};
+
+// Check winner - định nghĩa bên ngoài hook để dùng chung
+const checkWinnerResult = (newBoard) => {
+    for (const line of WINNING_LINES) {
+        const [a, b, c] = line;
+        if (newBoard[a] && newBoard[a] === newBoard[b] && newBoard[a] === newBoard[c]) {
+            return { winner: newBoard[a], line };
+        }
+    }
+    // Check for draw
+    if (newBoard.every(cell => cell !== null)) {
+        return { winner: 'DRAW', line: [] };
+    }
+    return null;
+};
+
+export const useTicTacToe = (isPlaying, botEnabled = false) => {
     const [board, setBoard] = useState(Array(9).fill(null)); // null, 'X', or 'O'
     const [currentPlayer, setCurrentPlayer] = useState('X');
     const [winner, setWinner] = useState(null);
@@ -79,20 +103,45 @@ export const useTicTacToe = (isPlaying) => {
         }
     }, [isPlaying]);
 
-    // Check winner
-    const checkWinner = (newBoard) => {
-        for (const line of WINNING_LINES) {
-            const [a, b, c] = line;
-            if (newBoard[a] && newBoard[a] === newBoard[b] && newBoard[a] === newBoard[c]) {
-                return { winner: newBoard[a], line };
-            }
+    // Bot logic - đi random khi đến lượt O
+    const makeBotMove = useCallback((currentBoard) => {
+        const emptyCells = getEmptyCells(currentBoard);
+        if (emptyCells.length === 0) return;
+        
+        // Chọn random một ô trống
+        const randomIndex = Math.floor(Math.random() * emptyCells.length);
+        const botMove = emptyCells[randomIndex];
+        
+        // Đặt quân O
+        const newBoard = [...currentBoard];
+        newBoard[botMove] = 'O';
+        setBoard(newBoard);
+        
+        // Kiểm tra thắng
+        const result = checkWinnerResult(newBoard);
+        if (result) {
+            setWinner(result.winner);
+            setWinningLine(result.line);
+        } else {
+            setCurrentPlayer('X');
         }
-        // Check for draw
-        if (newBoard.every(cell => cell !== null)) {
-            return { winner: 'DRAW', line: [] };
-        }
-        return null;
-    };
+    }, []);
+
+    // Bot tự động đi khi đến lượt O
+    useEffect(() => {
+        if (!isPlaying || !botEnabled || winner) return;
+        if (currentPlayer !== 'O') return;
+        
+        // Delay 500ms để người chơi thấy rõ nước đi
+        const timer = setTimeout(() => {
+            makeBotMove(board);
+        }, 500);
+        
+        return () => clearTimeout(timer);
+    }, [currentPlayer, isPlaying, botEnabled, winner, board, makeBotMove]);
+
+    // Check winner (wrapper cho hàm bên ngoài)
+    const checkWinner = checkWinnerResult;
 
     // Handle pixel click - convert to cell and place piece
     const handlePixelClick = (r, c) => {
