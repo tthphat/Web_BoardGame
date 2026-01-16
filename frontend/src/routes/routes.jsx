@@ -4,6 +4,7 @@ import DashboardPage from "../pages/DashboardPage";
 import DemoPage from "../pages/DemoPage";
 import LoginPage from "../pages/auth/LoginPage";
 import RegisterPage from "../pages/auth/RegisterPage";
+import AdminMainLayout from "../layouts/AdminMainLayout";
 import VerifyEmail from "../components/register/VerifyEmail";
 
 export const router = createBrowserRouter([
@@ -13,6 +14,10 @@ export const router = createBrowserRouter([
 
     { path: "/verify-email", element: <VerifyEmail /> },
 
+    {
+        path: "/admin",
+        element: <AdminMainLayout/>
+    },
     {
         path: "/",
         element: <MainLayout />,
