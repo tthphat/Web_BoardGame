@@ -1,4 +1,4 @@
-import { loginApi, registerApi } from "@/services/auth.service";
+import { loginApi, registerApi, verifyEmailApi } from "@/services/auth.service";
 import { useContext, createContext, useState } from "react";
 
 const AuthContext = createContext(null);
@@ -33,8 +33,21 @@ function AuthProvider({ children }) {
         }
     };
 
+    // verify email
+    const verifyEmail = async (payload) => {
+        setLoading(true);
+        try {
+            const response = await verifyEmailApi(payload);
+            setUser(response.data.user);
+        } catch (error) {
+            throw error;
+        } finally {
+            setLoading(false);
+        }
+    };
+
     return (
-        <AuthContext.Provider value={{ user, login, signup, loading }}>
+        <AuthContext.Provider value={{ user, login, signup, loading, setUser, verifyEmail }}>
             {children}
         </AuthContext.Provider>
     );

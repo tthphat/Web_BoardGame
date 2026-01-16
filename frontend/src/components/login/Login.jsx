@@ -25,7 +25,7 @@ function Login() {
             navigate("/");
         } catch (error) {
             toast.error("Login thất bại");
-            setError("root", { message: error.message });
+            setError("email", { message: error.message });
         }
     }
 

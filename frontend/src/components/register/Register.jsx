@@ -20,9 +20,9 @@ function Register() {
     const onSubmit = async (data) => {
         try {
             await signup(data);
-            navigate("/login");
+            navigate("/verify-email");
         } catch (error) {
-            setError("root", { message: error.message });
+            setError("email", { message: error.message });
         }
     }
 
