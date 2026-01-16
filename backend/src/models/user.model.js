@@ -14,5 +14,29 @@ export const UserModel = {
         }
     },
 
+    async createUser(data) {
+        try {
+            const [user] = await knex("users")
+                .insert(data)
+                .returning(["id", "email", "username", "role"]);
+
+            return { data: user, error: null };
+        } catch (error) {
+            return { data: null, error };
+        }
+    },
+
+    async deleteUser(id) {
+        try {
+            const user = await knex("users")
+                .where({ id })
+                .del();
+
+            return { data: user, error: null };
+        } catch (error) {
+            return { data: null, error };
+        }
+    }
+
 }
 
