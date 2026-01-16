@@ -45,17 +45,13 @@ const DashboardPage = () => {
     } else if (currentScreenName === 'MATCH3') {
       setIsPlaying(true);
       setScore(0);
-    } 
-    else if (currentScreenName === 'MEMORY') {
+    } else if (currentScreenName === 'MEMORY') {
       if (!isPlaying) {
         // Bắt đầu game:
         setIsPlaying(true);
         setScore(0);
-        memoryGame.initGame(); // <-- QUAN TRỌNG: Tạo bộ bài mới
+        memoryGame.initGame(); // Tạo bộ bài mới
       }
-    }
-    else {
-      alert("Enter pressed");
     } else {
       alert("Game chưa được implement!");
     }
@@ -78,7 +74,6 @@ const DashboardPage = () => {
 
         <div className="flex-1 flex flex-row border-2 border-t-[#808080] border-l-[#808080] border-b-white border-r-white dark:border-t-black dark:border-l-black dark:border-b-[#555] dark:border-r-[#555] p-1 overflow-hidden">
 
-
           <div className="flex-1 bg-black border-2 border-t-black border-l-black border-b-white border-r-white relative flex flex-col items-center justify-center overflow-hidden p-4">
             <div className="absolute top-4 left-4 text-green-500 font-mono text-xs z-10 opacity-70">
               {/* Hiển thị tên màn hình hiện tại */}
@@ -93,7 +88,7 @@ const DashboardPage = () => {
                 isPlaying={isPlaying}
                 onScoreUpdate={setScore}
                 onCardClick={memoryGame.handleCardClick}
-                activeGameState={memoryGame} 
+                activeGameState={memoryGame}
                 onGameStateUpdate={setTicTacToeState}
               />
             </div>
