@@ -214,5 +214,43 @@ export const AuthService = {
         }
     },
 
+    // resend OTP
+    async resendOtp(email) {
+        try {
+            const { data: user, error } = await UserModel.findUserByEmail(email);
+            if (error || !user) {
+                throw new Error("User not found");
+            }
+
+            // tạo otp mới
+            const otp = Math.floor(100000 + Math.random() * 900000).toString();
+
+            // Hash OTP
+            const otp_hash = crypto
+                .createHash("sha256")
+                .update(otp)
+                .digest("hex");
+
+            const otp_expires = new Date(Date.now() + 3 * 60 * 1000); // 3 phút mới
+            const otp_attempts = 0; // Reset số lần thử
+
+            // update otp
+            const { error: updateError } = await UserModel.updateUser(user.id,
+                { otp_hash, otp_expires, otp_attempts });
+
+            if (updateError) {
+                throw new Error("Lỗi khi cập nhật OTP");
+            }
+
+            // send otp
+            await AuthService.sendOtpEmail(email, otp);
+
+            return {
+                message: "OTP sent successfully"
+            };
+        } catch (error) {
+            throw error;
+        }
+    },
 }
 

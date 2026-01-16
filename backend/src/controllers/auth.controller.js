@@ -13,7 +13,7 @@ export const AuthController = {
             const { email, password } = req.body;
 
             if (!email || !password) {
-                throw new Error("Email and password are required");
+                return res.status(400).json({ error: "Email and password are required" });
             }
 
             const user = await AuthService.login(email, password);
@@ -46,7 +46,7 @@ export const AuthController = {
             const { email, password, username } = req.body;
 
             if (!email || !password) {
-                throw new Error("Email and password are required");
+                return res.status(400).json({ error: "Email and password are required" });
             }
 
             const user = await AuthService.register(email, password, username);
@@ -72,7 +72,7 @@ export const AuthController = {
             const { email, otp } = req.body;
 
             if (!email || !otp) {
-                throw new Error("Email and OTP are required");
+                return res.status(400).json({ error: "Email and OTP are required" });
             }
 
             const user = await AuthService.verifyEmail(email, otp);
@@ -97,4 +97,25 @@ export const AuthController = {
         }
     },
 
+    // resend OTP
+    async resendOtp(req, res, next) {
+        try {
+            const { email } = req.body;
+
+            if (!email) {
+                return res.status(400).json({ error: "Email is required" });
+            }
+
+            const user = await AuthService.resendOtp(email);
+
+            console.log("Backend-Auth-Controller: Resend OTP API output: ", user);
+
+            res.json({
+                message: "OTP sent successfully"
+            });
+
+        } catch (error) {
+            next(error);
+        }
+    },
 }
