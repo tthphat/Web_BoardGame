@@ -64,3 +64,24 @@ export async function verifyEmailApi(payload) {
     return data;
 }
 
+// Resend OTP
+export async function resendOTPApi(email) {
+    console.log("Fontend-Auth-Service: Resend OTP API input: ", email);
+
+    const response = await fetch("/api/auth/resend-otp", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email }),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+        throw new Error(data.message || data.error || "Resend OTP failed");
+    }
+
+    console.log("Fontend-Auth-Service: Resend OTP API output: ", data);
+    // return data;
+}
