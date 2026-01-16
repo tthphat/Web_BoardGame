@@ -26,15 +26,16 @@ const GameMatrix = ({
   onScoreUpdate, 
   onGameStateUpdate,
   activeGameState, 
-  onCardClick 
+  onCardClick,
+  botEnabled = false  // Thêm prop cho bot TicTacToe
 }) => {
   const { cols, rows, dotSize, gap } = getBoardConfig();
 
   // Hook cho game Match 3
   const match3 = useMatch3(rows, cols, isPlaying && screen === 'MATCH3');
 
-  // Hook cho game TicTacToe
-  const ticTacToe = useTicTacToe(isPlaying && screen === 'TICTACTOE');
+  // Hook cho game TicTacToe (truyền botEnabled)
+  const ticTacToe = useTicTacToe(isPlaying && screen === 'TICTACTOE', botEnabled);
 
   // Hook cho game Caro4
   const caro = useCaro(isPlaying && screen === 'CARO4');

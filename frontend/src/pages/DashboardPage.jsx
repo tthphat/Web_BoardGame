@@ -126,6 +126,7 @@ const DashboardPage = () => {
                 onScoreUpdate={setScore}
                 onCardClick={memoryGame.handleCardClick}
                 activeGameState={memoryGame}
+                botEnabled={true}  // Bật bot cho TicTacToe
                 onGameStateUpdate={(newState) => {
                   if (currentScreenName === 'TICTACTOE') {
                     setTicTacToeState(newState);
