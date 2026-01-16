@@ -1,5 +1,5 @@
 export async function seed(knex) {
-  await knex("games").del();
+  // await knex("games").del();
 
   await knex("games").insert([
     {
@@ -44,5 +44,5 @@ export async function seed(knex) {
       board_size: 3, // EXTRA_LARGE
       enabled: true
     }
-  ]);
+  ]).onConflict("slug").merge();
 }

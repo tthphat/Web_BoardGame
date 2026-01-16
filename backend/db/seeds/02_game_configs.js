@@ -1,7 +1,8 @@
 export async function seed(knex) {
+  // await knex("board_configs").del(); // Removed to avoid FK violation
+
   await knex("board_configs").insert([
     {
-      id: 1,
       code: "MEDIUM",
       cols: 13,
       rows: 13,
@@ -9,7 +10,6 @@ export async function seed(knex) {
       gap: 8
     },
     {
-      id: 2,
       code: "LARGE",
       cols: 21,
       rows: 15,
@@ -17,12 +17,11 @@ export async function seed(knex) {
       gap: 6
     },
     {
-      id: 3,
       code: "EXTRA_LARGE",
       cols: 30,
       rows: 18,
       dot_size: 19,
       gap: 6
     }
-  ]);
+  ]).onConflict("code").merge();
 }
