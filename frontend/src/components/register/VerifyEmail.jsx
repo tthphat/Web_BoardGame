@@ -3,7 +3,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useNavigate } from "react-router-dom";
 import { InputOTP } from "@/components/ui/input-otp";
-import { verifyEmail } from "@/services/auth.service";
+import { verifyEmailApi } from "@/services/auth.service";
 import { useAuth } from "@/contexts/AuthContext";
 
 function VerifyEmail() {
@@ -25,7 +25,7 @@ function VerifyEmail() {
 
     const onSubmit = async (data) => {
         try {
-            await verifyEmail(user.email, data.otp);
+            await verifyEmailApi({ email: user.email, otp: data.otp });
             navigate("/login");
         } catch (error) {
             setError("root", { message: error.message });
@@ -34,7 +34,7 @@ function VerifyEmail() {
 
 
     return (
-        <div>
+        <div className="h-screen w-screen flex items-center justify-center bg-retro-teal dark:bg-[#1a1a1a] font-mono">
             <form onSubmit={handleSubmit(onSubmit)}>
                 <InputOTP
                     control={control}
