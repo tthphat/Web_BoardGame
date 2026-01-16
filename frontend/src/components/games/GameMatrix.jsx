@@ -40,8 +40,8 @@ const GameMatrix = ({
   // Hook cho game Caro4
   const caro = useCaro(isPlaying && screen === 'CARO4');
 
-  // Hook cho game Caro5
-  const caro5 = useCaro5(isPlaying && screen === 'CARO5');
+  // Hook cho game Caro5 (truyền botEnabled)
+  const caro5 = useCaro5(isPlaying && screen === 'CARO5', botEnabled);
 
   // Sync score with parent (Dành cho Match 3)
   useEffect(() => {
