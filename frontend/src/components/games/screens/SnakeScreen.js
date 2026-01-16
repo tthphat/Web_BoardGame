@@ -27,5 +27,5 @@ export const getSnakePixel = (r, c) => {
     }
 
     // Nền tối
-    return 'bg-[#222] shadow-none opacity-20 scale-50';
+    return 'bg-[#333] shadow-none opacity-40 scale-[0.7]';
 };

@@ -7,12 +7,12 @@ import { getCaro5Pixel } from './screens/Caro5Screen';
 import { getCaro4Pixel } from './screens/Caro4Screen';
 import { getMatch3Pixel } from './screens/Match3Screen';
 import { getMemoryPixel } from './screens/MemoryScreen';
-import { useMatch3 } from '../../hooks/useMatch3';
-import { useEffect, useRef, useState } from 'react';
-
-
-// --- THAY ĐỔI 1: Import hàm vẽ Active của Memory ---
 import { getActiveMemoryPixel } from './screens/ActiveMemoryScreen';
+import { useMatch3 } from '../../hooks/useMatch3';
+import { useTicTacToe } from '../../hooks/useTicTacToe';
+import { useCaro } from '../../hooks/useCaro';
+import { useCaro5 } from '../../hooks/useCaro5';
+import { useEffect, useRef, useState } from 'react';
 
 // Games sử dụng full board (kích thước động theo config) - CHỈ KHI CHƠI THẬT
 const FULLBOARD_GAMES = ['CARO4', 'CARO5', 'DRAWING'];
@@ -20,12 +20,27 @@ const FULLBOARD_GAMES = ['CARO4', 'CARO5', 'DRAWING'];
 // Kích thước gốc của các game screens (được thiết kế cho 13x13)
 const ORIGINAL_GAME_SIZE = 13;
 
-// --- THAY ĐỔI 2: Thêm activeGameState vào props ---
-const GameMatrix = ({ screen = 'HEART', isPlaying = false, onScoreUpdate, activeGameState, onCardClick }) => {
+const GameMatrix = ({ 
+  screen = 'HEART', 
+  isPlaying = false, 
+  onScoreUpdate, 
+  onGameStateUpdate,
+  activeGameState, 
+  onCardClick 
+}) => {
   const { cols, rows, dotSize, gap } = getBoardConfig();
 
   // Hook cho game Match 3
   const match3 = useMatch3(rows, cols, isPlaying && screen === 'MATCH3');
+
+  // Hook cho game TicTacToe
+  const ticTacToe = useTicTacToe(isPlaying && screen === 'TICTACTOE');
+
+  // Hook cho game Caro4
+  const caro = useCaro(isPlaying && screen === 'CARO4');
+
+  // Hook cho game Caro5
+  const caro5 = useCaro5(isPlaying && screen === 'CARO5');
 
   // Sync score with parent (Dành cho Match 3)
   useEffect(() => {
@@ -33,6 +48,42 @@ const GameMatrix = ({ screen = 'HEART', isPlaying = false, onScoreUpdate, active
       onScoreUpdate(match3.score);
     }
   }, [match3.score, screen, isPlaying, onScoreUpdate]);
+
+  // Sync TicTacToe game state with parent
+  useEffect(() => {
+    if (screen === 'TICTACTOE' && isPlaying && onGameStateUpdate) {
+      onGameStateUpdate({
+        currentPlayer: ticTacToe.currentPlayer,
+        winner: ticTacToe.winner,
+        resetGame: ticTacToe.resetGame,
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ticTacToe.currentPlayer, ticTacToe.winner, screen, isPlaying]);
+
+  // Sync Caro4 game state with parent
+  useEffect(() => {
+    if (screen === 'CARO4' && isPlaying && onGameStateUpdate) {
+      onGameStateUpdate({
+        currentPlayer: caro.currentPlayer,
+        winner: caro.winner,
+        resetGame: caro.resetGame,
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [caro.currentPlayer, caro.winner, screen, isPlaying]);
+
+  // Sync Caro5 game state with parent
+  useEffect(() => {
+    if (screen === 'CARO5' && isPlaying && onGameStateUpdate) {
+      onGameStateUpdate({
+        currentPlayer: caro5.currentPlayer,
+        winner: caro5.winner,
+        resetGame: caro5.resetGame,
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [caro5.currentPlayer, caro5.winner, screen, isPlaying]);
 
   // Chỉ dùng fullboard khi đang CHƠI game (không phải preview)
   const useFullboard = isPlaying && FULLBOARD_GAMES.includes(screen);
@@ -45,7 +96,33 @@ const GameMatrix = ({ screen = 'HEART', isPlaying = false, onScoreUpdate, active
 
   // Hàm điều phối: chuyển đổi tọa độ và gọi screen tương ứng
   const getPixelColor = (r, c) => {
-    // 1. Ưu tiên: Match 3 (Logic nội bộ)
+    // Chuyển đổi tọa độ để căn giữa
+    const gameR = r - offsetRow;
+    const gameC = c - offsetCol;
+
+    // Xác định kích thước vùng chơi
+    // Fullboard games: dùng kích thước thực của board
+    // Standard games: dùng 13x13 căn giữa
+    const maxRows = useFullboard ? rows : ORIGINAL_GAME_SIZE;
+    const maxCols = useFullboard ? cols : ORIGINAL_GAME_SIZE;
+
+    // Nếu nằm ngoài vùng game
+    const isOutside = gameR < 1 || gameR > maxRows || gameC < 1 || gameC > maxCols;
+    if (isOutside) {
+      // TicTacToe: ẩn hoàn toàn các dots ngoài vùng chơi
+      if (screen === 'TICTACTOE' && isPlaying) {
+        return 'bg-transparent shadow-none opacity-0';
+      }
+      // Các game khác: hiển thị dot mờ
+      return 'bg-[#333] shadow-none opacity-40 scale-[0.7]';
+    }
+
+    // 1. Nếu đang chơi TicTacToe: lấy màu từ hook
+    if (screen === 'TICTACTOE' && isPlaying) {
+      return ticTacToe.getPixelColor(gameR, gameC);
+    }
+
+    // 2. Nếu đang chơi Match 3: lấy màu từ hook
     if (screen === 'MATCH3' && isPlaying) {
       const cellColor = match3.board[r - 1]?.[c - 1];
       let classes = cellColor || 'bg-[#222] opacity-20';
@@ -53,15 +130,24 @@ const GameMatrix = ({ screen = 'HEART', isPlaying = false, onScoreUpdate, active
       if (match3.selected && match3.selected.r === r - 1 && match3.selected.c === c - 1) {
         classes += ' ring-4 ring-white z-20 scale-110';
       }
+      
       return classes;
     }
 
-    // 2. Fullboard Games (Caro, Drawing...)
+    // 3. Fullboard Games (Caro, Drawing...)
     if (useFullboard) {
       switch (screen) {
         case 'CARO5':
+          // Khi đang chơi: dùng hook, không chơi: dùng preview
+          if (isPlaying) {
+            return caro5.getPixelColor(r, c);
+          }
           return getCaro5Pixel(r, c);
         case 'CARO4':
+          // Khi đang chơi: dùng hook, không chơi: dùng preview
+          if (isPlaying) {
+            return caro.getPixelColor(r, c);
+          }
           return getCaro4Pixel(r, c);
         case 'DRAWING':
           return 'bg-[#333] shadow-none opacity-50';
@@ -70,15 +156,7 @@ const GameMatrix = ({ screen = 'HEART', isPlaying = false, onScoreUpdate, active
       }
     }
 
-    // 3. Standard Games (Căn giữa 13x13) - Bao gồm MEMORY
-    const gameR = r - offsetRow;
-    const gameC = c - offsetCol;
-
-    // Nếu nằm ngoài vùng game 13x13, hiển thị dot mờ
-    if (gameR < 1 || gameR > ORIGINAL_GAME_SIZE || gameC < 1 || gameC > ORIGINAL_GAME_SIZE) {
-      return 'bg-[#222] shadow-none opacity-20 scale-50';
-    }
-
+    // 4. Standard Games (Căn giữa 13x13)
     switch (screen) {
       case 'SNAKE':
         return getSnakePixel(gameR, gameC);
@@ -90,8 +168,6 @@ const GameMatrix = ({ screen = 'HEART', isPlaying = false, onScoreUpdate, active
         return getCaro4Pixel(gameR, gameC);
       case 'MATCH3':
         return getMatch3Pixel(gameR, gameC);
-
-      // --- THAY ĐỔI 3: Logic hiển thị Memory ---
       case 'MEMORY':
         // Nếu đang chơi và có state truyền từ ngoài vào -> Dùng Active Pixel
         if (isPlaying && activeGameState) {
@@ -99,7 +175,6 @@ const GameMatrix = ({ screen = 'HEART', isPlaying = false, onScoreUpdate, active
         }
         // Nếu không -> Dùng Preview Pixel
         return getMemoryPixel(gameR, gameC);
-
       case 'HEART':
       default:
         return getHeartPixel(gameR, gameC);
@@ -114,7 +189,7 @@ const GameMatrix = ({ screen = 'HEART', isPlaying = false, onScoreUpdate, active
     }
   }
 
-  /* --- Logic Drag-to-Scroll (Giữ nguyên của team member) --- */
+  /* --- Logic Drag-to-Scroll --- */
   const scrollRef = useRef(null);
   const [isDragging, setIsDragging] = useState(false);
   const [startX, setStartX] = useState(0);
@@ -151,29 +226,40 @@ const GameMatrix = ({ screen = 'HEART', isPlaying = false, onScoreUpdate, active
 
   const onPixelClick = (r, c) => {
     if (isDragging) return;
-    // Click chỉ dành cho Match 3 (Memory dùng GameControls)
-    if (screen === 'MATCH3' && isPlaying) {
+    
+    // Chuyển đổi tọa độ cho game fixed-size
+    const gameR = r - offsetRow;
+    const gameC = c - offsetCol;
+    
+    // TicTacToe click
+    if (screen === 'TICTACTOE' && isPlaying) {
+      ticTacToe.handlePixelClick(gameR, gameC);
+    } 
+    // Match3 click
+    else if (screen === 'MATCH3' && isPlaying) {
       match3.handlePixelClick(r - 1, c - 1);
     }
-    if (screen === 'MEMORY' && isPlaying && onCardClick) {
-
-      // 1. Tính toạ độ thực tế trên lưới game (đã trừ offset căn giữa)
-      const gameR = r - offsetRow;
-      const gameC = c - offsetCol;
-
-      // 2. Định nghĩa vị trí các lá bài (Khớp với logic vẽ trong ActiveMemoryScreen)
+    // Caro4 click
+    else if (screen === 'CARO4' && isPlaying) {
+      caro.handlePixelClick(r, c);
+    }
+    // Caro5 click
+    else if (screen === 'CARO5' && isPlaying) {
+      caro5.handlePixelClick(r, c);
+    }
+    // Memory click
+    else if (screen === 'MEMORY' && isPlaying && onCardClick) {
+      // Định nghĩa vị trí các lá bài (Khớp với logic vẽ trong ActiveMemoryScreen)
       // Hàng/Cột: 4, 6, 8, 10 tương ứng với index 0, 1, 2, 3
       const validPositions = { 4: 0, 6: 1, 8: 2, 10: 3 };
 
       const cardRow = validPositions[gameR];
       const cardCol = validPositions[gameC];
 
-      // 3. Kiểm tra: Nếu click trúng vị trí có lá bài (không phải undefined)
+      // Kiểm tra: Nếu click trúng vị trí có lá bài (không phải undefined)
       if (cardRow !== undefined && cardCol !== undefined) {
         // Tính ra index mảng 1 chiều (0 - 15)
         const index = cardRow * 4 + cardCol;
-
-        // Gọi hàm xử lý (Tương tự match3.handlePixelClick)
         onCardClick(index);
       }
     }
