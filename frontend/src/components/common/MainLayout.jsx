@@ -7,38 +7,38 @@ import Footer from './Footer';
 const MainLayout = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  
+
   // Mặc định ban đầu là Game
   const [activeItem, setActiveItem] = useState('Game');
 
   // 1. Cập nhật Sidebar khi URL thay đổi (Sync URL -> Sidebar)
   useEffect(() => {
     const path = location.pathname.substring(1); // Lấy phần sau dấu /
-    
-    switch(path) {
-        case '': setActiveItem('Game'); break; // URL rỗng (Trang chủ) -> Sáng nút Game
-        case 'friends': setActiveItem('Friends'); break;
-        case 'messages': setActiveItem('Messages'); break;
-        case 'trophy': setActiveItem('Achievements'); break;
-        case 'ranking': setActiveItem('Ranking'); break;
-        case 'profile': setActiveItem('Profile'); break;
-        default: setActiveItem('Game'); break;
+
+    switch (path) {
+      case '': setActiveItem('Game'); break; // URL rỗng (Trang chủ) -> Sáng nút Game
+      case 'friends': setActiveItem('Friends'); break;
+      case 'messages': setActiveItem('Messages'); break;
+      case 'trophy': setActiveItem('Achievements'); break;
+      case 'ranking': setActiveItem('Ranking'); break;
+      case 'profile': setActiveItem('Profile'); break;
+      default: setActiveItem('Game'); break;
     }
   }, [location.pathname]);
 
   // 2. Xử lý khi bấm nút trên Sidebar (Sync Sidebar -> URL)
   const handleNavigation = (itemId) => {
     setActiveItem(itemId);
-    
+
     let path = '';
-    switch(itemId) {
-        case 'Game': path = ''; break; 
-        case 'Friends': path = 'friends'; break;
-        case 'Messages': path = 'messages'; break;
-        case 'Achievements': path = 'trophy'; break;
-        case 'Ranking': path = 'ranking'; break;
-        case 'Profile': path = 'profile'; break;
-        default: path = ''; break;
+    switch (itemId) {
+      case 'Game': path = ''; break;
+      case 'Friends': path = 'friends'; break;
+      case 'Messages': path = 'messages'; break;
+      case 'Achievements': path = 'trophy'; break;
+      case 'Ranking': path = 'ranking'; break;
+      case 'Profile': path = 'profile'; break;
+      default: path = ''; break;
     }
     navigate(`/${path}`);
   };
@@ -50,29 +50,29 @@ const MainLayout = () => {
   return (
     // THAY ĐỔI 1: Outer Container dùng flex-col (Dọc) thay vì mặc định (Ngang)
     <div className="flex flex-col h-screen w-full bg-gray-100 dark:bg-[#111827] overflow-hidden transition-colors duration-300">
-      
+
       {/* THAY ĐỔI 2: Đưa Header ra ngoài cùng -> Full width */}
-      <Header 
-        onNavigate={handleNavigation} 
+      <Header
+        onNavigate={handleNavigation}
         onLogout={handleLogout}
       />
-      
+
       {/* THAY ĐỔI 3: Tạo một Container ở giữa chứa Sidebar và Main Content (Ngang) */}
       <div className="flex flex-1 overflow-hidden relative">
-          
-          {/* Sidebar nằm bên trái */}
-          <Sidebar activeItem={activeItem} setActiveItem={handleNavigation} />
-          
-          {/* Main Content nằm bên phải, chiếm hết phần còn lại */}
-          <main className="flex-1 overflow-y-auto p-6 scroll-smooth bg-[#008080] dark:bg-[#111827]"> 
-             <Outlet />
-          </main>
+
+        {/* Sidebar nằm bên trái */}
+        <Sidebar activeItem={activeItem} setActiveItem={handleNavigation} />
+
+        {/* Main Content nằm bên phải, chiếm hết phần còn lại */}
+        <main className="flex-1 overflow-y-auto p-6 scroll-smooth bg-base-background">
+          <Outlet />
+        </main>
 
       </div>
 
       {/* THAY ĐỔI 4: Đưa Footer ra ngoài cùng -> Full width */}
-      <Footer/>
-      
+      <Footer />
+
     </div>
   );
 };
