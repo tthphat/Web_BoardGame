@@ -11,10 +11,13 @@ const DashboardPage = () => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [score, setScore] = useState(0);
   const memoryGame = useMemoryGame();
+  const [ticTacToeState, setTicTacToeState] = useState({ currentPlayer: 'X', winner: null });
+
   // Hàm chuyển màn hình sang TRÁI
   const handlePrevScreen = () => {
     setIsPlaying(false); // Reset game logic khi đổi màn
     setScore(0);
+    setTicTacToeState({ currentPlayer: 'X', winner: null });
     setCurrentScreenIndex((prev) => (prev - 1 + screens.length) % screens.length);
   };
 
@@ -22,13 +25,24 @@ const DashboardPage = () => {
   const handleNextScreen = () => {
     setIsPlaying(false); // Reset game logic khi đổi màn
     setScore(0);
+    setTicTacToeState({ currentPlayer: 'X', winner: null });
     setCurrentScreenIndex((prev) => (prev + 1) % screens.length);
   };
 
   const currentScreenName = screens[currentScreenIndex];
 
   const handleEnter = () => {
-    if (currentScreenName === 'MATCH3') {
+    if (currentScreenName === 'TICTACTOE') {
+      // Nếu game đã kết thúc, reset game
+      if (ticTacToeState.winner && ticTacToeState.resetGame) {
+        ticTacToeState.resetGame();
+        setTicTacToeState({ ...ticTacToeState, winner: null, currentPlayer: 'X' });
+      } else if (!isPlaying) {
+        // Bắt đầu game mới
+        setIsPlaying(true);
+        setTicTacToeState({ currentPlayer: 'X', winner: null, resetGame: null });
+      }
+    } else if (currentScreenName === 'MATCH3') {
       setIsPlaying(true);
       setScore(0);
     } 
@@ -42,7 +56,20 @@ const DashboardPage = () => {
     }
     else {
       alert("Enter pressed");
+    } else {
+      alert("Game chưa được implement!");
     }
+  };
+
+  // Hiển thị game status
+  const getStatusText = () => {
+    if (!isPlaying) return '';
+    if (currentScreenName === 'TICTACTOE') {
+      if (ticTacToeState.winner === 'DRAW') return '- DRAW!';
+      if (ticTacToeState.winner) return `- ${ticTacToeState.winner} WINS!`;
+      return `- ${ticTacToeState.currentPlayer}'s turn`;
+    }
+    return '(PLAYING)';
   };
 
   return (
@@ -56,7 +83,7 @@ const DashboardPage = () => {
             <div className="absolute top-4 left-4 text-green-500 font-mono text-xs z-10 opacity-70">
               {/* Hiển thị tên màn hình hiện tại */}
               <div>GAME:</div>
-              <div>{currentScreenName} {isPlaying ? '(PLAYING)' : ''}</div>
+              <div>{currentScreenName} {getStatusText()}</div>
             </div>
 
             <div className="scale-75 md:scale-100 lg:scale-110 transition-transform">
@@ -67,6 +94,7 @@ const DashboardPage = () => {
                 onScoreUpdate={setScore}
                 onCardClick={memoryGame.handleCardClick}
                 activeGameState={memoryGame} 
+                onGameStateUpdate={setTicTacToeState}
               />
             </div>
           </div>
@@ -88,7 +116,13 @@ const DashboardPage = () => {
               <GameControls
                 onLeft={handlePrevScreen}
                 onRight={handleNextScreen}
-                onBack={() => alert("Back pressed")}
+                onBack={() => {
+                  if (isPlaying) {
+                    setIsPlaying(false);
+                    setScore(0);
+                    setTicTacToeState({ currentPlayer: 'X', winner: null, resetGame: null });
+                  }
+                }}
                 onEnter={handleEnter}
               />
             </div>

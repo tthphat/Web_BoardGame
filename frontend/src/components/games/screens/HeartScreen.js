@@ -16,7 +16,7 @@ export const getHeartPixel = (r, c) => {
     const isHeart = heartShape.some(([hr, hc]) => hr === r && hc === c);
     
     // Nếu không phải hình tim -> Màu tối
-    if (!isHeart) return 'bg-[#222] shadow-none opacity-20 scale-50'; 
+    if (!isHeart) return 'bg-[#333] shadow-none opacity-40 scale-[0.7]'; 
 
     // Phối màu cầu vồng (cũng +1 vào điều kiện r)
     if (r <= 4) return 'bg-red-500 shadow-[0_0_10px_#ef4444]';

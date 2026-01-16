@@ -25,7 +25,7 @@ export const BOARD_SIZES = {
 };
 
 // Hardcode hiện tại - sau này Admin sẽ chỉnh từ DB
-export const CURRENT_BOARD_SIZE = 'EXTRA_LARGE';
+export const CURRENT_BOARD_SIZE = 'LARGE';
 
 export const getBoardConfig = () => {
   return BOARD_SIZES[CURRENT_BOARD_SIZE];

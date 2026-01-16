@@ -39,11 +39,6 @@ export const getCaro4Pixel = (r, c) => {
         return 'bg-yellow-500 shadow-[0_0_5px_yellow]';
     }
 
-    // Vẽ khung cột dọc (đặc trưng Connect 4) - chỉ trong vùng game
-    if (r >= 4 && r <= 9 && c % 2 !== 0 && c > 2 && c < 12) {
-        return 'bg-blue-900 shadow-none opacity-40 scale-[0.2]';
-    }
-
-    // Nền mờ giống CARO5
-    return 'bg-[#222] shadow-none opacity-20 scale-50';
+    // Nền bình thường
+    return 'bg-[#333] shadow-none opacity-40 scale-[0.7]';
 };
