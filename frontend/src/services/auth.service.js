@@ -85,3 +85,25 @@ export async function resendOTPApi(email) {
     console.log("Fontend-Auth-Service: Resend OTP API output: ", data);
     // return data;
 }
+
+// Get profile
+export async function getProfileApi() {
+    console.log("Fontend-Auth-Service: Get profile API input: ");
+
+    const response = await fetch("/api/user/profile", {
+        method: "GET",
+        credentials: "include",
+        headers: {
+            "Content-Type": "application/json",
+        },
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+        throw new Error(data.message || data.error || "Get profile failed");
+    }
+
+    console.log("Fontend-Auth-Service: Get profile API output: ", data);
+    return data;
+}
