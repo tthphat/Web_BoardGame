@@ -43,13 +43,13 @@ export const AuthController = {
     // =============
     async register(req, res, next) {
         try {
-            const { email, password } = req.body;
+            const { email, password, username } = req.body;
 
             if (!email || !password) {
                 throw new Error("Email and password are required");
             }
 
-            const user = await AuthService.register(email, password);
+            const user = await AuthService.register(email, password, username);
 
             res.json({
                 data: {

@@ -1,6 +1,7 @@
 import { UserModel } from "../models/user.model.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import crypto from "crypto";
 
 
 export const AuthService = {
@@ -47,15 +48,16 @@ export const AuthService = {
                 }
             };
         } catch (error) {
-            next(error);
+            throw error;
         }
     },
 
     // =============
     // Register
     // =============
-    async register(email, password) {
+    async register(email, password, username) {
         try {
+            console.log("Backend-Auth-Service: Register API input: ", { email, password, username });
             // check existed user
             const { data: user } = await UserModel.findUserByEmail(email);
             if (user) {
@@ -78,20 +80,24 @@ export const AuthService = {
                 .update(otp)
                 .digest("hex");
 
-            const otp_expires = Date.now() + 3 * 60 * 1000; // 3 phút
+            const otp_expires = new Date(Date.now() + 3 * 60 * 1000); // 3 phút
             const otp_attempts = 0;
 
             // create user
-            const { data: newUser } = await UserModel.createUser({
+            const { data: newUser, error } = await UserModel.createUser({
                 email,
                 password: hashedPassword,
+                username,
                 role: "user",
-                state: "peding",
+                state: "pending",
                 otp_hash,
                 otp_expires,
                 otp_attempts
             });
 
+            console.log("Backend-Auth-Service: Register API error: ", error);
+
+            console.log("Backend-Auth-Service: Register API output: ", newUser);
             // send otp
             await AuthService.sendOtpEmail(email, otp);
 
@@ -103,7 +109,7 @@ export const AuthService = {
                 }
             };
         } catch (error) {
-            next(error);
+            throw error;
         }
     },
 
