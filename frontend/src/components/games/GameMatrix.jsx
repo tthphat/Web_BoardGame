@@ -10,6 +10,8 @@ import { getMemoryPixel } from './screens/MemoryScreen';
 import { getActiveMemoryPixel } from './screens/ActiveMemoryScreen';
 import { useMatch3 } from '../../hooks/useMatch3';
 import { useTicTacToe } from '../../hooks/useTicTacToe';
+import { useCaro } from '../../hooks/useCaro';
+import { useCaro5 } from '../../hooks/useCaro5';
 import { useEffect, useRef, useState } from 'react';
 
 // Games sử dụng full board (kích thước động theo config) - CHỈ KHI CHƠI THẬT
@@ -34,6 +36,12 @@ const GameMatrix = ({
   // Hook cho game TicTacToe
   const ticTacToe = useTicTacToe(isPlaying && screen === 'TICTACTOE');
 
+  // Hook cho game Caro4
+  const caro = useCaro(isPlaying && screen === 'CARO4');
+
+  // Hook cho game Caro5
+  const caro5 = useCaro5(isPlaying && screen === 'CARO5');
+
   // Sync score with parent (Dành cho Match 3)
   useEffect(() => {
     if (screen === 'MATCH3' && isPlaying && onScoreUpdate) {
@@ -53,6 +61,30 @@ const GameMatrix = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ticTacToe.currentPlayer, ticTacToe.winner, screen, isPlaying]);
 
+  // Sync Caro4 game state with parent
+  useEffect(() => {
+    if (screen === 'CARO4' && isPlaying && onGameStateUpdate) {
+      onGameStateUpdate({
+        currentPlayer: caro.currentPlayer,
+        winner: caro.winner,
+        resetGame: caro.resetGame,
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [caro.currentPlayer, caro.winner, screen, isPlaying]);
+
+  // Sync Caro5 game state with parent
+  useEffect(() => {
+    if (screen === 'CARO5' && isPlaying && onGameStateUpdate) {
+      onGameStateUpdate({
+        currentPlayer: caro5.currentPlayer,
+        winner: caro5.winner,
+        resetGame: caro5.resetGame,
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [caro5.currentPlayer, caro5.winner, screen, isPlaying]);
+
   // Chỉ dùng fullboard khi đang CHƠI game (không phải preview)
   const useFullboard = isPlaying && FULLBOARD_GAMES.includes(screen);
 
@@ -68,8 +100,14 @@ const GameMatrix = ({
     const gameR = r - offsetRow;
     const gameC = c - offsetCol;
 
-    // Nếu nằm ngoài vùng game 13x13
-    const isOutside = gameR < 1 || gameR > ORIGINAL_GAME_SIZE || gameC < 1 || gameC > ORIGINAL_GAME_SIZE;
+    // Xác định kích thước vùng chơi
+    // Fullboard games: dùng kích thước thực của board
+    // Standard games: dùng 13x13 căn giữa
+    const maxRows = useFullboard ? rows : ORIGINAL_GAME_SIZE;
+    const maxCols = useFullboard ? cols : ORIGINAL_GAME_SIZE;
+
+    // Nếu nằm ngoài vùng game
+    const isOutside = gameR < 1 || gameR > maxRows || gameC < 1 || gameC > maxCols;
     if (isOutside) {
       // TicTacToe: ẩn hoàn toàn các dots ngoài vùng chơi
       if (screen === 'TICTACTOE' && isPlaying) {
@@ -100,8 +138,16 @@ const GameMatrix = ({
     if (useFullboard) {
       switch (screen) {
         case 'CARO5':
+          // Khi đang chơi: dùng hook, không chơi: dùng preview
+          if (isPlaying) {
+            return caro5.getPixelColor(r, c);
+          }
           return getCaro5Pixel(r, c);
         case 'CARO4':
+          // Khi đang chơi: dùng hook, không chơi: dùng preview
+          if (isPlaying) {
+            return caro.getPixelColor(r, c);
+          }
           return getCaro4Pixel(r, c);
         case 'DRAWING':
           return 'bg-[#333] shadow-none opacity-50';
@@ -192,6 +238,14 @@ const GameMatrix = ({
     // Match3 click
     else if (screen === 'MATCH3' && isPlaying) {
       match3.handlePixelClick(r - 1, c - 1);
+    }
+    // Caro4 click
+    else if (screen === 'CARO4' && isPlaying) {
+      caro.handlePixelClick(r, c);
+    }
+    // Caro5 click
+    else if (screen === 'CARO5' && isPlaying) {
+      caro5.handlePixelClick(r, c);
     }
     // Memory click
     else if (screen === 'MEMORY' && isPlaying && onCardClick) {
