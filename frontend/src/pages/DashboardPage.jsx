@@ -12,12 +12,14 @@ const DashboardPage = () => {
   const [score, setScore] = useState(0);
   const memoryGame = useMemoryGame();
   const [ticTacToeState, setTicTacToeState] = useState({ currentPlayer: 'X', winner: null });
+  const [caroState, setCaroState] = useState({ currentPlayer: 'BLUE', winner: null });
 
   // Hàm chuyển màn hình sang TRÁI
   const handlePrevScreen = () => {
     setIsPlaying(false); // Reset game logic khi đổi màn
     setScore(0);
     setTicTacToeState({ currentPlayer: 'X', winner: null });
+    setCaroState({ currentPlayer: 'BLUE', winner: null });
     setCurrentScreenIndex((prev) => (prev - 1 + screens.length) % screens.length);
   };
 
@@ -26,6 +28,7 @@ const DashboardPage = () => {
     setIsPlaying(false); // Reset game logic khi đổi màn
     setScore(0);
     setTicTacToeState({ currentPlayer: 'X', winner: null });
+    setCaroState({ currentPlayer: 'BLUE', winner: null });
     setCurrentScreenIndex((prev) => (prev + 1) % screens.length);
   };
 
@@ -52,18 +55,33 @@ const DashboardPage = () => {
         setScore(0);
         memoryGame.initGame(); // Tạo bộ bài mới
       }
+    } else if (currentScreenName === 'CARO4') {
+      // Nếu game đã kết thúc, reset game
+      if (caroState.winner && caroState.resetGame) {
+        caroState.resetGame();
+        setCaroState({ ...caroState, winner: null, currentPlayer: 'BLUE' });
+      } else if (!isPlaying) {
+        // Bắt đầu game mới
+        setIsPlaying(true);
+        setCaroState({ currentPlayer: 'BLUE', winner: null, resetGame: null });
+      }
     } else {
       alert("Game chưa được implement!");
     }
   };
 
-  // Hiển thị game status
   const getStatusText = () => {
     if (!isPlaying) return '';
     if (currentScreenName === 'TICTACTOE') {
       if (ticTacToeState.winner === 'DRAW') return '- DRAW!';
       if (ticTacToeState.winner) return `- ${ticTacToeState.winner} WINS!`;
       return `- ${ticTacToeState.currentPlayer}'s turn`;
+    }
+    if (currentScreenName === 'CARO4') {
+      if (caroState.winner === 'DRAW') return '- HÒA!';
+      if (caroState.winner === 'BLUE') return '- XANH THẮNG!';
+      if (caroState.winner === 'RED') return '- ĐỎ THẮNG!';
+      return `- Lượt ${caroState.currentPlayer === 'BLUE' ? 'XANH' : 'ĐỎ'}`;
     }
     return '(PLAYING)';
   };
@@ -89,7 +107,13 @@ const DashboardPage = () => {
                 onScoreUpdate={setScore}
                 onCardClick={memoryGame.handleCardClick}
                 activeGameState={memoryGame}
-                onGameStateUpdate={setTicTacToeState}
+                onGameStateUpdate={(newState) => {
+                  if (currentScreenName === 'TICTACTOE') {
+                    setTicTacToeState(newState);
+                  } else if (currentScreenName === 'CARO4') {
+                    setCaroState(newState);
+                  }
+                }}
               />
             </div>
           </div>
@@ -116,6 +140,7 @@ const DashboardPage = () => {
                     setIsPlaying(false);
                     setScore(0);
                     setTicTacToeState({ currentPlayer: 'X', winner: null, resetGame: null });
+                    setCaroState({ currentPlayer: 'BLUE', winner: null, resetGame: null });
                   }
                 }}
                 onEnter={handleEnter}

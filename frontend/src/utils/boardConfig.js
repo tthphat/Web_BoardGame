@@ -17,10 +17,10 @@ export const BOARD_SIZES = {
     gap: 6,
   },
   EXTRA_LARGE: {
-    cols: 30,
-    rows: 18,
+    cols: 33,
+    rows: 19,
     dotSize: 19,
-    gap: 6,
+    gap: 3,
   }
 };
 
