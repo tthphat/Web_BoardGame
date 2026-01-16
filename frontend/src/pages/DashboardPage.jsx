@@ -13,6 +13,7 @@ const DashboardPage = () => {
   const memoryGame = useMemoryGame();
   const [ticTacToeState, setTicTacToeState] = useState({ currentPlayer: 'X', winner: null });
   const [caroState, setCaroState] = useState({ currentPlayer: 'BLUE', winner: null });
+  const [caro5State, setCaro5State] = useState({ currentPlayer: 'BLUE', winner: null });
 
   // Hàm chuyển màn hình sang TRÁI
   const handlePrevScreen = () => {
@@ -20,6 +21,7 @@ const DashboardPage = () => {
     setScore(0);
     setTicTacToeState({ currentPlayer: 'X', winner: null });
     setCaroState({ currentPlayer: 'BLUE', winner: null });
+    setCaro5State({ currentPlayer: 'BLUE', winner: null });
     setCurrentScreenIndex((prev) => (prev - 1 + screens.length) % screens.length);
   };
 
@@ -29,6 +31,7 @@ const DashboardPage = () => {
     setScore(0);
     setTicTacToeState({ currentPlayer: 'X', winner: null });
     setCaroState({ currentPlayer: 'BLUE', winner: null });
+    setCaro5State({ currentPlayer: 'BLUE', winner: null });
     setCurrentScreenIndex((prev) => (prev + 1) % screens.length);
   };
 
@@ -65,6 +68,16 @@ const DashboardPage = () => {
         setIsPlaying(true);
         setCaroState({ currentPlayer: 'BLUE', winner: null, resetGame: null });
       }
+    } else if (currentScreenName === 'CARO5') {
+      // Nếu game đã kết thúc, reset game
+      if (caro5State.winner && caro5State.resetGame) {
+        caro5State.resetGame();
+        setCaro5State({ ...caro5State, winner: null, currentPlayer: 'BLUE' });
+      } else if (!isPlaying) {
+        // Bắt đầu game mới
+        setIsPlaying(true);
+        setCaro5State({ currentPlayer: 'BLUE', winner: null, resetGame: null });
+      }
     } else {
       alert("Game chưa được implement!");
     }
@@ -82,6 +95,12 @@ const DashboardPage = () => {
       if (caroState.winner === 'BLUE') return '- XANH THẮNG!';
       if (caroState.winner === 'RED') return '- ĐỎ THẮNG!';
       return `- Lượt ${caroState.currentPlayer === 'BLUE' ? 'XANH' : 'ĐỎ'}`;
+    }
+    if (currentScreenName === 'CARO5') {
+      if (caro5State.winner === 'DRAW') return '- HÒA!';
+      if (caro5State.winner === 'BLUE') return '- XANH THẮNG!';
+      if (caro5State.winner === 'RED') return '- ĐỎ THẮNG!';
+      return `- Lượt ${caro5State.currentPlayer === 'BLUE' ? 'XANH' : 'ĐỎ'}`;
     }
     return '(PLAYING)';
   };
@@ -112,6 +131,8 @@ const DashboardPage = () => {
                     setTicTacToeState(newState);
                   } else if (currentScreenName === 'CARO4') {
                     setCaroState(newState);
+                  } else if (currentScreenName === 'CARO5') {
+                    setCaro5State(newState);
                   }
                 }}
               />

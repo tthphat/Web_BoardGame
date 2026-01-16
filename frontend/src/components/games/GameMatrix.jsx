@@ -11,6 +11,7 @@ import { getActiveMemoryPixel } from './screens/ActiveMemoryScreen';
 import { useMatch3 } from '../../hooks/useMatch3';
 import { useTicTacToe } from '../../hooks/useTicTacToe';
 import { useCaro } from '../../hooks/useCaro';
+import { useCaro5 } from '../../hooks/useCaro5';
 import { useEffect, useRef, useState } from 'react';
 
 // Games sử dụng full board (kích thước động theo config) - CHỈ KHI CHƠI THẬT
@@ -37,6 +38,9 @@ const GameMatrix = ({
 
   // Hook cho game Caro4
   const caro = useCaro(isPlaying && screen === 'CARO4');
+
+  // Hook cho game Caro5
+  const caro5 = useCaro5(isPlaying && screen === 'CARO5');
 
   // Sync score with parent (Dành cho Match 3)
   useEffect(() => {
@@ -68,6 +72,18 @@ const GameMatrix = ({
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [caro.currentPlayer, caro.winner, screen, isPlaying]);
+
+  // Sync Caro5 game state with parent
+  useEffect(() => {
+    if (screen === 'CARO5' && isPlaying && onGameStateUpdate) {
+      onGameStateUpdate({
+        currentPlayer: caro5.currentPlayer,
+        winner: caro5.winner,
+        resetGame: caro5.resetGame,
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [caro5.currentPlayer, caro5.winner, screen, isPlaying]);
 
   // Chỉ dùng fullboard khi đang CHƠI game (không phải preview)
   const useFullboard = isPlaying && FULLBOARD_GAMES.includes(screen);
@@ -122,6 +138,10 @@ const GameMatrix = ({
     if (useFullboard) {
       switch (screen) {
         case 'CARO5':
+          // Khi đang chơi: dùng hook, không chơi: dùng preview
+          if (isPlaying) {
+            return caro5.getPixelColor(r, c);
+          }
           return getCaro5Pixel(r, c);
         case 'CARO4':
           // Khi đang chơi: dùng hook, không chơi: dùng preview
@@ -222,6 +242,10 @@ const GameMatrix = ({
     // Caro4 click
     else if (screen === 'CARO4' && isPlaying) {
       caro.handlePixelClick(r, c);
+    }
+    // Caro5 click
+    else if (screen === 'CARO5' && isPlaying) {
+      caro5.handlePixelClick(r, c);
     }
     // Memory click
     else if (screen === 'MEMORY' && isPlaying && onCardClick) {
