@@ -1,18 +1,15 @@
-import {User, Users, MessageSquare, Trophy, BarChart ,Moon, Gamepad2} from 'lucide-react';
-import React, {useState} from 'react';
-import MenuItem from './MenuItem';
+import { LayoutDashboard, Users, Settings, BarChart3, Moon, LogOut } from 'lucide-react';
+import React from 'react';
 
+import MenuItem from '../common/MenuItem';
+const AdminSidebar = ({ activeItem, setActiveItem }) => {
 
-const Sidebar = ({ activeItem, setActiveItem }) => {
-
-    const menuItems = [
-        {id: 'Game', icon: <Gamepad2 size={20}/>, label: 'Game Console'},
-        {id: 'Profile', icon: <User size={20}/>, label: 'Profile'},
-        {id: 'Friends', icon: <Users size={20}/>, label: 'Friends'},
-        {id: 'Messages', icon: <MessageSquare size={20}/>, label: 'Messages'},
-        {id: 'Achievements', icon: <Trophy size={20}/>, label: 'Trophy'},
-        {id: 'Ranking', icon: <BarChart size={20}/>, label: 'Ranking'},
-    ]
+    const adminMenuItems = [
+        {id: 'Dashboard', icon: <LayoutDashboard size={20}/>, label: 'Dashboard'},
+        {id: 'UserMgmt', icon: <Users size={20}/>, label: 'User Manager'},
+        {id: 'GameConfig', icon: <Settings size={20}/>, label: 'Game Config'},
+        {id: 'Statistics', icon: <BarChart3 size={20}/>, label: 'Statistics'},
+    ];
 
     return (
         <aside className="w-64 h-full bg-[#c0c0c0] dark:bg-[#2d2d2d] border-r-2 border-r-[#808080] dark:border-r-[#000] flex flex-col transition-colors duration-300 font-mono">
@@ -21,7 +18,7 @@ const Sidebar = ({ activeItem, setActiveItem }) => {
 
             {/* Menu List */}
             <nav className="flex-1 py-4 space-y-2 px-3">
-                {menuItems.map((item) => (
+                {adminMenuItems.map((item) => (
                 <MenuItem 
                     key={item.id}
                     icon={item.icon}
@@ -32,8 +29,10 @@ const Sidebar = ({ activeItem, setActiveItem }) => {
                 ))}
             </nav>
 
-            {/* Dark Mode Button Area: Style Retro 3D */}
-            <div className="p-4 border-t-2 border-t-white dark:border-t-[#555]">
+            {/* Footer Area: Dark Mode & Logout */}
+            <div className="p-4 border-t-2 border-t-white dark:border-t-[#555] space-y-2">
+                
+                {/* Dark Mode Button */}
                 <button 
                     onClick={() => document.documentElement.classList.toggle('dark')}
                     className="flex items-center justify-center gap-3 w-full px-4 py-2 
@@ -49,10 +48,12 @@ const Sidebar = ({ activeItem, setActiveItem }) => {
                     <Moon size={20} />
                     <span className="font-bold uppercase text-sm">Dark Mode</span>
                 </button>
+
+                
             </div>
 
         </aside>
     );
 };
 
-export default Sidebar;
+export default AdminSidebar;

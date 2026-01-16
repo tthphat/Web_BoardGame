@@ -1,8 +1,9 @@
 export const getTicTacToePixel = (r, c) => {
-    // 1. Vẽ khung bàn cờ (Dấu #)
-    // Kẻ 2 dòng dọc (Cột 5 và 9) và 2 dòng ngang (Hàng 5 và 9)
-    if (c === 5 || c === 9) return 'bg-gray-500 shadow-none';
-    if (r === 5 || r === 9) return 'bg-gray-500 shadow-none';
+    // 1. Vẽ khung bàn cờ (Dấu #) - chỉ trong vùng 2-12 để cân đối
+    // Kẻ 2 dòng dọc (Cột 5 và 9) - chỉ từ hàng 2 đến 12
+    if ((c === 5 || c === 9) && r >= 2 && r <= 12) return 'bg-gray-500 shadow-none';
+    // Kẻ 2 dòng ngang (Hàng 5 và 9) - chỉ từ cột 2 đến 12
+    if ((r === 5 || r === 9) && c >= 2 && c <= 12) return 'bg-gray-500 shadow-none';
 
     // 2. Vẽ quân X (Màu Xanh - Blue) - Ở ô Góc trên trái và Giữa phải
     // X ở góc trái (Hàng 2-4, Cột 2-4)
@@ -30,5 +31,5 @@ export const getTicTacToePixel = (r, c) => {
          return `bg-red-500 shadow-[0_0_10px_red] ${isWinning ? 'animate-pulse bg-red-400' : ''}`;
     }
 
-    return 'bg-[#222] shadow-none opacity-20 scale-50';
+    return 'bg-[#333] shadow-none opacity-40 scale-[0.7]';
 };

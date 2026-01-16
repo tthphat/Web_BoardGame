@@ -17,15 +17,15 @@ export const BOARD_SIZES = {
     gap: 6,
   },
   EXTRA_LARGE: {
-    cols: 30,
-    rows: 18,
+    cols: 33,
+    rows: 19,
     dotSize: 19,
-    gap: 6,
+    gap: 3,
   }
 };
 
 // Hardcode hiện tại - sau này Admin sẽ chỉnh từ DB
-export const CURRENT_BOARD_SIZE = 'EXTRA_LARGE';
+export const CURRENT_BOARD_SIZE = 'MEDIUM';
 
 export const getBoardConfig = () => {
   return BOARD_SIZES[CURRENT_BOARD_SIZE];
