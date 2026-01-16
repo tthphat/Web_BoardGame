@@ -20,5 +20,22 @@ export const UserController = {
             next(error);
         }
     },
+
+    // =============
+    // Edit User Profile
+    // =============
+    async editProfile(req, res, next) {
+        try {
+            const editData = req.body;
+            const user = await UserService.editProfile(req.user.id, editData);
+            res.json({
+                data: {
+                    user: user.data.user
+                }
+            });
+        } catch (error) {
+            next(error);
+        }
+    },
 }
 
