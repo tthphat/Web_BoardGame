@@ -101,14 +101,13 @@ export const AuthController = {
     async resendOtp(req, res, next) {
         try {
             const { email } = req.body;
+            console.log("Backend-Auth-Controller: Resend OTP API input: ", { email });
 
             if (!email) {
                 return res.status(400).json({ error: "Email is required" });
             }
 
-            const user = await AuthService.resendOtp(email);
-
-            console.log("Backend-Auth-Controller: Resend OTP API output: ", user);
+            await AuthService.resendOtp(email);
 
             res.json({
                 message: "OTP sent successfully"

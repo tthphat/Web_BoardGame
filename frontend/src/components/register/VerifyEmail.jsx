@@ -4,10 +4,31 @@ import { z } from "zod";
 import { useNavigate } from "react-router-dom";
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
 import { useAuth } from "@/contexts/AuthContext";
+import { useState, useEffect } from "react";
+import { toast } from "sonner";
+import { resendOTPApi } from "@/services/auth.service";
 
 function VerifyEmail() {
     const navigate = useNavigate();
     const { user, verifyEmail } = useAuth();
+
+    // countdown resend otp
+    const [countdown, setCountdown] = useState(10); // 3 phút
+    const [canResend, setCanResend] = useState(false);
+
+    // Timer countdown
+    useEffect(() => {
+        let timer;
+        if (countdown > 0 && !canResend) {
+            timer = setInterval(() => {
+                setCountdown((prev) => prev - 1);
+            }, 1000);
+        } else if (countdown === 0) {
+            setCanResend(true);
+        }
+        return () => clearInterval(timer);
+    }, [countdown, canResend]);
+
     const {
         handleSubmit,
         formState: { errors, isSubmitting },
@@ -28,12 +49,47 @@ function VerifyEmail() {
     const onSubmit = async (data) => {
         try {
             await verifyEmail({ email: user.email, otp: data.otp });
+            toast.success("Register successfully");
             navigate("/login");
         } catch (error) {
+            toast.error(error.message);
             setError("otp", { message: error.message });
+
+            if (error.message && (error.message.includes("Too many attempts. Please register again."))) {
+                setTimeout(() => {
+                    navigate("/register");
+                }, 2000);
+            }
+
+            if (error.message && error.message.includes("OTP expired")) {
+                setCanResend(true);
+                setCountdown(0);
+            }
         }
     }
 
+    const handleResend = async () => {
+        try {
+            await resendOTPApi(user.email);
+
+            // Success
+            setCountdown(10);
+            setCanResend(false);
+
+        } catch (error) {
+            console.error(error);
+            setError("otp", {
+                type: "manual",
+                message: error.message,
+            });
+        }
+    };
+
+    const formatTime = (seconds) => {
+        const minutes = Math.floor(seconds / 60);
+        const secs = seconds % 60;
+        return `${minutes}:${secs < 10 ? '0' : ''}${secs}`;
+    };
 
     return (
         <div className="h-screen w-screen flex items-center justify-center bg-retro-teal dark:bg-[#1a1a1a] font-mono">
@@ -104,6 +160,24 @@ function VerifyEmail() {
                         >
                             {isSubmitting ? "Processing..." : "Verify"}
                         </button>
+
+                        {/* Resend Logic */}
+                        <div className="text-center">
+                            {!canResend ? (
+                                <p className="text-sm text-gray-500">
+                                    Resend OTP after <span className="font-bold">{formatTime(countdown)}</span>
+                                </p>
+                            ) : (
+                                <button
+                                    type="button"
+                                    onClick={handleResend}
+                                    className="text-[#43A047] font-semibold hover:text-[#4caf50] hover:underline text-sm"
+                                >
+                                    Resend OTP
+                                </button>
+                            )}
+                        </div>
+
                     </form>
                 </div>
             </div>

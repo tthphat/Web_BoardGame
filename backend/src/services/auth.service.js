@@ -34,7 +34,7 @@ export const AuthService = {
                     role: user.role
                 },
                 process.env.JWT_SECRET,
-                { expiresIn: "1h" }
+                { expiresIn: "7d" }
             );
 
             return {
@@ -184,7 +184,7 @@ export const AuthService = {
                 { otp_attempts: 0, otp_hash: null, otp_expires: null, state: "active" });
 
             if (updateError) {
-                throw new Error("Lỗi khi cập nhật OTP");
+                throw new Error("Failed to update user");
             }
 
             // Tạo JWT
@@ -195,7 +195,7 @@ export const AuthService = {
                     email: user.email,
                 },
                 process.env.JWT_SECRET,
-                { expiresIn: "1h" }
+                { expiresIn: "7d" }
             );
 
             return {
