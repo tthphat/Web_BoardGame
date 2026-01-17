@@ -1,7 +1,6 @@
 import bcrypt from "bcrypt";
 
 export async function seed(knex) {
-  await knex("users").del();
 
   const passwordHash = await bcrypt.hash("123456", 10);
 
@@ -41,5 +40,5 @@ export async function seed(knex) {
       password: passwordHash,
       role: "user"
     }
-  ]);
+  ]).onConflict("email").ignore();
 }
