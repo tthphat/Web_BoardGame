@@ -8,7 +8,7 @@ import {
 } from "../models/userAchievement.model.js";
 
 export class AchievementService {
-    static async grantAchievement(knex, userId, code, meta) {
+    static async grantAchievementService(knex, userId, code, meta) {
         const achievement = await findAchievementByCode(knex, code);
         if (!achievement) return null;
 
@@ -21,7 +21,7 @@ export class AchievementService {
         return achievement;
     }
 
-    static async getUserAchievements(knex, userId, gameSlug) {
-        return await getUserAchievements(knex, userId, gameSlug);
+    static async getUserAchievementsService(knex, userId, gameSlug, searchName) {
+        return await getUserAchievements(knex, userId, gameSlug, searchName);
     }
 }

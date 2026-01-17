@@ -13,7 +13,7 @@ export function addUserAchievement(knex, {
         .ignore();
 }
 
-export function getUserAchievements(knex, userId, gameSlug = null) {
+export function getUserAchievements(knex, userId, gameSlug = null, searchName = null) {
     let query = knex("user_achievements")
         .join("achievements", "user_achievements.achievement_id", "achievements.id")
         .select(
@@ -31,6 +31,10 @@ export function getUserAchievements(knex, userId, gameSlug = null) {
     if (gameSlug) {
         // Assuming 'icon' column in achievements table holds the game slug/type identifier
         query = query.where("achievements.icon", gameSlug);
+    }
+
+    if (searchName) {
+        query = query.where("achievements.name", "ilike", `%${searchName}%`);
     }
 
     return query;
