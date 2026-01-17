@@ -22,6 +22,14 @@ const Sidebar = ({ activeItem, setActiveItem }) => {
             <aside className="w-64 h-full bg-[#c0c0c0] dark:bg-[#2d2d2d] border-r-2 border-r-[#808080] dark:border-r-[#000] flex flex-col transition-colors duration-300 font-mono">
                 <nav className="flex-1 py-4 space-y-2 px-3">
                     <MenuItem
+                        key='Game'
+                        icon={<Gamepad2 size={20} />}
+                        label='Game Console'
+                        active={activeItem === 'Game'}
+                        onClick={() => setActiveItem('Game')}
+                    />
+
+                    <MenuItem
                         key='Login'
                         icon={<Key size={20} />}
                         label='Login'
@@ -36,6 +44,8 @@ const Sidebar = ({ activeItem, setActiveItem }) => {
                         active={activeItem === 'Register'}
                         onClick={() => setActiveItem('Register')}
                     />
+
+                    <p className='mt-4 text-center text-xs'>You are playing as Guest. Login to save score & ranking</p>
                 </nav>
             </aside>
         );
