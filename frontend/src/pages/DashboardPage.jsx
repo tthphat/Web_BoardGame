@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import GameMatrix from '../components/games/GameMatrix';
 import GameControls from '../components/games/GameControls';
 import ColorPalette from '../components/games/ColorPalette';
@@ -17,82 +17,166 @@ const DashboardPage = () => {
   const [ticTacToeState, setTicTacToeState] = useState({ currentPlayer: 'X', winner: null });
   const [caroState, setCaroState] = useState({ currentPlayer: 'BLUE', winner: null });
   const [caro5State, setCaro5State] = useState({ currentPlayer: 'BLUE', winner: null });
+  const [snakeState, setSnakeState] = useState({ isGameOver: false, direction: 'LEFT' });
 
-  // Hàm chuyển màn hình sang TRÁI
-  const handlePrevScreen = () => {
-    setIsPlaying(false); // Reset game logic khi đổi màn
+  // Hàm chuyển màn hình sang TRÁI - Memoized
+  const handlePrevScreen = useCallback(() => {
+    setIsPlaying(false);
     setScore(0);
     setTicTacToeState({ currentPlayer: 'X', winner: null });
     setCaroState({ currentPlayer: 'BLUE', winner: null });
     setCaro5State({ currentPlayer: 'BLUE', winner: null });
     setCurrentScreenIndex((prev) => (prev - 1 + screens.length) % screens.length);
-  };
+  }, [screens.length]);
 
-  // Hàm chuyển màn hình sang PHẢI
-  const handleNextScreen = () => {
-    setIsPlaying(false); // Reset game logic khi đổi màn
+  // Hàm chuyển màn hình sang PHẢI - Memoized
+  const handleNextScreen = useCallback(() => {
+    setIsPlaying(false);
     setScore(0);
     setTicTacToeState({ currentPlayer: 'X', winner: null });
     setCaroState({ currentPlayer: 'BLUE', winner: null });
     setCaro5State({ currentPlayer: 'BLUE', winner: null });
     setCurrentScreenIndex((prev) => (prev + 1) % screens.length);
-  };
+  }, [screens.length]);
 
   const currentScreenName = screens[currentScreenIndex];
 
-  // Drawing hook - phải đặt sau currentScreenName
+  // Drawing hook
   const drawingGame = useDrawing(isPlaying && currentScreenName === 'DRAWING');
 
-  const handleEnter = () => {
+  // Callback đồng bộ Score - Memoized
+  const handleScoreUpdate = useCallback((newScore) => {
+    setScore(newScore);
+  }, []);
+
+  // Callback đồng bộ Game State - Memoized
+  const handleGameStateUpdate = useCallback((newState) => {
     if (currentScreenName === 'TICTACTOE') {
-      // Nếu game đã kết thúc, reset game
+      setTicTacToeState(newState);
+    } else if (currentScreenName === 'CARO4') {
+      setCaroState(newState);
+    } else if (currentScreenName === 'CARO5') {
+      setCaro5State(newState);
+    } else if (currentScreenName === 'SNAKE') {
+      // Chỉ update nếu thực sự có thay đổi quan trọng để tránh render loop
+      setSnakeState(prev => {
+        if (prev.isGameOver === newState.isGameOver &&
+          prev.direction === newState.direction &&
+          prev.resetGame === newState.resetGame) {
+          return prev;
+        }
+        return newState;
+      });
+    }
+  }, [currentScreenName]);
+
+  const handleEnter = useCallback(() => {
+    // Diagnosos: Báo trạng thái ra UI để check
+    const statusText = `Enter: ${currentScreenName} | Play: ${isPlaying} | Over: ${snakeState.isGameOver}`;
+    toast.info(statusText);
+    console.log("HANDLE ENTER:", statusText);
+
+    if (currentScreenName === 'TICTACTOE') {
       if (ticTacToeState.winner && ticTacToeState.resetGame) {
         ticTacToeState.resetGame();
-        setTicTacToeState({ ...ticTacToeState, winner: null, currentPlayer: 'X' });
+        setTicTacToeState(prev => ({ ...prev, winner: null, currentPlayer: 'X' }));
       } else if (!isPlaying) {
-        // Bắt đầu game mới
         setIsPlaying(true);
         setTicTacToeState({ currentPlayer: 'X', winner: null, resetGame: null });
       }
-    } else if (currentScreenName === 'MATCH3') {
-      setIsPlaying(true);
-      setScore(0);
-    } else if (currentScreenName === 'MEMORY') {
-      if (!isPlaying) {
-        // Bắt đầu game:
-        setIsPlaying(true);
-        setScore(0);
-        memoryGame.initGame(); // Tạo bộ bài mới
-      }
     } else if (currentScreenName === 'CARO4') {
-      // Nếu game đã kết thúc, reset game
       if (caroState.winner && caroState.resetGame) {
         caroState.resetGame();
-        setCaroState({ ...caroState, winner: null, currentPlayer: 'BLUE' });
+        setCaroState(prev => ({ ...prev, winner: null, currentPlayer: 'BLUE' }));
       } else if (!isPlaying) {
-        // Bắt đầu game mới
         setIsPlaying(true);
         setCaroState({ currentPlayer: 'BLUE', winner: null, resetGame: null });
       }
     } else if (currentScreenName === 'CARO5') {
-      // Nếu game đã kết thúc, reset game
       if (caro5State.winner && caro5State.resetGame) {
         caro5State.resetGame();
-        setCaro5State({ ...caro5State, winner: null, currentPlayer: 'BLUE' });
+        setCaro5State(prev => ({ ...prev, winner: null, currentPlayer: 'BLUE' }));
       } else if (!isPlaying) {
-        // Bắt đầu game mới
         setIsPlaying(true);
         setCaro5State({ currentPlayer: 'BLUE', winner: null, resetGame: null });
       }
-    } else if (currentScreenName === 'DRAWING') {
-      // Bắt đầu vẽ
-      if (!isPlaying) {
+    } else if (currentScreenName === 'SNAKE') {
+      // ĐỂ ĐẢM BẢO RESTART: Luôn cho phép restart khi bấm Enter ở màn hình Snake
+      toast.success("RESTARTING SNAKE...");
+
+      // Reset triệt để bằng cách tắt/bật
+      setIsPlaying(false);
+      setScore(0);
+      setSnakeState(prev => ({ ...prev, isGameOver: false }));
+
+      setTimeout(() => {
         setIsPlaying(true);
-      }
-    } else {
-      toast.error("Game chưa được implement!");
+      }, 20);
+    } else if (currentScreenName === 'MEMORY' && !isPlaying) {
+      setIsPlaying(true);
+      setScore(0);
+      memoryGame.initGame();
+    } else if (currentScreenName === 'DRAWING' && !isPlaying) {
+      setIsPlaying(true);
+    } else if (!isPlaying) {
+      setIsPlaying(true);
+      setScore(0);
     }
-  };
+  }, [currentScreenName, isPlaying, snakeState.isGameOver, ticTacToeState, caroState, caro5State, memoryGame]);
+
+  // Keyboard controls
+  const handleEnterRef = useRef();
+
+  // Luôn cập nhật ref với hàm mới nhất để listener không bao giờ bị stale
+  useEffect(() => {
+    handleEnterRef.current = handleEnter;
+  }, [handleEnter]);
+
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      // 1. Phím Enter hoặc NumpadEnter
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        if (handleEnterRef.current) {
+          handleEnterRef.current();
+        }
+        return;
+      }
+
+      // 2. Chỉ xử lý di chuyển nếu đang chơi Snake
+      if (!isPlaying || currentScreenName !== 'SNAKE' || !snakeState.changeDirection) return;
+
+      switch (e.key) {
+        case 'ArrowUp':
+        case 'w':
+        case 'W':
+          snakeState.changeDirection('UP');
+          break;
+        case 'ArrowDown':
+        case 's':
+        case 'S':
+          snakeState.changeDirection('DOWN');
+          break;
+        case 'ArrowLeft':
+        case 'a':
+        case 'A':
+          snakeState.changeDirection('LEFT');
+          break;
+        case 'ArrowRight':
+        case 'd':
+        case 'D':
+          snakeState.changeDirection('RIGHT');
+          break;
+        default:
+          break;
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isPlaying, currentScreenName, snakeState.changeDirection]);
+  // Rất quan trọng: Re-bind khi isPlaying hoặc changeDirection đổi để đảm bảo capture đúng context
+
 
   const getStatusText = () => {
     if (!isPlaying) return '';
@@ -116,8 +200,21 @@ const DashboardPage = () => {
     if (currentScreenName === 'DRAWING') {
       return `- ${drawingGame.isErasing ? 'ERASING' : drawingGame.selectedColor}`;
     }
+    if (currentScreenName === 'SNAKE') {
+      if (snakeState.isGameOver) return '- GAME OVER! (PRESS ENTER TO RESTART)';
+      return '- HUNTING... (USE ARROWS OR L/R BUTTONS)';
+    }
     return '(PLAYING)';
   };
+
+  // Xử lý nút vật lý Left/Right
+  const handleOnLeft = useCallback(() => {
+    handlePrevScreen();
+  }, [handlePrevScreen]);
+
+  const handleOnRight = useCallback(() => {
+    handleNextScreen();
+  }, [handleNextScreen]);
 
   return (
     <div className="h-full w-full flex items-center justify-center p-4 overflow-hidden">
@@ -137,19 +234,11 @@ const DashboardPage = () => {
               <GameMatrix
                 screen={currentScreenName}
                 isPlaying={isPlaying}
-                onScoreUpdate={setScore}
+                onScoreUpdate={handleScoreUpdate}
                 onCardClick={memoryGame.handleCardClick}
                 activeGameState={memoryGame}
                 botEnabled={true}  // Bật bot cho TicTacToe
-                onGameStateUpdate={(newState) => {
-                  if (currentScreenName === 'TICTACTOE') {
-                    setTicTacToeState(newState);
-                  } else if (currentScreenName === 'CARO4') {
-                    setCaroState(newState);
-                  } else if (currentScreenName === 'CARO5') {
-                    setCaro5State(newState);
-                  }
-                }}
+                onGameStateUpdate={handleGameStateUpdate}
                 drawingState={drawingGame}
               />
             </div>
@@ -181,16 +270,16 @@ const DashboardPage = () => {
 
               {/* Truyền hàm xử lý bấm nút vào GameControls */}
               <GameControls
-                onLeft={handlePrevScreen}
-                onRight={handleNextScreen}
-                onBack={() => {
+                onLeft={handleOnLeft}
+                onRight={handleOnRight}
+                onBack={useCallback(() => {
                   if (isPlaying) {
                     setIsPlaying(false);
                     setScore(0);
                     setTicTacToeState({ currentPlayer: 'X', winner: null, resetGame: null });
                     setCaroState({ currentPlayer: 'BLUE', winner: null, resetGame: null });
                   }
-                }}
+                }, [isPlaying])}
                 onEnter={handleEnter}
               />
             </div>

@@ -13,20 +13,21 @@ import { useMatch3 } from '../../hooks/useMatch3';
 import { useTicTacToe } from '../../hooks/useTicTacToe';
 import { useCaro } from '../../hooks/useCaro';
 import { useCaro5 } from '../../hooks/useCaro5';
+import { useSnake } from '../../hooks/useSnake';
 import { useEffect, useRef, useState } from 'react';
 
 // Games sử dụng full board (kích thước động theo config) - CHỈ KHI CHƠI THẬT
-const FULLBOARD_GAMES = ['CARO4', 'CARO5', 'DRAWING'];
+const FULLBOARD_GAMES = ['CARO4', 'CARO5', 'DRAWING', 'SNAKE'];
 
 // Kích thước gốc của các game screens (được thiết kế cho 13x13)
 const ORIGINAL_GAME_SIZE = 13;
 
-const GameMatrix = ({ 
-  screen = 'HEART', 
-  isPlaying = false, 
-  onScoreUpdate, 
+const GameMatrix = ({
+  screen = 'HEART',
+  isPlaying = false,
+  onScoreUpdate,
   onGameStateUpdate,
-  activeGameState, 
+  activeGameState,
   onCardClick,
   botEnabled = false,
   drawingState
@@ -45,12 +46,33 @@ const GameMatrix = ({
   // Hook cho game Caro5
   const caro5 = useCaro5(isPlaying && screen === 'CARO5', true);
 
-  // Sync score with parent (Dành cho Match 3)
+  // Hook cho game Snake
+  const snake = useSnake(isPlaying && screen === "SNAKE", rows, cols);
+
   useEffect(() => {
     if (screen === 'MATCH3' && isPlaying && onScoreUpdate) {
       onScoreUpdate(match3.score);
     }
   }, [match3.score, screen, isPlaying, onScoreUpdate]);
+
+  // Sync score with parent (Dành cho Snake)
+  useEffect(() => {
+    if (screen === 'SNAKE' && isPlaying && onScoreUpdate) {
+      onScoreUpdate(snake.score);
+    }
+  }, [snake.score, screen, isPlaying, onScoreUpdate]);
+
+  // Sync Snake game state with parent
+  useEffect(() => {
+    if (screen === 'SNAKE' && isPlaying && onGameStateUpdate) {
+      onGameStateUpdate({
+        isGameOver: snake.isGameOver,
+        resetGame: snake.resetGame,
+        changeDirection: snake.changeDirection,
+        direction: snake.direction
+      });
+    }
+  }, [snake.isGameOver, snake.resetGame, snake.changeDirection, snake.direction, screen, isPlaying, onGameStateUpdate]);
 
   // Sync TicTacToe game state with parent
   useEffect(() => {
@@ -120,6 +142,8 @@ const GameMatrix = ({
       return 'bg-[#333] shadow-none opacity-40 scale-[0.7]';
     }
 
+
+
     // 1. Nếu đang chơi TicTacToe: lấy màu từ hook
     if (screen === 'TICTACTOE' && isPlaying) {
       return ticTacToe.getPixelColor(gameR, gameC);
@@ -131,16 +155,18 @@ const GameMatrix = ({
       if (gameR < 1 || gameR > ORIGINAL_GAME_SIZE || gameC < 1 || gameC > ORIGINAL_GAME_SIZE) {
         return 'bg-transparent shadow-none opacity-0';
       }
-      
+
       const cellColor = match3.board[gameR - 1]?.[gameC - 1];
       let classes = cellColor || 'bg-[#222] opacity-20';
 
       if (match3.selected && match3.selected.r === gameR - 1 && match3.selected.c === gameC - 1) {
         classes += ' ring-4 ring-white z-20 scale-110';
       }
-      
+
       return classes;
     }
+
+
 
     // 3. Fullboard Games (Caro, Drawing...)
     if (useFullboard) {
@@ -162,6 +188,13 @@ const GameMatrix = ({
             return drawingState.getPixelColor(r, c);
           }
           return getDrawingPixel(r, c);
+        case 'SNAKE':
+          // Khi đang chơi: dùng hook, không chơi: dùng preview
+          if (isPlaying) {
+            return snake.getPixelColor(r, c);
+          }
+          // PREVIEW: dùng tọa độ đã căn giữa
+          return getSnakePixel(gameR, gameC);
         default:
           return 'bg-[#333] shadow-none opacity-50';
       }
@@ -237,15 +270,15 @@ const GameMatrix = ({
 
   const onPixelClick = (r, c) => {
     if (isDragging) return;
-    
+
     // Chuyển đổi tọa độ cho game fixed-size
     const gameR = r - offsetRow;
     const gameC = c - offsetCol;
-    
+
     // TicTacToe click
     if (screen === 'TICTACTOE' && isPlaying) {
       ticTacToe.handlePixelClick(gameR, gameC);
-    } 
+    }
     // Match3 click (sử dụng tọa độ đã căn giữa)
     else if (screen === 'MATCH3' && isPlaying) {
       match3.handlePixelClick(gameR - 1, gameC - 1);
@@ -299,7 +332,7 @@ const GameMatrix = ({
         {grid.map((dot, index) => (
           <div
             key={index}
-            className={`rounded-full ${dot.colorClass} transition-all duration-300`}
+            className={`rounded-full ${dot.colorClass} transition-all duration-75`}
             style={{ width: `${dotSize}px`, height: `${dotSize}px` }}
             onClick={() => onPixelClick(dot.r, dot.c)}
           ></div>
