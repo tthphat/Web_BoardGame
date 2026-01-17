@@ -7,7 +7,7 @@ export const AchievementController = {
             const userId = req.user.id;
             const { gameSlug, search } = req.query;
 
-            const achievements = await AchievementService.getUserAchievements(knex, userId, gameSlug, search);
+            const achievements = await AchievementService.getUserAchievementsService(knex, userId, gameSlug, search);
 
             res.json({
                 data: achievements
