@@ -169,7 +169,7 @@ export const AuthService = {
             if (user.otp_hash !== otp_hash) {
                 // Tăng số lần thử
                 const newAttempts = (user.otp_attempts || 0) + 1;
-                await UserModel.editUser(user.id, { otp_attempts: newAttempts });
+                await UserModel.updateUser(user.id, { otp_attempts: newAttempts });
 
                 if (newAttempts >= 3) {
                     await UserModel.deleteUser(user.id);
@@ -180,7 +180,7 @@ export const AuthService = {
             }
 
             // reset otp attempts
-            const { error: editError } = await UserModel.editUser(user.id,
+            const { error: editError } = await UserModel.updateUser(user.id,
                 { otp_attempts: 0, otp_hash: null, otp_expires: null, state: "active" });
 
             if (editError) {
@@ -235,7 +235,7 @@ export const AuthService = {
             const otp_attempts = 0; // Reset số lần thử
 
             // edit otp
-            const { error: editError } = await UserModel.editUser(user.id,
+            const { error: editError } = await UserModel.updateUser(user.id,
                 { otp_hash, otp_expires, otp_attempts });
 
             if (editError) {

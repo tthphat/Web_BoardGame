@@ -4,6 +4,7 @@ import GameControls from '../components/games/GameControls';
 import ColorPalette from '../components/games/ColorPalette';
 import { useMemoryGame } from '../hooks/useMemoryGame';
 import { useDrawing } from '../hooks/useDrawing';
+import { toast } from 'sonner';
 
 const DashboardPage = () => {
   // Danh sách các màn hình
@@ -89,7 +90,7 @@ const DashboardPage = () => {
         setIsPlaying(true);
       }
     } else {
-      alert("Game chưa được implement!");
+      toast.error("Game chưa được implement!");
     }
   };
 

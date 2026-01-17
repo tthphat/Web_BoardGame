@@ -38,6 +38,8 @@ const MainLayout = () => {
       case 'Achievements': path = 'trophy'; break;
       case 'Ranking': path = 'ranking'; break;
       case 'Profile': path = 'profile'; break;
+      case 'Login': path = 'login'; break;
+      case 'Register': path = 'register'; break;
       default: path = ''; break;
     }
     navigate(`/${path}`);
