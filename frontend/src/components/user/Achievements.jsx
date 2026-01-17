@@ -110,18 +110,18 @@ const Achievements = () => {
                                     </div>
 
                                     {/* Achievement Details */}
-                                    <div className="flex-1 space-y-1 overflow-hidden">
-                                        <h3 className="font-bold text-xs uppercase truncate text-retro-navy leading-tight" title={ach.name}>
+                                    <div className="flex-1 space-y-2 overflow-hidden">
+                                        <h3 className="font-bold text-sm uppercase text-retro-navy leading-tight" title={ach.name}>
                                             {ach.name}
                                         </h3>
-                                        <p className="text-[10px] text-retro-shadow leading-tight line-clamp-2 min-h-[20px]">
+                                        <p className="text-xs text-gray-700 leading-relaxed font-medium line-clamp-3 min-h-[36px]">
                                             {ach.description}
                                         </p>
-                                        <div className="flex justify-between items-end mt-1">
-                                            <span className="text-[9px] bg-retro-navy text-white px-1 font-bold">
+                                        <div className="flex flex-wrap justify-between items-end mt-1 gap-1">
+                                            <span className="text-[11px] bg-retro-navy text-white px-1.5 py-0.5 font-bold">
                                                 {ach.code}
                                             </span>
-                                            <span className="text-[9px] text-gray-500 italic">
+                                            <span className="text-[11px] text-gray-800 font-bold">
                                                 {new Date(ach.earned_at).toLocaleDateString()}
                                             </span>
                                         </div>
