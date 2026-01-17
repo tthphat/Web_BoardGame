@@ -37,8 +37,8 @@ const GameMatrix = ({
   // Hook cho game TicTacToe (truyền botEnabled)
   const ticTacToe = useTicTacToe(isPlaying && screen === 'TICTACTOE', botEnabled);
 
-  // Hook cho game Caro4
-  const caro = useCaro(isPlaying && screen === 'CARO4');
+  // Hook cho game Caro4 (truyền botEnabled)
+  const caro = useCaro(isPlaying && screen === 'CARO4', botEnabled);
 
   // Hook cho game Caro5 (truyền botEnabled)
   const caro5 = useCaro5(isPlaying && screen === 'CARO5', botEnabled);
