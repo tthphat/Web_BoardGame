@@ -8,6 +8,7 @@ import { getCaro4Pixel } from './screens/Caro4Screen';
 import { getMatch3Pixel } from './screens/Match3Screen';
 import { getMemoryPixel } from './screens/MemoryScreen';
 import { getActiveMemoryPixel } from './screens/ActiveMemoryScreen';
+import { getDrawingPixel } from './screens/DrawingScreen';
 import { useMatch3 } from '../../hooks/useMatch3';
 import { useTicTacToe } from '../../hooks/useTicTacToe';
 import { useCaro } from '../../hooks/useCaro';
@@ -27,7 +28,8 @@ const GameMatrix = ({
   onGameStateUpdate,
   activeGameState, 
   onCardClick,
-  botEnabled = false  // Thêm prop cho bot TicTacToe
+  botEnabled = false,
+  drawingState
 }) => {
   const { cols, rows, dotSize, gap } = getBoardConfig();
 
@@ -37,11 +39,11 @@ const GameMatrix = ({
   // Hook cho game TicTacToe (truyền botEnabled)
   const ticTacToe = useTicTacToe(isPlaying && screen === 'TICTACTOE', botEnabled);
 
-  // Hook cho game Caro4 (truyền botEnabled)
-  const caro = useCaro(isPlaying && screen === 'CARO4', botEnabled);
+  // Hook cho game Caro4
+  const caro = useCaro(isPlaying && screen === 'CARO4');
 
-  // Hook cho game Caro5 (truyền botEnabled)
-  const caro5 = useCaro5(isPlaying && screen === 'CARO5', botEnabled);
+  // Hook cho game Caro5
+  const caro5 = useCaro5(isPlaying && screen === 'CARO5');
 
   // Sync score with parent (Dành cho Match 3)
   useEffect(() => {
@@ -151,7 +153,10 @@ const GameMatrix = ({
           }
           return getCaro4Pixel(r, c);
         case 'DRAWING':
-          return 'bg-[#333] shadow-none opacity-50';
+          if (isPlaying && drawingState) {
+            return drawingState.getPixelColor(r, c);
+          }
+          return getDrawingPixel(r, c);
         default:
           return 'bg-[#333] shadow-none opacity-50';
       }
@@ -247,6 +252,10 @@ const GameMatrix = ({
     // Caro5 click
     else if (screen === 'CARO5' && isPlaying) {
       caro5.handlePixelClick(r, c);
+    }
+    // Drawing click
+    else if (screen === 'DRAWING' && isPlaying && drawingState) {
+      drawingState.handlePixelClick(r, c);
     }
     // Memory click
     else if (screen === 'MEMORY' && isPlaying && onCardClick) {
