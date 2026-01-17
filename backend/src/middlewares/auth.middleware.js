@@ -3,7 +3,7 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
-export function authMiddleware(req, res, next) {
+export function verifyToken(req, res, next) {
     const header = req.cookies.access_token;
 
     console.log("Backend-auth.middleware.js-verifyToken header: ", header);
