@@ -64,3 +64,69 @@ export async function verifyEmailApi(payload) {
     return data;
 }
 
+// Resend OTP
+export async function resendOTPApi(email) {
+    console.log("Fontend-Auth-Service: Resend OTP API input: ", email);
+
+    const response = await fetch("/api/auth/resend-otp", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email }),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+        throw new Error(data.message || data.error || "Resend OTP failed");
+    }
+
+    console.log("Fontend-Auth-Service: Resend OTP API output: ", data);
+    // return data;
+}
+
+// Get profile
+export async function getProfileApi() {
+    console.log("Fontend-Auth-Service: Get profile API input: ");
+
+    const response = await fetch("/api/user/profile", {
+        method: "GET",
+        credentials: "include",
+        headers: {
+            "Content-Type": "application/json",
+        },
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+        throw new Error(data.message || data.error || "Get profile failed");
+    }
+
+    console.log("Fontend-Auth-Service: Get profile API output: ", data);
+    return data;
+}
+
+// Edit profile
+export async function editProfileApi(payload) {
+    console.log("Fontend-Auth-Service: Edit profile API input: ", payload);
+
+    const response = await fetch("/api/user/profile", {
+        method: "PATCH",
+        credentials: "include",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+        throw new Error(data.message || data.error || "Edit profile failed");
+    }
+
+    console.log("Fontend-Auth-Service: Edit profile API output: ", data);
+    return data;
+}

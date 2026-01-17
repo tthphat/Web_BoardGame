@@ -3,18 +3,20 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
-export const authMiddleware = (req, res, next) => {
+export function authMiddleware(req, res, next) {
+    const header = req.cookies.access_token;
+
+    console.log("Backend-auth.middleware.js-verifyToken header: ", header);
+
+    if (!header) return res.status(401).json({ error: "Missing token" });
+
     try {
-        const token = req.cookies.token;
-
-        if (!token) {
-            return res.status(401).json({ message: "Unauthorized: No token provided" });
-        }
-
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        req.user = decoded; // { id, email, role, ... }
+        const decoded = jwt.verify(header, process.env.JWT_SECRET);
+        req.user = decoded; // { id, role, email }
+        console.log("Backend-auth.middleware.js-verifyToken decoded: ", decoded);
         next();
-    } catch (error) {
-        return res.status(401).json({ message: "Unauthorized: Invalid token" });
+    } catch (err) {
+        console.log("Backend-auth.middleware.js-verifyToken error: ", err);
+        res.status(401).json({ error: "Invalid token" });
     }
-};
+}

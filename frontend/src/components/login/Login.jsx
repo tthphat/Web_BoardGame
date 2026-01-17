@@ -21,10 +21,10 @@ function Login() {
     const onSubmit = async (data) => {
         try {
             await login(data);
-            toast.success("Login thành công");
+            toast.success("Login successfully");
             navigate("/");
         } catch (error) {
-            toast.error("Login thất bại");
+            toast.error("Login failed");
             setError("email", { message: error.message });
         }
     }

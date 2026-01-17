@@ -34,7 +34,7 @@ export const AuthService = {
                     role: user.role
                 },
                 process.env.JWT_SECRET,
-                { expiresIn: "1h" }
+                { expiresIn: "7d" }
             );
 
             return {
@@ -169,7 +169,7 @@ export const AuthService = {
             if (user.otp_hash !== otp_hash) {
                 // Tăng số lần thử
                 const newAttempts = (user.otp_attempts || 0) + 1;
-                await UserModel.updateUser(user.id, { otp_attempts: newAttempts });
+                await UserModel.editUser(user.id, { otp_attempts: newAttempts });
 
                 if (newAttempts >= 3) {
                     await UserModel.deleteUser(user.id);
@@ -180,22 +180,22 @@ export const AuthService = {
             }
 
             // reset otp attempts
-            const { error: updateError } = await UserModel.updateUser(user.id,
+            const { error: editError } = await UserModel.editUser(user.id,
                 { otp_attempts: 0, otp_hash: null, otp_expires: null, state: "active" });
 
-            if (updateError) {
-                throw new Error("Lỗi khi cập nhật OTP");
+            if (editError) {
+                throw new Error("Failed to edit user");
             }
 
             // Tạo JWT
             const token = jwt.sign(
                 {
-                    userid: user.userid,
+                    id: user.id,
                     role: user.role,
                     email: user.email,
                 },
                 process.env.JWT_SECRET,
-                { expiresIn: "1h" }
+                { expiresIn: "7d" }
             );
 
             return {
@@ -208,6 +208,45 @@ export const AuthService = {
                         username: user.username,
                     }
                 }
+            };
+        } catch (error) {
+            throw error;
+        }
+    },
+
+    // resend OTP
+    async resendOtp(email) {
+        try {
+            const { data: user, error } = await UserModel.findUserByEmail(email);
+            if (error || !user) {
+                throw new Error("User not found");
+            }
+
+            // tạo otp mới
+            const otp = Math.floor(100000 + Math.random() * 900000).toString();
+
+            // Hash OTP
+            const otp_hash = crypto
+                .createHash("sha256")
+                .update(otp)
+                .digest("hex");
+
+            const otp_expires = new Date(Date.now() + 3 * 60 * 1000); // 3 phút mới
+            const otp_attempts = 0; // Reset số lần thử
+
+            // edit otp
+            const { error: editError } = await UserModel.editUser(user.id,
+                { otp_hash, otp_expires, otp_attempts });
+
+            if (editError) {
+                throw new Error("Lỗi khi cập nhật OTP");
+            }
+
+            // send otp
+            await AuthService.sendOtpEmail(email, otp);
+
+            return {
+                message: "OTP sent successfully"
             };
         } catch (error) {
             throw error;

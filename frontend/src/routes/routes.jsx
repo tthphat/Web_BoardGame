@@ -4,7 +4,9 @@ import DashboardPage from "../pages/DashboardPage";
 import DemoPage from "../pages/DemoPage";
 import LoginPage from "../pages/auth/LoginPage";
 import RegisterPage from "../pages/auth/RegisterPage";
+import AdminMainLayout from "../layouts/AdminMainLayout";
 import VerifyEmail from "../components/register/VerifyEmail";
+import ProfilePage from "../pages/user/ProfilePage";
 
 export const router = createBrowserRouter([
     { path: "/login", element: <LoginPage /> },
@@ -13,6 +15,10 @@ export const router = createBrowserRouter([
 
     { path: "/verify-email", element: <VerifyEmail /> },
 
+    {
+        path: "/admin",
+        element: <AdminMainLayout />
+    },
     {
         path: "/",
         element: <MainLayout />,
@@ -27,7 +33,7 @@ export const router = createBrowserRouter([
             },
             {
                 path: "/profile",
-                element: <DemoPage title="Profile" description="Đây là trang thông tin cá nhân. Hãy thử cuộn chuột hoặc đổi theme!" />
+                element: <ProfilePage />
             },
             {
                 path: "/friends",

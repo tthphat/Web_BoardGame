@@ -83,11 +83,26 @@
 
   --color-sidebar-ring: var(--sidebar-ring);
 
+  /* tự định nghĩa */
   --color-retro-silver: #c0c0c0;
   --color-retro-teal: #008080;
   --color-retro-navy: #000080;
   --color-retro-shadow: #808080;
   --color-retro-highlight: #ffffff;
+  /* khúc này của login, để tạm đừng xóa để phát sửa sau */
+
+  --color-base-background: var(--base-background);
+
+  --color-primary-background: var(--primary-background);
+
+  --color-secondary-background: var(--secondary-background);
+
+  --color-primary-border: #808080;
+
+  --color-primary-text: var(--primary-text);
+
+  --color-secondary-text: var(--secondary-text);
+
 }
 
 :root {
@@ -155,6 +170,17 @@
   --sidebar-border: oklch(0.922 0 0);
 
   --sidebar-ring: oklch(0.708 0 0);
+
+  /* tự định nghĩa */
+  --base-background: #008080;
+
+  --primary-background: #c0c0c0;
+
+  --secondary-background: #e0e0e0;
+
+  --primary-text: text-gray-800;
+
+  --secondary-text: text-gray-600;
 }
 
 .dark {
@@ -220,6 +246,17 @@
   --sidebar-border: oklch(1 0 0 / 10%);
 
   --sidebar-ring: oklch(0.556 0 0);
+
+  /* tự định nghĩa */
+  --base-background: #111827;
+
+  --primary-background: #2d2d2d;
+
+  --secondary-background: #333;
+
+  --primary-text: text-white;
+
+  --secondary-text: text-gray-300;
 }
 
 @layer base {

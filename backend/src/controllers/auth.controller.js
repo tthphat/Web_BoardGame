@@ -13,12 +13,12 @@ export const AuthController = {
             const { email, password } = req.body;
 
             if (!email || !password) {
-                throw new Error("Email and password are required");
+                return res.status(400).json({ error: "Email and password are required" });
             }
 
             const user = await AuthService.login(email, password);
 
-            res.cookie("token", user.data.token, {
+            res.cookie("access_token", user.data.token, {
                 httpOnly: true,
                 secure: process.env.NODE_ENV === "production",
                 sameSite: "lax",
@@ -46,7 +46,7 @@ export const AuthController = {
             const { email, password, username } = req.body;
 
             if (!email || !password) {
-                throw new Error("Email and password are required");
+                return res.status(400).json({ error: "Email and password are required" });
             }
 
             const user = await AuthService.register(email, password, username);
@@ -72,12 +72,12 @@ export const AuthController = {
             const { email, otp } = req.body;
 
             if (!email || !otp) {
-                throw new Error("Email and OTP are required");
+                return res.status(400).json({ error: "Email and OTP are required" });
             }
 
             const user = await AuthService.verifyEmail(email, otp);
 
-            res.cookie("token", user.data.token, {
+            res.cookie("access_token", user.data.token, {
                 httpOnly: true,
                 secure: process.env.NODE_ENV === "production",
                 sameSite: "lax",
@@ -90,6 +90,27 @@ export const AuthController = {
                 data: {
                     user: user.data.user
                 }
+            });
+
+        } catch (error) {
+            next(error);
+        }
+    },
+
+    // resend OTP
+    async resendOtp(req, res, next) {
+        try {
+            const { email } = req.body;
+            console.log("Backend-Auth-Controller: Resend OTP API input: ", { email });
+
+            if (!email) {
+                return res.status(400).json({ error: "Email is required" });
+            }
+
+            await AuthService.resendOtp(email);
+
+            res.json({
+                message: "OTP sent successfully"
             });
 
         } catch (error) {
