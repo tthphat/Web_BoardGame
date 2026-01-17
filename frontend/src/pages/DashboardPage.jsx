@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import GameMatrix from '../components/games/GameMatrix';
 import GameControls from '../components/games/GameControls';
+import ColorPalette from '../components/games/ColorPalette';
 import { useMemoryGame } from '../hooks/useMemoryGame';
+import { useDrawing } from '../hooks/useDrawing';
 
 const DashboardPage = () => {
   // Danh sách các màn hình
-  const screens = ['HEART', 'SNAKE', 'CARO5', 'CARO4', 'TICTACTOE', 'MATCH3', 'MEMORY'];
+  const screens = ['SNAKE', 'DRAWING', 'CARO5', 'CARO4', 'TICTACTOE', 'MATCH3', 'MEMORY'];
   // State lưu chỉ số màn hình hiện tại (0 là HEART)
   const [currentScreenIndex, setCurrentScreenIndex] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -36,6 +38,9 @@ const DashboardPage = () => {
   };
 
   const currentScreenName = screens[currentScreenIndex];
+
+  // Drawing hook - phải đặt sau currentScreenName
+  const drawingGame = useDrawing(isPlaying && currentScreenName === 'DRAWING');
 
   const handleEnter = () => {
     if (currentScreenName === 'TICTACTOE') {
@@ -78,6 +83,11 @@ const DashboardPage = () => {
         setIsPlaying(true);
         setCaro5State({ currentPlayer: 'BLUE', winner: null, resetGame: null });
       }
+    } else if (currentScreenName === 'DRAWING') {
+      // Bắt đầu vẽ
+      if (!isPlaying) {
+        setIsPlaying(true);
+      }
     } else {
       alert("Game chưa được implement!");
     }
@@ -101,6 +111,9 @@ const DashboardPage = () => {
       if (caro5State.winner === 'BLUE') return '- XANH THẮNG!';
       if (caro5State.winner === 'RED') return '- ĐỎ THẮNG!';
       return `- Lượt ${caro5State.currentPlayer === 'BLUE' ? 'XANH' : 'ĐỎ'}`;
+    }
+    if (currentScreenName === 'DRAWING') {
+      return `- ${drawingGame.isErasing ? 'ERASING' : drawingGame.selectedColor}`;
     }
     return '(PLAYING)';
   };
@@ -136,6 +149,7 @@ const DashboardPage = () => {
                     setCaro5State(newState);
                   }
                 }}
+                drawingState={drawingGame}
               />
             </div>
           </div>
@@ -147,11 +161,22 @@ const DashboardPage = () => {
             </div>
 
             <div className="flex-1 flex flex-col items-center justify-center gap-8 p-4">
-              <div className="w-full bg-black border-2 border-gray-500 p-2 text-green-500 font-mono text-xs mb-4">
-                <div className="flex justify-between"><span>SCORE</span><span>{score.toString().padStart(4, '0')}</span></div>
-                <div className="flex justify-between"><span>HI-SC</span><span>9999</span></div>
-                <div className="flex justify-between mt-2"><span>LEVEL</span><span>01</span></div>
-              </div>
+              {/* Hiển thị ColorPalette khi đang chơi Drawing */}
+              {currentScreenName === 'DRAWING' && isPlaying ? (
+                <ColorPalette
+                  selectedColor={drawingGame.selectedColor}
+                  isErasing={drawingGame.isErasing}
+                  onColorChange={drawingGame.setColor}
+                  onToggleEraser={drawingGame.toggleEraser}
+                  onClear={drawingGame.clearCanvas}
+                />
+              ) : (
+                <div className="w-full bg-black border-2 border-gray-500 p-2 text-green-500 font-mono text-xs mb-4">
+                  <div className="flex justify-between"><span>SCORE</span><span>{score.toString().padStart(4, '0')}</span></div>
+                  <div className="flex justify-between"><span>HI-SC</span><span>9999</span></div>
+                  <div className="flex justify-between mt-2"><span>LEVEL</span><span>01</span></div>
+                </div>
+              )}
 
               {/* Truyền hàm xử lý bấm nút vào GameControls */}
               <GameControls
