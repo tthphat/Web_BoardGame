@@ -50,7 +50,7 @@ function VerifyEmail() {
         try {
             await verifyEmail({ email: user.email, otp: data.otp });
             toast.success("Register successfully");
-            navigate("/login");
+            navigate("/login", { replace: true });
         } catch (error) {
             toast.error(error.message);
             setError("otp", { message: error.message });
