@@ -33,17 +33,17 @@ const GameMatrix = ({
 }) => {
   const { cols, rows, dotSize, gap } = getBoardConfig();
 
-  // Hook cho game Match 3
-  const match3 = useMatch3(rows, cols, isPlaying && screen === 'MATCH3');
+  // Hook cho game Match 3 (sử dụng kích thước cố định 13x13)
+  const match3 = useMatch3(isPlaying && screen === 'MATCH3');
 
   // Hook cho game TicTacToe (truyền botEnabled)
   const ticTacToe = useTicTacToe(isPlaying && screen === 'TICTACTOE', botEnabled);
 
   // Hook cho game Caro4
-  const caro = useCaro(isPlaying && screen === 'CARO4');
+  const caro = useCaro(isPlaying && screen === 'CARO4', true);
 
   // Hook cho game Caro5
-  const caro5 = useCaro5(isPlaying && screen === 'CARO5');
+  const caro5 = useCaro5(isPlaying && screen === 'CARO5', true);
 
   // Sync score with parent (Dành cho Match 3)
   useEffect(() => {
@@ -92,10 +92,10 @@ const GameMatrix = ({
   const useFullboard = isPlaying && FULLBOARD_GAMES.includes(screen);
 
   // Tính offset để căn giữa
-  // Match 3: Full size -> Offset 0
-  // Memory (Active): Vẫn dùng 13x13 căn giữa -> Có Offset
-  const offsetCol = (useFullboard || (screen === 'MATCH3' && isPlaying)) ? 0 : Math.floor((cols - ORIGINAL_GAME_SIZE) / 2);
-  const offsetRow = (useFullboard || (screen === 'MATCH3' && isPlaying)) ? 0 : Math.floor((rows - ORIGINAL_GAME_SIZE) / 2);
+  // Fullboard games (Caro4, Caro5, Drawing): Offset 0 (dùng toàn bộ board)
+  // Standard games (Match3, Memory, TicTacToe...): Căn giữa 13x13 -> Có Offset
+  const offsetCol = useFullboard ? 0 : Math.floor((cols - ORIGINAL_GAME_SIZE) / 2);
+  const offsetRow = useFullboard ? 0 : Math.floor((rows - ORIGINAL_GAME_SIZE) / 2);
 
   // Hàm điều phối: chuyển đổi tọa độ và gọi screen tương ứng
   const getPixelColor = (r, c) => {
@@ -112,8 +112,8 @@ const GameMatrix = ({
     // Nếu nằm ngoài vùng game
     const isOutside = gameR < 1 || gameR > maxRows || gameC < 1 || gameC > maxCols;
     if (isOutside) {
-      // TicTacToe: ẩn hoàn toàn các dots ngoài vùng chơi
-      if (screen === 'TICTACTOE' && isPlaying) {
+      // TicTacToe, Match3 và Memory: ẩn hoàn toàn các dots ngoài vùng chơi
+      if ((screen === 'TICTACTOE' || screen === 'MATCH3' || screen === 'MEMORY') && isPlaying) {
         return 'bg-transparent shadow-none opacity-0';
       }
       // Các game khác: hiển thị dot mờ
@@ -125,12 +125,17 @@ const GameMatrix = ({
       return ticTacToe.getPixelColor(gameR, gameC);
     }
 
-    // 2. Nếu đang chơi Match 3: lấy màu từ hook
+    // 2. Nếu đang chơi Match 3: lấy màu từ hook (sử dụng tọa độ đã căn giữa)
     if (screen === 'MATCH3' && isPlaying) {
-      const cellColor = match3.board[r - 1]?.[c - 1];
+      // Kiểm tra xem có nằm trong vùng 13x13 không - ẩn hoàn toàn dots ngoài vùng chơi
+      if (gameR < 1 || gameR > ORIGINAL_GAME_SIZE || gameC < 1 || gameC > ORIGINAL_GAME_SIZE) {
+        return 'bg-transparent shadow-none opacity-0';
+      }
+      
+      const cellColor = match3.board[gameR - 1]?.[gameC - 1];
       let classes = cellColor || 'bg-[#222] opacity-20';
 
-      if (match3.selected && match3.selected.r === r - 1 && match3.selected.c === c - 1) {
+      if (match3.selected && match3.selected.r === gameR - 1 && match3.selected.c === gameC - 1) {
         classes += ' ring-4 ring-white z-20 scale-110';
       }
       
@@ -241,9 +246,9 @@ const GameMatrix = ({
     if (screen === 'TICTACTOE' && isPlaying) {
       ticTacToe.handlePixelClick(gameR, gameC);
     } 
-    // Match3 click
+    // Match3 click (sử dụng tọa độ đã căn giữa)
     else if (screen === 'MATCH3' && isPlaying) {
-      match3.handlePixelClick(r - 1, c - 1);
+      match3.handlePixelClick(gameR - 1, gameC - 1);
     }
     // Caro4 click
     else if (screen === 'CARO4' && isPlaying) {
