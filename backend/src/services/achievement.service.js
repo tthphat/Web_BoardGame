@@ -1,5 +1,6 @@
 import {
-    findAchievementByCode
+    findAchievementByCode,
+    getAchievements
 } from "../models/achievement.model.js";
 
 import {
@@ -23,5 +24,9 @@ export class AchievementService {
 
     static async getUserAchievementsService(knex, userId, gameSlug, searchName) {
         return await getUserAchievements(knex, userId, gameSlug, searchName);
+    }
+
+    static async getAchievementsService(knex, gameSlug) {
+        return await getAchievements(knex, gameSlug);
     }
 }

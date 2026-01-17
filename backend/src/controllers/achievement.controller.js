@@ -15,5 +15,18 @@ export const AchievementController = {
         } catch (error) {
             next(error);
         }
+    },
+
+    async getAllAchievements(req, res, next) {
+        try {
+            const { gameSlug } = req.query;
+            const achievements = await AchievementService.getAchievementsService(knex, gameSlug);
+
+            res.json({
+                data: achievements
+            });
+        } catch (error) {
+            next(error);
+        }
     }
 };
