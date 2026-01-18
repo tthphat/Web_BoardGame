@@ -47,7 +47,9 @@ const DashboardPage = () => {
   // Callback đồng bộ Score - Memoized
   const handleScoreUpdate = useCallback((newScore) => {
     setScore(newScore);
-  }, []);
+  }, []); /* GameMatrix gọi callback này liên tục. Nếu function đổi reference: 
+  GameMatrix sẽ re-render lại. Không dùng useCallback sẽ không crash nhưng GameMatrix sẽ
+  re-render liên tục */
 
   // Callback đồng bộ Game State - Memoized
   const handleGameStateUpdate = useCallback((newState) => {
@@ -71,11 +73,6 @@ const DashboardPage = () => {
   }, [currentScreenName]);
 
   const handleEnter = useCallback(() => {
-    // Diagnosos: Báo trạng thái ra UI để check
-    const statusText = `Enter: ${currentScreenName} | Play: ${isPlaying} | Over: ${snakeState.isGameOver}`;
-    toast.info(statusText);
-    console.log("HANDLE ENTER:", statusText);
-
     if (currentScreenName === 'TICTACTOE') {
       if (ticTacToeState.winner && ticTacToeState.resetGame) {
         ticTacToeState.resetGame();
@@ -202,7 +199,7 @@ const DashboardPage = () => {
     }
     if (currentScreenName === 'SNAKE') {
       if (snakeState.isGameOver) return '- GAME OVER! (PRESS ENTER TO RESTART)';
-      return '- HUNTING... (USE ARROWS OR L/R BUTTONS)';
+      return '- HUNTING... (USE ARROWS OR ASWD)';
     }
     return '(PLAYING)';
   };
@@ -218,7 +215,7 @@ const DashboardPage = () => {
               {/* Hiển thị tên màn hình hiện tại */}
               <div>GAME:</div>
               <div>{currentScreenName} {getStatusText()}</div>
-            </div>
+            </div >
 
             <div className="scale-75 md:scale-100 lg:scale-110 transition-transform">
               {/* Truyền tên màn hình hiện tại vào Matrix */}
@@ -233,10 +230,10 @@ const DashboardPage = () => {
                 drawingState={drawingGame}
               />
             </div>
-          </div>
+          </div >
 
           {/* CỘT PHẢI: ĐIỀU KHIỂN */}
-          <div className="w-64 bg-[#c0c0c0] dark:bg-[#2d2d2d] flex flex-col border-l-2 border-l-gray-400 dark:border-l-gray-700">
+          < div className="w-64 bg-[#c0c0c0] dark:bg-[#2d2d2d] flex flex-col border-l-2 border-l-gray-400 dark:border-l-gray-700" >
             <div className="h-12 border-b-2 border-gray-400 flex items-center justify-center bg-gradient-to-r from-blue-800 to-blue-600">
               <span className="text-white font-bold font-mono tracking-widest">CONTROLS</span>
             </div>
@@ -278,10 +275,10 @@ const DashboardPage = () => {
             <div className="p-2 text-center border-t-2 border-gray-400">
               <div className="text-[10px] text-gray-500 font-mono">INSERT COIN</div>
             </div>
-          </div>
-        </div>
-      </div>
-    </div>
+          </div >
+        </div >
+      </div >
+    </div >
   );
 };
 
