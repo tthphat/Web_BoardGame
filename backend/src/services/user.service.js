@@ -165,4 +165,38 @@ export const UserService = {
             throw error;
         }
     },
+
+    // =============
+    // Get My Friends
+    // =============
+    async getMyFriends(id, page, limit, search) {
+        try {
+            const offset = (page - 1) * limit;
+
+            const { data: count, error: countError } = await UserModel.countMyFriends(id, search);
+            if (countError) {
+                throw new Error("Failed to count my friends");
+            }
+
+            const { data: myFriends, error } = await UserModel.getMyFriends(id, offset, limit, search);
+            console.log("Backend-user.service.js-getMyFriends: ", myFriends);
+            if (error) {
+                throw new Error("Failed to get my friends");
+            }
+
+            return {
+                data: {
+                    myFriends,
+                    pagination: {
+                        page,
+                        limit,
+                        totalPages: Math.ceil(count / limit),
+                        total: count
+                    }
+                }
+            };
+        } catch (error) {
+            throw error;
+        }
+    },
 };

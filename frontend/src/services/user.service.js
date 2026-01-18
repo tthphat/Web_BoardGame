@@ -115,3 +115,26 @@ export async function getFriendRequestsApi(page, limit, search) {
     return data;
 }
 
+// get my friend list
+export async function getMyFriendsApi(page, limit, search) {
+    console.log("Fontend-User-Service: Get my friends API input: ", page, limit, search);
+
+    const response = await fetch(`/api/user/my-friends?page=${page}&limit=${limit}&search=${search}`, {
+        method: "GET",
+        credentials: "include",
+        headers: {
+            "Content-Type": "application/json",
+            "x-api-key": import.meta.env.VITE_API_KEY,
+        },
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+        throw new Error(data.message || data.error || "Get my friends failed");
+    }
+
+    console.log("Fontend-User-Service: Get my friends API output: ", data);
+    return data;
+}
+

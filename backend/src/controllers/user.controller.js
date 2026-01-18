@@ -95,5 +95,26 @@ export const UserController = {
             next(error);
         }
     },
+
+    // =============
+    // Get My Friends
+    // =============
+    async getMyFriends(req, res, next) {
+        try {
+            const page = Number(req.query.page) || 1;
+            const limit = Number(req.query.limit) || 10;
+            const search = req.query.search || "";
+
+            const myFriends = await UserService.getMyFriends(req.user.id, page, limit, search);
+            res.json({
+                data: {
+                    myFriends: myFriends.data.myFriends,
+                    pagination: myFriends.data.pagination
+                }
+            });
+        } catch (error) {
+            next(error);
+        }
+    },
 }
 

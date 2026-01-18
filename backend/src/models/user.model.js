@@ -162,5 +162,75 @@ export const UserModel = {
         }
     },
 
+    // Get my friends
+    async getMyFriends(userId, offset, limit, search = "") {
+        try {
+            const query = knex("friends as f")
+                .join("users as u", function () {
+                    this.on("u.id", "=", "f.sender_id")
+                        .orOn("u.id", "=", "f.receiver_id");
+                })
+                .where("f.status", "accepted")
+                .andWhere(function () {
+                    this.where("f.sender_id", userId)
+                        .orWhere("f.receiver_id", userId);
+                })
+                .andWhere("u.id", "!=", userId); // loại chính mình
+
+            if (search) {
+                query.andWhere((qb) => {
+                    qb.where("u.username", "ilike", `%${search}%`)
+                        .orWhere("u.email", "ilike", `%${search}%`);
+                });
+            }
+
+            const myFriends = await query
+                .select(
+                    "u.id as friend_id",
+                    "u.username",
+                    "u.email",
+                    "u.avatar",
+                    "f.created_at"
+                )
+                .orderBy("f.created_at", "desc")
+                .offset(offset)
+                .limit(limit);
+
+            return { data: myFriends, error: null };
+        } catch (error) {
+            return { data: null, error };
+        }
+    },
+
+    // Count my friends
+    async countMyFriends(userId, search = "") {
+        try {
+            const query = knex("friends as f")
+                .join("users as u", function () {
+                    this.on("u.id", "=", "f.sender_id")
+                        .orOn("u.id", "=", "f.receiver_id");
+                })
+                .where("f.status", "accepted")
+                .andWhere(function () {
+                    this.where("f.sender_id", userId)
+                        .orWhere("f.receiver_id", userId);
+                })
+                .andWhere("u.id", "!=", userId); // loại chính mình
+
+            if (search) {
+                query.andWhere((qb) => {
+                    qb.where("u.username", "ilike", `%${search}%`)
+                        .orWhere("u.email", "ilike", `%${search}%`);
+                });
+            }
+
+            const count = await query.count("u.id as count");
+
+            return { data: Number(count[0].count), error: null };
+        } catch (error) {
+            return { data: null, error };
+        }
+    }
+
 }
 
