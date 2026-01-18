@@ -70,7 +70,6 @@ export async function editProfileApi(payload) {
 }
 
 // Get all users
-// Get all users
 export async function getAllUsersApi(page = 1, limit = 10, search = "") {
     console.log("Fontend-User-Service: Get all users API input: ", page, limit, search);
 
@@ -114,6 +113,29 @@ export async function updateUserStateApi(userId, state) {
     return data;
 }
 
+// Get all users friend
+export async function getAllUsersFriendApi(page, limit, search) {
+    console.log("Fontend-User-Service: Get all users API input: ", page, limit, search);
+
+    const response = await fetch(`/api/user/all-users?page=${page}&limit=${limit}&search=${search}`, {
+        method: "GET",
+        credentials: "include",
+        headers: {
+            "Content-Type": "application/json",
+            "x-api-key": import.meta.env.VITE_API_KEY,
+        },
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+        throw new Error(data.message || data.error || "Get all users failed");
+    }
+
+    console.log("Fontend-User-Service: Get all users API output: ", data);
+    return data;
+}
+
 // Get friend requests
 export async function getFriendRequestsApi(page = 1, limit = 10, search = "") {
     console.log("Fontend-User-Service: Get friend requests API input: ", page, limit, search);
@@ -137,3 +159,49 @@ export async function getFriendRequestsApi(page = 1, limit = 10, search = "") {
     return data;
 }
 
+// get my friend list
+export async function getMyFriendsApi(page, limit, search) {
+    console.log("Fontend-User-Service: Get my friends API input: ", page, limit, search);
+
+    const response = await fetch(`/api/user/my-friends?page=${page}&limit=${limit}&search=${search}`, {
+        method: "GET",
+        credentials: "include",
+        headers: {
+            "Content-Type": "application/json",
+            "x-api-key": import.meta.env.VITE_API_KEY,
+        },
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+        throw new Error(data.message || data.error || "Get my friends failed");
+    }
+
+    console.log("Fontend-User-Service: Get my friends API output: ", data);
+    return data;
+}
+
+// Add friend
+export async function addFriendApi(user_id) {
+    console.log("Fontend-User-Service: Add friend API input: ", user_id);
+
+    const response = await fetch(`/api/user/add-friend`, {
+        method: "POST",
+        credentials: "include",
+        headers: {
+            "Content-Type": "application/json",
+            "x-api-key": import.meta.env.VITE_API_KEY,
+        },
+        body: JSON.stringify({ user_id }),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+        throw new Error(data.message || data.error || "Add friend failed");
+    }
+
+    console.log("Fontend-User-Service: Add friend API output: ", data);
+    return data;
+}

@@ -1,6 +1,7 @@
 import { PaginationSection } from "../common/PaginationSection";
-import { getAllUsersApi } from "@/services/user.service";
+import { getAllUsersFriendApi } from "@/services/user.service";
 import { useState, useEffect, useRef } from "react";
+import AddFriend from "@/components/friends/AddFriend";
 
 
 function UserList() {
@@ -26,7 +27,7 @@ function UserList() {
     useEffect(() => {
         const fetchUsers = async () => {
             try {
-                const data = await getAllUsersApi(page, limit, search);
+                const data = await getAllUsersFriendApi(page, limit, search);
                 setUsers(data.data.users);
                 setTotalPages(data.data.pagination.totalPages);
             } catch (error) {
@@ -113,19 +114,7 @@ function UserList() {
                                             </span>
                                         </td>
                                         <td className="p-3 text-center">
-                                            {user.role !== 'admin' && (
-                                                <button
-                                                    className="
-                                                        px-3 py-1 text-xs border border-blue-600 text-blue-600 
-                                                        hover:bg-blue-600 hover:text-white transition-all
-                                                        active:scale-95 font-bold uppercase
-                                                    "
-                                                    onClick={() => console.log("Add friend:", user.id)}
-                                                    title="Send Friend Request"
-                                                >
-                                                    + Add
-                                                </button>
-                                            )}
+                                            <AddFriend friend_state={user.friend_state} user_id={user.id} />
                                         </td>
                                     </tr>
                                 ))
