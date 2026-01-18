@@ -1,10 +1,11 @@
-export async function getUserAchievementsApi(gameSlug = null, search = null) {
-    console.log("Frontend-Achievement-Service: Get achievements API input: ", { gameSlug, search });
+export async function getUserAchievementsApi(gameSlug = null, search = null, includeUnearned = false) {
+    console.log("Frontend-Achievement-Service: Get achievements API input: ", { gameSlug, search, includeUnearned });
 
     let url = "/api/achievements";
     const params = new URLSearchParams();
     if (gameSlug) params.append("gameSlug", gameSlug);
     if (search) params.append("search", search);
+    if (includeUnearned) params.append("includeUnearned", "true");
 
     if (params.toString()) {
         url += `?${params.toString()}`;

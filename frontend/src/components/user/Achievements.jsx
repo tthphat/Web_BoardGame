@@ -1,17 +1,21 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { getUserAchievementsApi } from '@/services/achievement.service';
-import { Trophy, ShieldAlert, Search, RefreshCcw } from 'lucide-react';
+import { Trophy, ShieldAlert, Search, RefreshCcw, Gamepad2 } from 'lucide-react';
+import { GAME_REGISTRY, GAME_SCREENS } from '@/config/gameRegistry';
 
 const Achievements = () => {
     const [achievements, setAchievements] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [searchTerm, setSearchTerm] = useState('');
+    const [selectedGame, setSelectedGame] = useState(null); // null means "All Games"
 
-    const fetchAchievements = async () => {
+    const fetchAchievements = useCallback(async () => {
         setLoading(true);
         try {
-            const response = await getUserAchievementsApi(null, searchTerm);
+            // Get slug from registry if selectedGame is set
+            const gameSlug = selectedGame ? GAME_REGISTRY[selectedGame]?.slug : null;
+            const response = await getUserAchievementsApi(gameSlug, searchTerm, true);
             setAchievements(response.data || []);
             setError(null);
         } catch (err) {
@@ -19,11 +23,11 @@ const Achievements = () => {
         } finally {
             setLoading(false);
         }
-    };
+    }, [selectedGame, searchTerm]);
 
     useEffect(() => {
         fetchAchievements();
-    }, []);
+    }, [selectedGame]);
 
     const handleSearch = (e) => {
         e.preventDefault();
@@ -42,6 +46,31 @@ const Achievements = () => {
                     <button className="w-5 h-5 bg-retro-silver border-2 border-t-retro-highlight border-l-retro-highlight border-b-black border-r-black text-[10px] flex items-center justify-center active:border-t-black active:border-l-black active:border-b-retro-highlight active:border-r-retro-highlight">_</button>
                     <button className="w-5 h-5 bg-retro-silver border-2 border-t-retro-highlight border-l-retro-highlight border-b-black border-r-black text-[10px] flex items-center justify-center active:border-t-black active:border-l-black active:border-b-retro-highlight active:border-r-retro-highlight">X</button>
                 </div>
+            </div>
+
+            {/* Retro Tabs Filter */}
+            <div className="flex flex-wrap gap-0 px-1 pt-1">
+                <button
+                    onClick={() => setSelectedGame(null)}
+                    className={`px-3 py-1 text-[10px] font-bold uppercase transition-all relative ${!selectedGame
+                        ? 'bg-retro-silver border-2 border-t-retro-shadow border-l-retro-shadow border-b-transparent border-r-retro-shadow z-10 -mb-[2px] pt-1.5'
+                        : 'bg-[#b0b0b0] border-2 border-t-retro-highlight border-l-retro-highlight border-b-retro-shadow border-r-retro-shadow hover:bg-retro-silver'
+                        }`}
+                >
+                    All Games
+                </button>
+                {GAME_SCREENS.filter(key => key !== 'HEART').map((gameKey) => (
+                    <button
+                        key={gameKey}
+                        onClick={() => setSelectedGame(gameKey)}
+                        className={`px-3 py-1 text-[10px] font-bold uppercase transition-all relative ${selectedGame === gameKey
+                            ? 'bg-retro-silver border-2 border-t-retro-shadow border-l-retro-shadow border-b-transparent border-r-retro-shadow z-10 -mb-[2px] pt-1.5'
+                            : 'bg-[#b0b0b0] border-2 border-t-retro-highlight border-l-retro-highlight border-b-retro-shadow border-r-retro-shadow hover:bg-retro-silver'
+                            }`}
+                    >
+                        {GAME_REGISTRY[gameKey].name}
+                    </button>
+                ))}
             </div>
 
             {/* Toolbar / Filters */}
@@ -97,38 +126,41 @@ const Achievements = () => {
                     </div>
                 ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                        {achievements.map((ach) => (
-                            <div
-                                key={ach.id}
-                                className="bg-retro-silver border-2 border-t-retro-highlight border-l-retro-highlight border-b-retro-shadow border-r-retro-shadow p-3 hover:translate-x-0.5 hover:translate-y-0.5 transition-transform group"
-                            >
-                                <div className="flex gap-3">
-                                    {/* Achievement Icon */}
-                                    <div className="w-12 h-12 shrink-0 bg-white border-2 border-t-retro-shadow border-l-retro-shadow border-b-retro-highlight border-r-retro-highlight flex items-center justify-center group-hover:bg-yellow-50 transition-colors">
-                                        {/* Placeholder for custom icons, using generic Trophy if not found */}
-                                        <Trophy className={`w-8 h-8 ${ach.earned_at ? 'text-yellow-600' : 'text-gray-400 opacity-30'}`} />
-                                    </div>
+                        {achievements.map((ach) => {
+                            const isEarned = !!ach.earned_at;
+                            return (
+                                <div
+                                    key={ach.id}
+                                    className={`bg-retro-silver border-2 border-t-retro-highlight border-l-retro-highlight border-b-retro-shadow border-r-retro-shadow p-3 transition-transform group ${isEarned ? 'hover:translate-x-0.5 hover:translate-y-0.5' : 'opacity-70 grayscale'
+                                        }`}
+                                >
+                                    <div className="flex gap-3">
+                                        {/* Achievement Icon */}
+                                        <div className={`w-12 h-12 shrink-0 bg-white border-2 border-t-retro-shadow border-l-retro-shadow border-b-retro-highlight border-r-retro-highlight flex items-center justify-center transition-colors ${isEarned ? 'group-hover:bg-yellow-50' : 'bg-gray-100'}`}>
+                                            <Trophy className={`w-8 h-8 ${isEarned ? 'text-yellow-600' : 'text-gray-400'}`} />
+                                        </div>
 
-                                    {/* Achievement Details */}
-                                    <div className="flex-1 space-y-2 overflow-hidden">
-                                        <h3 className="font-bold text-sm uppercase text-retro-navy leading-tight" title={ach.name}>
-                                            {ach.name}
-                                        </h3>
-                                        <p className="text-xs text-gray-700 leading-relaxed font-medium line-clamp-3 min-h-[36px]">
-                                            {ach.description}
-                                        </p>
-                                        <div className="flex flex-wrap justify-between items-end mt-1 gap-1">
-                                            <span className="text-[11px] bg-retro-navy text-white px-1.5 py-0.5 font-bold">
-                                                {ach.code}
-                                            </span>
-                                            <span className="text-[11px] text-gray-800 font-bold">
-                                                {new Date(ach.earned_at).toLocaleDateString()}
-                                            </span>
+                                        {/* Achievement Details */}
+                                        <div className="flex-1 space-y-2 overflow-hidden">
+                                            <h3 className={`font-bold text-sm uppercase leading-tight ${isEarned ? 'text-retro-navy' : 'text-gray-600'}`} title={ach.name}>
+                                                {ach.name}
+                                            </h3>
+                                            <p className="text-xs text-gray-700 leading-relaxed font-medium line-clamp-3 min-h-[36px]">
+                                                {ach.description}
+                                            </p>
+                                            <div className="flex flex-wrap justify-between items-end mt-1 gap-1">
+                                                <span className={`text-[11px] text-white px-1.5 py-0.5 font-bold ${isEarned ? 'bg-retro-navy' : 'bg-gray-500'}`}>
+                                                    {ach.code}
+                                                </span>
+                                                <span className={`text-[11px] font-bold ${isEarned ? 'text-gray-800' : 'text-gray-500 italic'}`}>
+                                                    {isEarned ? new Date(ach.earned_at).toLocaleDateString() : 'Locked'}
+                                                </span>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                        ))}
+                            );
+                        })}
                     </div>
                 )}
             </div>
