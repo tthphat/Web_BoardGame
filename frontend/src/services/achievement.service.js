@@ -15,6 +15,7 @@ export async function getUserAchievementsApi(gameSlug = null, search = null) {
         credentials: "include",
         headers: {
             "Content-Type": "application/json",
+            "x-api-key": import.meta.env.VITE_API_KEY,
         },
     });
 
