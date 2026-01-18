@@ -12,6 +12,8 @@ import cookieParser from "cookie-parser";
 
 import authRoute from "./routes/auth.route.js";
 import userRoute from "./routes/user.route.js";
+import adminRoute from "./routes/admin.route.js"; // Import route
+
 import { checkApiKey } from "./middlewares/apiKey.middleware.js";
 import { verifyToken } from "./middlewares/auth.middleware.js";
 
@@ -25,6 +27,7 @@ app.use("/api/auth", authRoute); // login, register không cần check api key
 
 app.use(checkApiKey); // middleware kiểm tra api key
 
+app.use("/api/admin", verifyToken, adminRoute); // Register admin route
 app.use("/api/achievements", verifyToken, achievementRoute);
 app.use("/api/games", verifyToken, gameRoute);
 app.use("/api/user", verifyToken, userRoute);
