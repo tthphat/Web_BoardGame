@@ -2,7 +2,7 @@ import React from 'react';
 import { RouterProvider } from 'react-router-dom';
 import { router } from './routes/routes';
 import AuthProvider from './contexts/AuthContext';
-import { Toaster } from "sonner";
+import { Toaster } from './components/ui/toaster';
 
 function App() {
     return (
