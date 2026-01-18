@@ -31,14 +31,18 @@ export const GAME_REGISTRY = {
   SNAKE: {
     name: 'Snake',
     slug: 'snake',
-    refKey: null,
-    fullboard: false,
-    useFullCoords: false,
+    refKey: 'snake',  // Changed from null
+    fullboard: true,  // Changed from false - Snake uses full board
+    useFullCoords: true,  // Snake uses full coordinates
     hideOutsideDots: false,
-    hasWrapper: false,
+    hasWrapper: true,  // Changed from false - now has SnakeWrapper
     externalState: null,
-    initialState: {},
-    getStatusText: (state, isPlaying) => isPlaying ? '(PLAYING)' : '',
+    initialState: { score: 0, isGameOver: false },
+    getStatusText: (state, isPlaying) => {
+      if (!isPlaying) return '';
+      if (state.isGameOver) return '- GAME OVER!';
+      return `- Playing`;
+    },
   },
   DRAWING: {
     name: 'Free Draw',

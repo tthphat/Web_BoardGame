@@ -3,6 +3,7 @@ import { useTicTacToe } from '../../hooks/useTicTacToe';
 import { useCaro } from '../../hooks/useCaro';
 import { useCaro5 } from '../../hooks/useCaro5';
 import { useMatch3 } from '../../hooks/useMatch3';
+import { useSnake } from '../../hooks/useSnake';
 
 // Screen previews
 import { getTicTacToePixel } from './screens/TicTacToeScreen';
@@ -194,6 +195,63 @@ export const Match3Wrapper = forwardRef(({ isPlaying, onScoreUpdate, onBoardUpda
   return null;
 });
 Match3Wrapper.displayName = 'Match3Wrapper';
+
+// ===== SNAKE WRAPPER =====
+export const SnakeWrapper = forwardRef(({ isPlaying, rows, cols, onScoreUpdate, onGameStateUpdate }, ref) => {
+  const game = useSnake(isPlaying, rows, cols);
+  const scoreCallbackRef = useRef(onScoreUpdate);
+  const stateCallbackRef = useRef(onGameStateUpdate);
+  const prevScoreRef = useRef(null);
+  const prevGameOverRef = useRef(null);
+  
+  // Lưu game vào ref để luôn lấy được giá trị mới nhất
+  const gameRef = useRef(game);
+  gameRef.current = game;
+  
+  useEffect(() => {
+    scoreCallbackRef.current = onScoreUpdate;
+  }, [onScoreUpdate]);
+  
+  useEffect(() => {
+    stateCallbackRef.current = onGameStateUpdate;
+  }, [onGameStateUpdate]);
+  
+  useImperativeHandle(ref, () => ({
+    getPixelColor: (r, c) => gameRef.current.getPixelColor(r, c),
+    changeDirection: (dir) => gameRef.current.changeDirection(dir),
+    resetGame: () => gameRef.current.resetGame(),
+    get isGameOver() { return gameRef.current.isGameOver; },
+    get score() { return gameRef.current.score; },
+  }), []);
+
+  // Gọi onScoreUpdate khi score thay đổi
+  useEffect(() => {
+    if (!isPlaying || !scoreCallbackRef.current) return;
+    
+    if (prevScoreRef.current !== game.score) {
+      prevScoreRef.current = game.score;
+      scoreCallbackRef.current(game.score);
+    }
+  }, [game.score, isPlaying]);
+
+  // Gọi onGameStateUpdate khi game state thay đổi
+  useEffect(() => {
+    if (!isPlaying || !stateCallbackRef.current) return;
+    
+    if (prevGameOverRef.current !== game.isGameOver) {
+      prevGameOverRef.current = game.isGameOver;
+      stateCallbackRef.current({
+        isGameOver: game.isGameOver,
+        resetGame: game.resetGame,
+        changeDirection: game.changeDirection,
+        direction: game.direction,
+      });
+    }
+  }, [game.isGameOver, game.resetGame, game.changeDirection, game.direction, isPlaying]);
+
+  return null;
+});
+SnakeWrapper.displayName = 'SnakeWrapper';
 
 /**
  * PREVIEW FUNCTIONS REGISTRY
