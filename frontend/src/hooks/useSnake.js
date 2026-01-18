@@ -143,7 +143,7 @@ export const useSnake = (enabled, rows, cols) => {
 
     const getPixelColor = (r, c) => {
         const { snake, food, isGameOver } = gameState;
-        if (!snake || snake.length === 0) return 'bg-[#222] opacity-20';
+        if (!snake || snake.length === 0) return 'bg-[#333] opacity-40';
 
         const isHead = snake[0].r === r && snake[0].c === c;
         const isBody = snake.slice(1).some(s => s.r === r && s.c === c);
@@ -157,7 +157,7 @@ export const useSnake = (enabled, rows, cols) => {
         if (isBody) return 'bg-green-600 opacity-90';
         if (isFood) return 'bg-red-500 shadow-[0_0_15px_red] animate-pulse';
 
-        return 'bg-[#222] opacity-20';
+        return 'bg-[#333] opacity-40';
     };
 
     return {
