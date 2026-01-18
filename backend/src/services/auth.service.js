@@ -34,7 +34,7 @@ export const AuthService = {
                     role: user.role
                 },
                 process.env.JWT_SECRET,
-                { expiresIn: "7d" }
+                { expiresIn: "24h" }
             );
 
             return {
@@ -180,11 +180,11 @@ export const AuthService = {
             }
 
             // reset otp attempts
-            const { error: updateError } = await UserModel.updateUser(user.id,
+            const { error: editError } = await UserModel.updateUser(user.id,
                 { otp_attempts: 0, otp_hash: null, otp_expires: null, state: "active" });
 
-            if (updateError) {
-                throw new Error("Failed to update user");
+            if (editError) {
+                throw new Error("Failed to edit user");
             }
 
             // Tạo JWT
@@ -195,7 +195,7 @@ export const AuthService = {
                     email: user.email,
                 },
                 process.env.JWT_SECRET,
-                { expiresIn: "7d" }
+                { expiresIn: "24h" }
             );
 
             return {
@@ -234,11 +234,11 @@ export const AuthService = {
             const otp_expires = new Date(Date.now() + 3 * 60 * 1000); // 3 phút mới
             const otp_attempts = 0; // Reset số lần thử
 
-            // update otp
-            const { error: updateError } = await UserModel.updateUser(user.id,
+            // edit otp
+            const { error: editError } = await UserModel.updateUser(user.id,
                 { otp_hash, otp_expires, otp_attempts });
 
-            if (updateError) {
+            if (editError) {
                 throw new Error("Lỗi khi cập nhật OTP");
             }
 

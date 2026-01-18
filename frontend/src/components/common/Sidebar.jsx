@@ -1,40 +1,77 @@
-import {User, Users, MessageSquare, Trophy, BarChart ,Moon, Gamepad2} from 'lucide-react';
-import React, {useState} from 'react';
+import { User, Users, MessageSquare, Trophy, BarChart, Moon, Gamepad2 } from 'lucide-react';
+import React, { useState } from 'react';
 import MenuItem from './MenuItem';
+import { useAuth } from '@/contexts/AuthContext';
+import { Key, UserPlus } from 'lucide-react';
 
 
 const Sidebar = ({ activeItem, setActiveItem }) => {
+    const { user } = useAuth();
 
     const menuItems = [
-        {id: 'Game', icon: <Gamepad2 size={20}/>, label: 'Game Console'},
-        {id: 'Profile', icon: <User size={20}/>, label: 'Profile'},
-        {id: 'Friends', icon: <Users size={20}/>, label: 'Friends'},
-        {id: 'Messages', icon: <MessageSquare size={20}/>, label: 'Messages'},
-        {id: 'Achievements', icon: <Trophy size={20}/>, label: 'Trophy'},
-        {id: 'Ranking', icon: <BarChart size={20}/>, label: 'Ranking'},
+        { id: 'Game', icon: <Gamepad2 size={20} />, label: 'Game Console' },
+        { id: 'Profile', icon: <User size={20} />, label: 'Profile' },
+        { id: 'Friends', icon: <Users size={20} />, label: 'Friends' },
+        { id: 'Messages', icon: <MessageSquare size={20} />, label: 'Messages' },
+        { id: 'Achievements', icon: <Trophy size={20} />, label: 'Trophy' },
+        { id: 'Ranking', icon: <BarChart size={20} />, label: 'Ranking' },
     ]
+
+    if (!user) {
+        return (
+            <aside className="w-64 h-full bg-[#c0c0c0] dark:bg-[#2d2d2d] border-r-2 border-r-[#808080] dark:border-r-[#000] flex flex-col transition-colors duration-300 font-mono">
+                <nav className="flex-1 py-4 space-y-2 px-3">
+                    <MenuItem
+                        key='Game'
+                        icon={<Gamepad2 size={20} />}
+                        label='Game Console'
+                        active={activeItem === 'Game'}
+                        onClick={() => setActiveItem('Game')}
+                    />
+
+                    <MenuItem
+                        key='Login'
+                        icon={<Key size={20} />}
+                        label='Login'
+                        active={activeItem === 'Login'}
+                        onClick={() => setActiveItem('Login')}
+                    />
+
+                    <MenuItem
+                        key='Register'
+                        icon={<UserPlus size={20} />}
+                        label='Register'
+                        active={activeItem === 'Register'}
+                        onClick={() => setActiveItem('Register')}
+                    />
+
+                    <p className='mt-4 text-center text-xs'>You are playing as Guest. Login to save score & ranking</p>
+                </nav>
+            </aside>
+        );
+    }
 
     return (
         <aside className="w-64 h-full bg-[#c0c0c0] dark:bg-[#2d2d2d] border-r-2 border-r-[#808080] dark:border-r-[#000] flex flex-col transition-colors duration-300 font-mono">
-            
-            
+
+
 
             {/* Menu List */}
             <nav className="flex-1 py-4 space-y-2 px-3">
                 {menuItems.map((item) => (
-                <MenuItem 
-                    key={item.id}
-                    icon={item.icon}
-                    label={item.label}
-                    active={activeItem === item.id}
-                    onClick={() => setActiveItem(item.id)} 
-                />
+                    <MenuItem
+                        key={item.id}
+                        icon={item.icon}
+                        label={item.label}
+                        active={activeItem === item.id}
+                        onClick={() => setActiveItem(item.id)}
+                    />
                 ))}
             </nav>
 
             {/* Dark Mode Button Area: Style Retro 3D */}
             <div className="p-4 border-t-2 border-t-white dark:border-t-[#555]">
-                <button 
+                <button
                     onClick={() => document.documentElement.classList.toggle('dark')}
                     className="flex items-center justify-center gap-3 w-full px-4 py-2 
                     bg-[#e0e0e0] dark:bg-[#404040] 

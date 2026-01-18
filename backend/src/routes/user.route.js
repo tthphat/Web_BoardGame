@@ -1,12 +1,12 @@
-import Router from "express";
+import { Router } from "express";
 import { UserController } from "../controllers/user.controller.js";
-import { verifyToken } from "../middlewares/auth.middleware.js";
 
 const router = Router();
 
 
-router.get("/profile", verifyToken, UserController.getProfile);
-
+router.get("/profile", UserController.getProfile);
+router.patch("/profile", UserController.editProfile);
+router.get("/me", UserController.getMe);
 
 
 export default router;  

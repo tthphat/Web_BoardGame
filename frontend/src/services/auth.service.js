@@ -86,12 +86,10 @@ export async function resendOTPApi(email) {
     // return data;
 }
 
-// Get profile
-export async function getProfileApi() {
-    console.log("Fontend-Auth-Service: Get profile API input: ");
-
-    const response = await fetch("/api/user/profile", {
-        method: "GET",
+// Log out
+export async function logoutApi() {
+    const response = await fetch("/api/auth/logout", {
+        method: "POST",
         credentials: "include",
         headers: {
             "Content-Type": "application/json",
@@ -101,9 +99,6 @@ export async function getProfileApi() {
     const data = await response.json();
 
     if (!response.ok) {
-        throw new Error(data.message || data.error || "Get profile failed");
+        throw new Error(data.message || data.error || "Log out failed");
     }
-
-    console.log("Fontend-Auth-Service: Get profile API output: ", data);
-    return data;
 }

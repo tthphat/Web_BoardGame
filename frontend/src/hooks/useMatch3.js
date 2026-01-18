@@ -44,7 +44,13 @@ const generateBoard = (rows, cols) => {
     return board;
 };
 
-export const useMatch3 = (rows, cols, isPlaying) => {
+// Kích thước cố định cho game Match3 (13x13)
+const MATCH3_SIZE = 13;
+
+export const useMatch3 = (isPlaying) => {
+    const rows = MATCH3_SIZE;
+    const cols = MATCH3_SIZE;
+    
     const [board, setBoard] = useState([]);
     const [selected, setSelected] = useState(null); // {r, c}
     const [isAnimating, setIsAnimating] = useState(false);

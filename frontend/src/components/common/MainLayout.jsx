@@ -3,10 +3,13 @@ import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import Sidebar from './Sidebar';
 import Header from './Header';
 import Footer from './Footer';
+import { useAuth } from '@/contexts/AuthContext';
+import { toast } from 'sonner';
 
 const MainLayout = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const { logout } = useAuth();
 
   // Mặc định ban đầu là Game
   const [activeItem, setActiveItem] = useState('Game');
@@ -38,13 +41,21 @@ const MainLayout = () => {
       case 'Achievements': path = 'trophy'; break;
       case 'Ranking': path = 'ranking'; break;
       case 'Profile': path = 'profile'; break;
+      case 'Login': path = 'login'; break;
+      case 'Register': path = 'register'; break;
       default: path = ''; break;
     }
     navigate(`/${path}`);
   };
 
-  const handleLogout = () => {
-    alert("Đã đăng xuất! (Giả lập)");
+  const handleLogout = async () => {
+    try {
+      await logout();
+      navigate('/');
+      toast.info('Logout successfully');
+    } catch (error) {
+      toast.error(error.message);
+    }
   };
 
   return (
