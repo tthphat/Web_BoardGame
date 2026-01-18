@@ -71,8 +71,11 @@ export const UserModel = {
     async getAllUsers(offset, limit, search) {
         try {
             const users = await knex("users")
-                .where("username", "like", `%${search}%`)
-                .orWhere("email", "like", `%${search}%`)
+                .where((qb) => {
+                    qb.where("username", "like", `%${search}%`)
+                        .orWhere("email", "like", `%${search}%`);
+                })
+                .andWhere("role", "!=", "admin")
                 .select("id", "username", "email", "role", "created_at", "updated_at")
                 .offset(offset)
                 .limit(limit);
@@ -87,8 +90,11 @@ export const UserModel = {
     async countUsers(search) {
         try {
             const count = await knex("users")
-                .where("username", "like", `%${search}%`)
-                .orWhere("email", "like", `%${search}%`)
+                .where((qb) => {
+                    qb.where("username", "like", `%${search}%`)
+                        .orWhere("email", "like", `%${search}%`);
+                })
+                .andWhere("role", "!=", "admin")
                 .count("id");
 
             return { data: count[0].count, error: null };

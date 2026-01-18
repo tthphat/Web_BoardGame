@@ -69,3 +69,26 @@ export async function editProfileApi(payload) {
     return data;
 }
 
+// Get all users
+export async function getAllUsersApi(page, limit, search) {
+    console.log("Fontend-User-Service: Get all users API input: ", page, limit, search);
+
+    const response = await fetch(`/api/user/all?page=${page}&limit=${limit}&search=${search}`, {
+        method: "GET",
+        credentials: "include",
+        headers: {
+            "Content-Type": "application/json",
+            "x-api-key": import.meta.env.VITE_API_KEY,
+        },
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+        throw new Error(data.message || data.error || "Get all users failed");
+    }
+
+    console.log("Fontend-User-Service: Get all users API output: ", data);
+    return data;
+}
+
