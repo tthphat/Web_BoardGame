@@ -116,5 +116,22 @@ export const UserController = {
             next(error);
         }
     },
+
+    // =============
+    // Add Friend
+    // =============
+    async addFriend(req, res, next) {
+        try {
+            const { user_id } = req.body;
+            const friend = await UserService.addFriend(req.user.id, user_id);
+            res.json({
+                data: {
+                    friend: friend.data.friend
+                }
+            });
+        } catch (error) {
+            next(error);
+        }
+    },
 }
 

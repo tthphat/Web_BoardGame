@@ -139,17 +139,17 @@ export async function getMyFriendsApi(page, limit, search) {
 }
 
 // Add friend
-export async function addFriendApi(userId) {
-    console.log("Fontend-User-Service: Add friend API input: ", userId);
+export async function addFriendApi(user_id) {
+    console.log("Fontend-User-Service: Add friend API input: ", user_id);
 
-    const response = await fetch(`/api/user/friend-requests`, {
+    const response = await fetch(`/api/user/add-friend`, {
         method: "POST",
         credentials: "include",
         headers: {
             "Content-Type": "application/json",
             "x-api-key": import.meta.env.VITE_API_KEY,
         },
-        body: JSON.stringify({ userId }),
+        body: JSON.stringify({ user_id }),
     });
 
     const data = await response.json();

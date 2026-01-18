@@ -199,4 +199,24 @@ export const UserService = {
             throw error;
         }
     },
+
+    // =============
+    // Add Friend
+    // =============
+    async addFriend(id, user_id) {
+        try {
+            const { data: friend, error } = await UserModel.addFriend(id, user_id);
+            if (error || !friend) {
+                throw new Error("Failed to add friend");
+            }
+            console.log("Backend-user.service.js-addFriend: ", friend);
+            return {
+                data: {
+                    friend
+                }
+            };
+        } catch (error) {
+            throw error;
+        }
+    },
 };

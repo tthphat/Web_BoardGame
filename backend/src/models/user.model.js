@@ -264,7 +264,24 @@ export const UserModel = {
         } catch (error) {
             return { data: null, error };
         }
-    }
+    },
+
+    // Add friend
+    async addFriend(senderId, receiverId) {
+        try {
+            const [friend] = await knex("friends")
+                .insert({
+                    sender_id: senderId,
+                    receiver_id: receiverId,
+                    status: "pending"
+                })
+                .returning(["sender_id", "receiver_id", "status"]);
+
+            return { data: friend, error: null };
+        } catch (error) {
+            return { data: null, error };
+        }
+    },
 
 }
 
