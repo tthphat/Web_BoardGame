@@ -176,12 +176,12 @@ export const Match3Wrapper = forwardRef(({ isPlaying, onScoreUpdate, onBoardUpda
     get board() { return gameRef.current.board; },
   }), []); // Không cần dependencies vì dùng gameRef
 
-  // Gọi onBoardUpdate khi board thay đổi để force parent re-render
+  // Gọi onBoardUpdate khi board hoặc selected thay đổi để force parent re-render
   useEffect(() => {
     if (isPlaying && boardUpdateRef.current) {
       boardUpdateRef.current();
     }
-  }, [game.board, isPlaying]);
+  }, [game.board, game.selected, isPlaying]);
 
   useEffect(() => {
     if (!isPlaying || !callbackRef.current) return;
@@ -197,10 +197,11 @@ export const Match3Wrapper = forwardRef(({ isPlaying, onScoreUpdate, onBoardUpda
 Match3Wrapper.displayName = 'Match3Wrapper';
 
 // ===== SNAKE WRAPPER =====
-export const SnakeWrapper = forwardRef(({ isPlaying, rows, cols, onScoreUpdate, onGameStateUpdate }, ref) => {
+export const SnakeWrapper = forwardRef(({ isPlaying, rows, cols, onScoreUpdate, onGameStateUpdate, onBoardUpdate }, ref) => {
   const game = useSnake(isPlaying, rows, cols);
   const scoreCallbackRef = useRef(onScoreUpdate);
   const stateCallbackRef = useRef(onGameStateUpdate);
+  const boardUpdateRef = useRef(onBoardUpdate);
   const prevScoreRef = useRef(null);
   const prevGameOverRef = useRef(null);
   
@@ -216,6 +217,10 @@ export const SnakeWrapper = forwardRef(({ isPlaying, rows, cols, onScoreUpdate, 
     stateCallbackRef.current = onGameStateUpdate;
   }, [onGameStateUpdate]);
   
+  useEffect(() => {
+    boardUpdateRef.current = onBoardUpdate;
+  }, [onBoardUpdate]);
+  
   useImperativeHandle(ref, () => ({
     getPixelColor: (r, c) => gameRef.current.getPixelColor(r, c),
     changeDirection: (dir) => gameRef.current.changeDirection(dir),
@@ -223,6 +228,13 @@ export const SnakeWrapper = forwardRef(({ isPlaying, rows, cols, onScoreUpdate, 
     get isGameOver() { return gameRef.current.isGameOver; },
     get score() { return gameRef.current.score; },
   }), []);
+
+  // CRITICAL: Force parent re-render when snake moves
+  useEffect(() => {
+    if (isPlaying && boardUpdateRef.current) {
+      boardUpdateRef.current();
+    }
+  }, [game.snake, isPlaying]);
 
   // Gọi onScoreUpdate khi score thay đổi
   useEffect(() => {

@@ -168,20 +168,26 @@ const GameMatrix = ({
       return;
     }
 
+    // Drawing game (external state)
+    if (screen === 'DRAWING' && drawingState?.handlePixelClick) {
+      // Drawing dùng full coords (1-indexed)
+      drawingState.handlePixelClick(r, c);
+      return;
+    }
+
     // Memory game (external state)
     if (screen === 'MEMORY' && activeGameState) {
-      const maxRow = 4;
-      const maxCol = 4;
-      const validPositions = [3, 4, 5, 6, 7, 8, 9, 10];
+      // Cards are at positions 4, 6, 8, 10 (matching ActiveMemoryScreen.js)
+      const rowMap = { 4: 0, 6: 1, 8: 2, 10: 3 };
+      const colMap = { 4: 0, 6: 1, 8: 2, 10: 3 };
       
-      if (validPositions.includes(gameR) && validPositions.includes(gameC)) {
-        const cardRow = validPositions.indexOf(gameR);
-        const cardCol = validPositions.indexOf(gameC);
-        if (cardRow !== -1 && cardCol !== -1) {
-          const cardIndex = cardRow * maxCol + cardCol;
-          if (cardIndex >= 0 && cardIndex < 16 && onCardClick) {
-            onCardClick(cardIndex);
-          }
+      const cardRow = rowMap[gameR];
+      const cardCol = colMap[gameC];
+      
+      if (cardRow !== undefined && cardCol !== undefined) {
+        const cardIndex = cardRow * 4 + cardCol;
+        if (cardIndex >= 0 && cardIndex < 16 && onCardClick) {
+          onCardClick(cardIndex);
         }
       }
     }
@@ -231,6 +237,7 @@ const GameMatrix = ({
           cols={cols}
           onScoreUpdate={screen === 'SNAKE' ? onScoreUpdate : undefined}
           onGameStateUpdate={screen === 'SNAKE' ? onGameStateUpdate : undefined}
+          onBoardUpdate={screen === 'SNAKE' ? handleBoardUpdate : undefined}
         />
       )}
     </>

@@ -65,11 +65,20 @@ const DashboardPage = () => {
     }
 
     // Snake game - restart logic
-    if (currentScreenName === 'SNAKE' && gameState.isGameOver) {
-      // Reset bằng cách toggle isPlaying
-      setIsPlaying(false);
-      setScore(0);
-      setTimeout(() => setIsPlaying(true), 50);
+    if (currentScreenName === 'SNAKE') {
+      if (gameState.isGameOver && gameState.resetGame) {
+        // Đã game over -> reset trực tiếp, không toggle isPlaying
+        gameState.resetGame();
+        setScore(0);
+        setGameState(prev => ({ ...prev, isGameOver: false }));
+        return;
+      }
+      // Chưa chơi -> bắt đầu chơi
+      if (!isPlaying) {
+        setIsPlaying(true);
+        setScore(0);
+        return;
+      }
       return;
     }
 
