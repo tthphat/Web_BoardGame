@@ -36,16 +36,6 @@ const UserSettings = () => {
         setLocalControls(defaultControls);
         setLocalBoardId(defaultBoardId);
 
-        // Also commit defaults immediately or wait for save? 
-        // Request says "reset ... to default (show toast)", usually implies immediate action or just form reset.
-        // "Change settings... only when user clicks save".
-        // Use case: User clicks Reset -> Form updates to default -> User clicks Save to apply? 
-        // OR Reset -> Applies immediately?
-        // Usually Reset in a form just resets the form. 
-        // But "Reset setting về mặc định" might imply the action of resetting.
-        // Let's implement: Reset Button -> Resets FORM to default values. User still needs to Click Save?
-        // User request: "Chỉ khi người dùng nhấn save settings thì mới áp dụng các setting ấy" (Only apply when user presses save).
-        // So Reset should ONLY reset the form state.
 
         toast.info("Settings reset to default. Click Save to apply.");
     };
@@ -121,16 +111,6 @@ const UserSettings = () => {
                                 onChange={(e) => setLocalBoardId(e.target.value ? parseInt(e.target.value) : null)}
                                 className="w-full p-2 bg-white border-2 border-t-[#808080] border-l-[#808080] border-b-white border-r-white outline-none font-mono"
                             >
-                                {/* Removed System Default as requested. If value is null, it shows empty or first? 
-                                    If user MUST select one, we should auto-select first one. 
-                                    But "null" means default logic in code.
-                                    If we remove option but keep null possibility, select might separate.
-                                    Let's add a placeholder if no id selected that forces selection? 
-                                    Or just don't show "System Default".
-                                    If I remove <option value="">, and localBoardId is null, browser might show nothing or first option.
-                                    Better to show "Select Board Size" if null, but request says "Remove option".
-                                    I will remove the EXPLICIT option. 
-                                */}
                                 {availableConfigs.map(config => (
                                     <option key={config.id} value={config.id}>
                                         {config.code} ({config.cols}x{config.rows}, Dot: {config.dot_size}px)
