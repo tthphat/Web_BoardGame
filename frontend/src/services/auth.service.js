@@ -130,3 +130,20 @@ export async function editProfileApi(payload) {
     console.log("Fontend-Auth-Service: Edit profile API output: ", data);
     return data;
 }
+
+// Log out
+export async function logoutApi() {
+    const response = await fetch("/api/auth/logout", {
+        method: "POST",
+        credentials: "include",
+        headers: {
+            "Content-Type": "application/json",
+        },
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+        throw new Error(data.message || data.error || "Log out failed");
+    }
+}
