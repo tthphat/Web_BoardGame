@@ -1,4 +1,6 @@
 import knex from "../../db/db.js";
+import { GameModel } from "../models/game.model.js";
+import { BoardConfigModel } from "../models/boardConfig.model.js";
 
 export const AdminService = {
     // =============
@@ -95,5 +97,53 @@ export const AdminService = {
             console.error("AdminService.getRecentActivities error:", error);
             throw error;
         }
-    }
+
+    },
+// ... (previous code)
+
+    // =============
+    // Game Management
+    // =============
+    async getAllGames() {
+            try {
+                const { data, error } = await GameModel.findAll();
+                if (error) throw error;
+                return { data };
+            } catch (error) {
+                throw error;
+            }
+        },
+
+    async updateGameState(id, enabled) {
+            try {
+                const { data, error } = await GameModel.updateState(id, enabled);
+                if (error) throw error;
+                return { data };
+            } catch (error) {
+                throw error;
+            }
+        },
+
+    // =============
+    // Board Config Management
+    // =============
+    async getAllBoardConfigs() {
+            try {
+                const { data, error } = await BoardConfigModel.findAll();
+                if (error) throw error;
+                return { data };
+            } catch (error) {
+                throw error;
+            }
+        },
+
+    async updateBoardConfig(id, configData) {
+            try {
+                const { data, error } = await BoardConfigModel.update(id, configData);
+                if (error) throw error;
+                return { data };
+            } catch (error) {
+                throw error;
+            }
+        }
 };

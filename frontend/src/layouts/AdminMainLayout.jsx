@@ -6,7 +6,8 @@ import AdminDashboardMock from '../components/admin/AdminDashboard';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
-import UserManagement from '../components/admin/user/UserManagement';
+import UserManagement from '../components/admin/page/UserManagement';
+import GameConfig from '../components/admin/page/GameConfig';
 
 // Import các trang placeholder cho các mục chưa làm
 const PlaceholderPage = ({ title }) => (
@@ -42,7 +43,7 @@ const AdminMainLayout = () => {
             case 'UserMgmt':
                 return <UserManagement />;
             case 'GameConfig':
-                return <PlaceholderPage title="Game Configuration" />;
+                return <GameConfig />;
             case 'Statistics':
                 return <PlaceholderPage title="Detailed Statistics" />;
             default:
