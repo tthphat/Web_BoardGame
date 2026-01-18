@@ -24,6 +24,36 @@ function FriendRequests() {
         setSearch("");               // trigger fetch all
     };
 
+    const handleDateSent = (date) => {
+        const now = new Date();
+        const sentDate = new Date(date);
+        const diffMs = now - sentDate;
+
+        const days = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+
+        if (days < 1) {
+            return "Hôm nay";
+        }
+
+        if (days < 7) {
+            return `${days} ngày trước`;
+        }
+
+        if (days < 30) {
+            const weeks = Math.floor(days / 7);
+            return `${weeks} tuần trước`;
+        }
+
+        if (days < 365) {
+            const months = Math.floor(days / 30);
+            return `${months} tháng trước`;
+        }
+
+        const years = Math.floor(days / 365);
+        return `${years} năm trước`;
+    };
+
+
     useEffect(() => {
         const fetchRequests = async () => {
             try {
@@ -88,6 +118,7 @@ function FriendRequests() {
                             <tr>
                                 <th className="p-3 border-b-2 border-gray-600 font-mono text-sm uppercase tracking-wider">Username</th>
                                 <th className="p-3 border-b-2 border-gray-600 font-mono text-sm uppercase tracking-wider">Email</th>
+                                <th className="p-3 border-b-2 border-gray-600 font-mono text-sm uppercase tracking-wider text-center">Date sent</th>
                                 <th className="p-3 border-b-2 border-gray-600 font-mono text-sm uppercase tracking-wider text-center">Action</th>
                             </tr>
                         </thead>
@@ -103,6 +134,9 @@ function FriendRequests() {
                                         </td>
                                         <td className="p-3 border-r border-dashed border-gray-300 group-hover:border-blue-200 text-gray-600">
                                             {request.email}
+                                        </td>
+                                        <td className="p-3 border-r border-dashed border-gray-300 group-hover:border-blue-200 text-gray-600 text-center">
+                                            {handleDateSent(request.created_at)}
                                         </td>
                                         <td className="p-3 text-center">
                                             <div className="flex gap-4 justify-center">
