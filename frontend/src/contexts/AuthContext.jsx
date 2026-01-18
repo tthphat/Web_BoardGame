@@ -16,10 +16,14 @@ function AuthProvider({ children }) {
                 setUser(user.data.user);
             } catch (error) {
                 console.error("Failed to fetch user:", error);
+                await logoutApi();
+                toast.error("Session expired. Pls, login again");
+                window.location.href = "/";
+            } finally {
+                setLoading(false);
             }
         };
         fetchUser();
-        setLoading(false);
     }, []);
 
 

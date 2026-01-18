@@ -6,6 +6,7 @@ const router = Router();
 
 router.get("/profile", UserController.getProfile);
 router.patch("/profile", UserController.editProfile);
+router.get("/me", UserController.getMe);
 
 
 export default router;  
