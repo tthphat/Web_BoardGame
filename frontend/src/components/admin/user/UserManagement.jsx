@@ -30,7 +30,8 @@ const UserManagement = () => {
         try {
             const response = await getAllUsersApi(page, meta.limit);
             setUsers(response.data.users);
-            setMeta(response.data.meta);
+            setUsers(response.data.users);
+            setMeta(response.data.pagination);
         } catch (error) {
             toast.error(error.message);
         } finally {

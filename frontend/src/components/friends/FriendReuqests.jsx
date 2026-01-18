@@ -1,10 +1,11 @@
+
 import { PaginationSection } from "../common/PaginationSection";
-import { getAllUsersApi } from "@/services/user.service";
+import { getFriendRequestsApi } from "@/services/user.service";
 import { useState, useEffect, useRef } from "react";
 
 
-function UserList() {
-    const [users, setUsers] = useState([]);
+function FriendRequests() {
+    const [requests, setRequests] = useState([]);
     const [totalPages, setTotalPages] = useState(0);
     const [search, setSearch] = useState("");
     const [page, setPage] = useState(1);
@@ -24,16 +25,16 @@ function UserList() {
     };
 
     useEffect(() => {
-        const fetchUsers = async () => {
+        const fetchRequests = async () => {
             try {
-                const data = await getAllUsersApi(page, limit, search);
-                setUsers(data.data.users);
+                const data = await getFriendRequestsApi(page, limit, search);
+                setRequests(data.data.friendRequests);
                 setTotalPages(data.data.pagination.totalPages);
             } catch (error) {
-                console.error("Error fetching users:", error);
+                console.error("Error fetching requests:", error);
             }
         };
-        fetchUsers();
+        fetchRequests();
     }, [page, search]);
 
     return (
@@ -87,45 +88,48 @@ function UserList() {
                             <tr>
                                 <th className="p-3 border-b-2 border-gray-600 font-mono text-sm uppercase tracking-wider">Username</th>
                                 <th className="p-3 border-b-2 border-gray-600 font-mono text-sm uppercase tracking-wider">Email</th>
-                                <th className="p-3 border-b-2 border-gray-600 font-mono text-sm uppercase tracking-wider text-center">Role</th>
                                 <th className="p-3 border-b-2 border-gray-600 font-mono text-sm uppercase tracking-wider text-center">Action</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-200">
-                            {users.length > 0 ? (
-                                users.map((user) => (
+                            {requests?.length > 0 ? (
+                                requests.map((request) => (
                                     <tr
-                                        key={user.id}
+                                        key={request.id}
                                         className="hover:bg-blue-50 transition-colors cursor-default font-mono text-sm group"
                                     >
                                         <td className="p-3 border-r border-dashed border-gray-300 group-hover:border-blue-200">
-                                            <div className="font-bold text-gray-800">{user.username}</div>
+                                            <div className="font-bold text-gray-800">{request.username}</div>
                                         </td>
                                         <td className="p-3 border-r border-dashed border-gray-300 group-hover:border-blue-200 text-gray-600">
-                                            {user.email}
-                                        </td>
-                                        <td className="p-3 border-r border-dashed border-gray-300 group-hover:border-blue-200 text-center">
-                                            <span className={`
-                                                px-2 py-0.5 text-xs border border-gray-400 font-bold
-                                                ${user.role === 'admin' ? 'bg-red-100 text-red-800' : 'bg-gray-100 text-gray-600'}
-                                            `}>
-                                                {user.role}
-                                            </span>
+                                            {request.email}
                                         </td>
                                         <td className="p-3 text-center">
-                                            {user.role !== 'admin' && (
+                                            <div className="flex gap-4 justify-center">
                                                 <button
                                                     className="
-                                                        px-3 py-1 text-xs border border-blue-600 text-blue-600 
-                                                        hover:bg-blue-600 hover:text-white transition-all
+                                                        px-3 py-1 text-xs border border-green-600 text-green-600 
+                                                        hover:bg-green-600 hover:text-white transition-all
                                                         active:scale-95 font-bold uppercase
                                                     "
-                                                    onClick={() => console.log("Add friend:", user.id)}
-                                                    title="Send Friend Request"
+
+                                                    title="Accept Friend Request"
                                                 >
-                                                    + Add
+                                                    + Accept
                                                 </button>
-                                            )}
+
+                                                <button
+                                                    className="
+                                                        px-3 py-1 text-xs border border-red-600 text-red-600 
+                                                        hover:bg-red-600 hover:text-white transition-all
+                                                        active:scale-95 font-bold uppercase
+                                                    "
+
+                                                    title="Reject Friend Request"
+                                                >
+                                                    - Reject
+                                                </button>
+                                            </div>
                                         </td>
                                     </tr>
                                 ))
@@ -147,6 +151,4 @@ function UserList() {
     );
 }
 
-export default UserList;
-
-
+export default FriendRequests;

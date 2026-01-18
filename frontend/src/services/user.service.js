@@ -70,8 +70,11 @@ export async function editProfileApi(payload) {
 }
 
 // Get all users
-export async function getAllUsersApi(page = 1, limit = 10) {
-    const response = await fetch(`/api/user/all?page=${page}&limit=${limit}`, {
+// Get all users
+export async function getAllUsersApi(page = 1, limit = 10, search = "") {
+    console.log("Fontend-User-Service: Get all users API input: ", page, limit, search);
+
+    const response = await fetch(`/api/user/all?page=${page}&limit=${limit}&search=${search}`, {
         method: "GET",
         credentials: "include",
         headers: {
@@ -79,12 +82,14 @@ export async function getAllUsersApi(page = 1, limit = 10) {
             "x-api-key": import.meta.env.VITE_API_KEY,
         },
     });
+
     const data = await response.json();
 
     if (!response.ok) {
-        throw new Error(data.message || data.error || "Failed to fetch users");
+        throw new Error(data.message || data.error || "Failed to get users");
     }
 
+    console.log("Fontend-User-Service: Get all users API output: ", data);
     return data;
 }
 
@@ -106,6 +111,29 @@ export async function updateUserStateApi(userId, state) {
         throw new Error(data.message || data.error || "Failed to update user state");
     }
 
+    return data;
+}
+
+// Get friend requests
+export async function getFriendRequestsApi(page = 1, limit = 10, search = "") {
+    console.log("Fontend-User-Service: Get friend requests API input: ", page, limit, search);
+
+    const response = await fetch(`/api/user/friend-requests?page=${page}&limit=${limit}&search=${search}`, {
+        method: "GET",
+        credentials: "include",
+        headers: {
+            "Content-Type": "application/json",
+            "x-api-key": import.meta.env.VITE_API_KEY,
+        },
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+        throw new Error(data.message || data.error || "Get friend requests failed");
+    }
+
+    console.log("Fontend-User-Service: Get friend requests API output: ", data);
     return data;
 }
 

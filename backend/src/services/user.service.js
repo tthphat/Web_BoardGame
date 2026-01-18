@@ -102,25 +102,28 @@ export const UserService = {
     // =============
     // Get All Users
     // =============
-    async getAllUsers(page = 1, limit = 10) {
+    async getAllUsers(page, limit, search) {
         try {
             const offset = (page - 1) * limit;
-            const { data, error } = await UserModel.findAllUsers(limit, offset);
 
-            if (error) {
-                throw new Error("Failed to get users");
+            const { data: count, error: countError } = await UserModel.countUsers(search);
+            if (countError) {
+                throw new Error("Failed to count users");
             }
 
-            const totalPages = Math.ceil(data.total / limit);
+            const { data: users, error } = await UserModel.getAllUsers(offset, limit, search);
+            if (error) {
+                throw new Error("Failed to get all users");
+            }
 
             return {
                 data: {
-                    users: data.users,
-                    meta: {
-                        total: parseInt(data.total),
-                        page: parseInt(page),
-                        limit: parseInt(limit),
-                        totalPages: totalPages
+                    users,
+                    pagination: {
+                        page,
+                        limit,
+                        totalPages: Math.ceil(count / limit),
+                        total: count
                     }
                 }
             };
@@ -140,5 +143,37 @@ export const UserService = {
         } catch (error) {
             throw error;
         }
-    }
+    },
+    // Get Friend Requests
+    // =============
+    async getFriendRequests(id, page, limit, search) {
+        try {
+            const offset = (page - 1) * limit;
+
+            const { data: count, error: countError } = await UserModel.countFriendRequests(id, search);
+            if (countError) {
+                throw new Error("Failed to count friend requests");
+            }
+
+            const { data: friendRequests, error } = await UserModel.getFriendRequests(id, offset, limit, search);
+            console.log("Backend-user.service.js-getFriendRequests: ", friendRequests);
+            if (error) {
+                throw new Error("Failed to get friend requests");
+            }
+
+            return {
+                data: {
+                    friendRequests,
+                    pagination: {
+                        page,
+                        limit,
+                        totalPages: Math.ceil(count / limit),
+                        total: count
+                    }
+                }
+            };
+        } catch (error) {
+            throw error;
+        }
+    },
 };

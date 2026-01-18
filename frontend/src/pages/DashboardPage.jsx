@@ -4,12 +4,16 @@ import GameControls from '../components/games/GameControls';
 import ColorPalette from '../components/games/ColorPalette';
 import { useMemoryGame } from '../hooks/useMemoryGame';
 import { useDrawing } from '../hooks/useDrawing';
+import { useEnabledGames } from '../hooks/useEnabledGames';
 import { toast } from 'sonner';
-import { GAME_SCREENS, getGameConfig } from '../config/gameRegistry';
+import { getGameConfig } from '../config/gameRegistry';
 
 const DashboardPage = () => {
-  // Danh sách các màn hình từ registry
-  const screens = GAME_SCREENS;
+  // Fetch enabled games from backend
+  const { enabledScreens, loading: gamesLoading } = useEnabledGames();
+  
+  // Danh sách các màn hình từ backend (filtered)
+  const screens = enabledScreens;
   
   // State lưu chỉ số màn hình hiện tại
   const [currentScreenIndex, setCurrentScreenIndex] = useState(0);
@@ -22,7 +26,7 @@ const DashboardPage = () => {
   // Hooks cho games cần quản lý ở Dashboard level
   const memoryGame = useMemoryGame();
   
-  const currentScreenName = screens[currentScreenIndex];
+  const currentScreenName = screens[currentScreenIndex] || 'HEART';
   const currentConfig = getGameConfig(currentScreenName);
   
   // Drawing hook - cần screen name

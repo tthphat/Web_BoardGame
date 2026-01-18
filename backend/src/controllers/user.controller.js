@@ -55,15 +55,21 @@ export const UserController = {
     },
 
     // =============
-    // Get All Users (Admin)
+    // Get All Users
     // =============
     async getAllUsers(req, res, next) {
         try {
-            const page = parseInt(req.query.page) || 1;
-            const limit = parseInt(req.query.limit) || 10;
+            const page = Number(req.query.page) || 1;
+            const limit = Number(req.query.limit) || 10;
+            const search = req.query.search || "";
 
-            const result = await UserService.getAllUsers(page, limit);
-            res.json(result);
+            const users = await UserService.getAllUsers(page, limit, search);
+            res.json({
+                data: {
+                    users: users.data.users,
+                    pagination: users.data.pagination
+                }
+            });
         } catch (error) {
             next(error);
         }
@@ -87,6 +93,25 @@ export const UserController = {
         } catch (error) {
             next(error);
         }
-    }
+    },
+    // Get Friend Requests
+    // =============
+    async getFriendRequests(req, res, next) {
+        try {
+            const page = Number(req.query.page) || 1;
+            const limit = Number(req.query.limit) || 10;
+            const search = req.query.search || "";
+
+            const friendRequests = await UserService.getFriendRequests(req.user.id, page, limit, search);
+            res.json({
+                data: {
+                    friendRequests: friendRequests.data.friendRequests,
+                    pagination: friendRequests.data.pagination
+                }
+            });
+        } catch (error) {
+            next(error);
+        }
+    },
 }
 
