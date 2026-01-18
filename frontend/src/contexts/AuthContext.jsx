@@ -51,7 +51,7 @@ function AuthProvider({ children }) {
     const logout = async () => {
         setLoading(true);
         try {
-            const response = await logoutApi();
+            await logoutApi();
             setUser(null);
         } catch (error) {
             toast.error(error.message);
@@ -62,7 +62,7 @@ function AuthProvider({ children }) {
     };
 
     return (
-        <AuthContext.Provider value={{ user, login, signup, loading, setUser, verifyEmail }}>
+        <AuthContext.Provider value={{ user, login, signup, loading, setUser, verifyEmail, logout }}>
             {children}
         </AuthContext.Provider>
     );

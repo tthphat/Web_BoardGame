@@ -132,7 +132,7 @@ export async function editProfileApi(payload) {
 }
 
 // Log out
-export async function LogoutApi() {
+export async function logoutApi() {
     const response = await fetch("/api/auth/logout", {
         method: "POST",
         credentials: "include",
