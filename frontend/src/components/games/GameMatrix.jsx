@@ -1,18 +1,18 @@
 import React, { useRef, useState, useCallback } from 'react';
 import { getBoardConfig } from '../../utils/boardConfig';
-import { 
-  GAME_REGISTRY, 
-  getGameConfig, 
-  HIDE_OUTSIDE_DOTS_GAMES 
+import {
+  GAME_REGISTRY,
+  getGameConfig,
+  HIDE_OUTSIDE_DOTS_GAMES
 } from '../../config/gameRegistry';
-import { 
-  TicTacToeWrapper, 
-  Caro4Wrapper, 
-  Caro5Wrapper, 
+import {
+  TicTacToeWrapper,
+  Caro4Wrapper,
+  Caro5Wrapper,
   Match3Wrapper,
   SnakeWrapper,
   PREVIEW_FUNCTIONS,
-  getActiveGamePixel 
+  getActiveGamePixel
 } from './GameWrappers';
 
 // Screen previews cho Heart (default)
@@ -21,29 +21,40 @@ import { getHeartPixel } from './screens/HeartScreen';
 // Kích thước gốc của các game screens (được thiết kế cho 13x13)
 const ORIGINAL_GAME_SIZE = 13;
 
-const GameMatrix = ({ 
-  screen = 'HEART', 
-  isPlaying = false, 
-  onScoreUpdate, 
+import { useSettings } from '../../contexts/SettingsContext';
+
+// ... (imports)
+
+const GameMatrix = ({
+  screen = 'HEART',
+  isPlaying = false,
+  onScoreUpdate,
   onGameStateUpdate,
-  activeGameState, 
+  activeGameState,
   onCardClick,
   botEnabled = false,
   drawingState
 }) => {
-  const { cols, rows, dotSize, gap } = getBoardConfig();
-  
+  const { activeBoardConfig } = useSettings();
+  const defaultConfig = getBoardConfig();
+
+  // Use active config from settings if available, otherwise default
+  const cols = activeBoardConfig?.cols || defaultConfig.cols;
+  const rows = activeBoardConfig?.rows || defaultConfig.rows;
+  const dotSize = activeBoardConfig?.dot_size || defaultConfig.dotSize; // Note: Database uses dot_size, utils uses dotSize
+  const gap = activeBoardConfig?.gap || defaultConfig.gap;
+
   // Force re-render key để cập nhật UI khi Match3 board thay đổi
   const [forceRenderKey, setForceRenderKey] = useState(0);
-  
+
   // Callback để Match3 wrapper gọi khi board thay đổi
   const handleBoardUpdate = useCallback(() => {
     setForceRenderKey(prev => prev + 1);
   }, []);
-  
+
   // Lấy config của game hiện tại từ registry
   const gameConfig = getGameConfig(screen);
-  
+
   // ===== REFS OBJECT - Map refKey -> ref =====
   // Do React hooks không thể tạo động, ta phải khai báo sẵn
   // nhưng dùng object để lookup theo refKey từ registry
@@ -54,7 +65,7 @@ const GameMatrix = ({
     match3: useRef(null),
     snake: useRef(null),
   };
-  
+
   // Helper: Lấy ref của game hiện tại dựa trên registry
   const getActiveGameRef = () => {
     const refKey = gameConfig?.refKey;
@@ -72,7 +83,7 @@ const GameMatrix = ({
   const getPixelColor = (r, c) => {
     const gameR = r - offsetRow;
     const gameC = c - offsetCol;
-    
+
     const maxRows = useFullboard ? rows : ORIGINAL_GAME_SIZE;
     const maxCols = useFullboard ? cols : ORIGINAL_GAME_SIZE;
 
@@ -89,7 +100,7 @@ const GameMatrix = ({
     // === ĐANG CHƠI ===
     if (isPlaying) {
       const gameRef = getActiveGameRef();
-      
+
       // Games có wrapper (từ registry: hasWrapper = true)
       if (gameConfig?.hasWrapper && gameRef?.current?.getPixelColor) {
         // Match3 cần kiểm tra thêm vùng chơi và selected state
@@ -103,20 +114,20 @@ const GameMatrix = ({
           }
           return classes;
         }
-        
+
         // Dùng registry: useFullCoords (true cho CARO4, CARO5, SNAKE)
         if (gameConfig?.useFullCoords) {
           return gameRef.current.getPixelColor(r, c);
         }
         return gameRef.current.getPixelColor(gameR, gameC);
       }
-      
+
       // Games với external state (từ registry: externalState)
       if (gameConfig?.externalState) {
-        const externalData = gameConfig.externalState === 'activeGameState' 
-          ? activeGameState 
+        const externalData = gameConfig.externalState === 'activeGameState'
+          ? activeGameState
           : drawingState;
-        
+
         if (externalData) {
           // Drawing dùng full coords
           if (gameConfig?.useFullCoords && externalData.getPixelColor) {
@@ -136,7 +147,7 @@ const GameMatrix = ({
       if (useFullboard) return previewFn(r, c);
       return previewFn(gameR, gameC);
     }
-    
+
     // Default: Heart screen
     return getHeartPixel(gameR, gameC);
   };
@@ -157,13 +168,13 @@ const GameMatrix = ({
         gameRef.current.handlePixelClick(gameR, gameC);
         return;
       }
-      
+
       // Các game dùng fullCoords
       if (gameConfig?.useFullCoords) {
         gameRef.current.handlePixelClick(r, c);
         return;
       }
-      
+
       gameRef.current.handlePixelClick(gameR, gameC);
       return;
     }
@@ -180,10 +191,10 @@ const GameMatrix = ({
       // Cards are at positions 4, 6, 8, 10 (matching ActiveMemoryScreen.js)
       const rowMap = { 4: 0, 6: 1, 8: 2, 10: 3 };
       const colMap = { 4: 0, 6: 1, 8: 2, 10: 3 };
-      
+
       const cardRow = rowMap[gameR];
       const cardCol = colMap[gameC];
-      
+
       if (cardRow !== undefined && cardCol !== undefined) {
         const cardIndex = cardRow * 4 + cardCol;
         if (cardIndex >= 0 && cardIndex < 16 && onCardClick) {
@@ -198,7 +209,7 @@ const GameMatrix = ({
   const renderWrappers = () => (
     <>
       {GAME_REGISTRY.TICTACTOE.hasWrapper && (
-        <TicTacToeWrapper 
+        <TicTacToeWrapper
           ref={gameRefs.ticTacToe}
           isPlaying={isPlaying && screen === 'TICTACTOE'}
           botEnabled={botEnabled}
@@ -206,7 +217,7 @@ const GameMatrix = ({
         />
       )}
       {GAME_REGISTRY.CARO4.hasWrapper && (
-        <Caro4Wrapper 
+        <Caro4Wrapper
           ref={gameRefs.caro4}
           isPlaying={isPlaying && screen === 'CARO4'}
           botEnabled={true}
@@ -214,7 +225,7 @@ const GameMatrix = ({
         />
       )}
       {GAME_REGISTRY.CARO5.hasWrapper && (
-        <Caro5Wrapper 
+        <Caro5Wrapper
           ref={gameRefs.caro5}
           isPlaying={isPlaying && screen === 'CARO5'}
           botEnabled={true}
@@ -222,7 +233,7 @@ const GameMatrix = ({
         />
       )}
       {GAME_REGISTRY.MATCH3.hasWrapper && (
-        <Match3Wrapper 
+        <Match3Wrapper
           ref={gameRefs.match3}
           isPlaying={isPlaying && screen === 'MATCH3'}
           onScoreUpdate={screen === 'MATCH3' ? onScoreUpdate : undefined}
@@ -230,7 +241,7 @@ const GameMatrix = ({
         />
       )}
       {GAME_REGISTRY.SNAKE.hasWrapper && (
-        <SnakeWrapper 
+        <SnakeWrapper
           ref={gameRefs.snake}
           isPlaying={isPlaying && screen === 'SNAKE'}
           rows={rows}
@@ -249,7 +260,7 @@ const GameMatrix = ({
       {renderWrappers()}
 
       {/* Render board grid */}
-      <div 
+      <div
         className="grid"
         style={{
           gridTemplateColumns: `repeat(${cols}, ${dotSize}px)`,

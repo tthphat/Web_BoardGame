@@ -1,4 +1,5 @@
 import { AchievementService } from "./achievement.service.js";
+import { BoardConfigModel } from "../models/boardConfig.model.js";
 
 const GAME_ACHIEVEMENT_MAPPING = {
     "tic-tac-toe": "FIRST_PLAY_TIC_TAC_TOE",
@@ -35,5 +36,16 @@ export class GameService {
             gameSlug,
             earnedAchievement
         };
+        // ... (previous content)
+    }
+
+    static async getBoardConfigs() {
+        try {
+            const { data, error } = await BoardConfigModel.findAll();
+            if (error) throw error;
+            return { data };
+        } catch (error) {
+            throw error;
+        }
     }
 }

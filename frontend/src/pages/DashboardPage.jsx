@@ -7,28 +7,29 @@ import { useDrawing } from '../hooks/useDrawing';
 import { useEnabledGames } from '../hooks/useEnabledGames';
 import { toast } from 'sonner';
 import { getGameConfig } from '../config/gameRegistry';
+import { useSettings } from '../contexts/SettingsContext';
 
 const DashboardPage = () => {
   // Fetch enabled games from backend
   const { enabledScreens, loading: gamesLoading } = useEnabledGames();
-  
+
   // Danh sách các màn hình từ backend (filtered)
   const screens = enabledScreens;
-  
+
   // State lưu chỉ số màn hình hiện tại
   const [currentScreenIndex, setCurrentScreenIndex] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
   const [score, setScore] = useState(0);
-  
+
   // Game state chung cho tất cả games (thay vì nhiều state riêng lẻ)
   const [gameState, setGameState] = useState({});
-  
+
   // Hooks cho games cần quản lý ở Dashboard level
   const memoryGame = useMemoryGame();
-  
+
   const currentScreenName = screens[currentScreenIndex] || 'HEART';
   const currentConfig = getGameConfig(currentScreenName);
-  
+
   // Drawing hook - cần screen name
   const drawingGame = useDrawing(isPlaying && currentScreenName === 'DRAWING');
 
@@ -55,7 +56,7 @@ const DashboardPage = () => {
   // Xử lý nút Enter (bắt đầu/reset game)
   const handleEnter = () => {
     const config = currentConfig;
-    
+
     if (!config) {
       toast.error("Game chưa được implement!");
       return;
@@ -91,7 +92,7 @@ const DashboardPage = () => {
       setIsPlaying(true);
       setScore(0);
       setGameState(config.initialState);
-      
+
       // Memory game cần init riêng
       if (currentScreenName === 'MEMORY') {
         memoryGame.initGame();
@@ -111,12 +112,12 @@ const DashboardPage = () => {
   // Lấy text trạng thái từ registry
   const getStatusText = () => {
     if (!currentConfig) return '';
-    
+
     // Drawing cần state từ hook
     if (currentScreenName === 'DRAWING') {
       return currentConfig.getStatusText(drawingGame, isPlaying);
     }
-    
+
     return currentConfig.getStatusText(gameState, isPlaying);
   };
 
@@ -133,6 +134,8 @@ const DashboardPage = () => {
   re-render liên tục */
 
   // Keyboard controls cho Snake
+  const { controls } = useSettings();
+
   useEffect(() => {
     const handleKeyDown = (e) => {
       // Enter key cho tất cả games
@@ -145,39 +148,39 @@ const DashboardPage = () => {
       // Arrow keys chỉ cho Snake
       if (!isPlaying || currentScreenName !== 'SNAKE' || !gameState.changeDirection) return;
 
-      switch (e.key) {
-        case 'ArrowUp':
-        case 'w':
-        case 'W':
-          e.preventDefault();
-          gameState.changeDirection('UP');
-          break;
-        case 'ArrowDown':
-        case 's':
-        case 'S':
-          e.preventDefault();
-          gameState.changeDirection('DOWN');
-          break;
-        case 'ArrowLeft':
-        case 'a':
-        case 'A':
-          e.preventDefault();
-          gameState.changeDirection('LEFT');
-          break;
-        case 'ArrowRight':
-        case 'd':
-        case 'D':
-          e.preventDefault();
-          gameState.changeDirection('RIGHT');
-          break;
-        default:
-          break;
+      const keys = {
+        UP: controls === 'WASD' ? ['w', 'W'] : ['ArrowUp'],
+        DOWN: controls === 'WASD' ? ['s', 'S'] : ['ArrowDown'],
+        LEFT: controls === 'WASD' ? ['a', 'A'] : ['ArrowLeft'],
+        RIGHT: controls === 'WASD' ? ['d', 'D'] : ['ArrowRight'],
+      };
+
+      // Combine default arrow keys if using ARROWS (to allow both standard and w/s/a/d if user prefers fallback? No, request implies switch)
+      // Actually request says: "mặc định đang là các phím mũi tên ... tôi muốn người dùng có thể cài đặt thay đổi mặc định này"
+      // If WASD is selected, Arrow keys should probably NOT work, or both can work? Usually exclusive or additive.
+      // Let's implement strict switching as per "change default". 
+      // Wait, standard games usually allow Arrows + WASD always? 
+      // "cho phép cài đặt thay đổi" implies the user selects one. 
+      // If user selects WASD, I will check ONLY WASD (and maybe arrows as backup if that's standard UX, but let's stick to strict for now to demonstrate the feature).
+
+      if (keys.UP.includes(e.key)) {
+        e.preventDefault();
+        gameState.changeDirection('UP');
+      } else if (keys.DOWN.includes(e.key)) {
+        e.preventDefault();
+        gameState.changeDirection('DOWN');
+      } else if (keys.LEFT.includes(e.key)) {
+        e.preventDefault();
+        gameState.changeDirection('LEFT');
+      } else if (keys.RIGHT.includes(e.key)) {
+        e.preventDefault();
+        gameState.changeDirection('RIGHT');
       }
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isPlaying, currentScreenName, gameState.changeDirection, handleEnter]);
+  }, [isPlaying, currentScreenName, gameState.changeDirection, handleEnter, controls]);
 
   return (
     <div className="h-full w-full flex items-center justify-center p-4 overflow-hidden">

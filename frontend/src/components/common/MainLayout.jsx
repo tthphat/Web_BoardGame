@@ -25,6 +25,7 @@ const MainLayout = () => {
       case 'trophy': setActiveItem('Achievements'); break;
       case 'ranking': setActiveItem('Ranking'); break;
       case 'profile': setActiveItem('Profile'); break;
+      case 'settings': setActiveItem('Settings'); break;
       default: setActiveItem('Game'); break;
     }
   }, [location.pathname]);
@@ -43,6 +44,7 @@ const MainLayout = () => {
       case 'Profile': path = 'profile'; break;
       case 'Login': path = 'login'; break;
       case 'Register': path = 'register'; break;
+      case 'Settings': path = 'settings'; break;
       default: path = ''; break;
     }
     navigate(`/${path}`);
