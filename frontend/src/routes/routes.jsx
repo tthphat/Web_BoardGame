@@ -1,3 +1,4 @@
+import AdminRoute from "./AdminRoute";
 import { createBrowserRouter, Navigate } from "react-router-dom";
 import MainLayout from "../components/common/MainLayout";
 import DashboardPage from "../pages/DashboardPage";
@@ -18,7 +19,11 @@ export const router = createBrowserRouter([
 
     {
         path: "/admin",
-        element: <AdminMainLayout />
+        element: (
+            <AdminRoute>
+                <AdminMainLayout />
+            </AdminRoute>
+        )
     },
     {
         path: "/",
