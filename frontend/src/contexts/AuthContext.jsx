@@ -32,6 +32,7 @@ function AuthProvider({ children }) {
         try {
             const response = await loginApi(payload);
             setUser(response.data.user);
+            return response;
         } catch (error) {
             throw error;
         } finally {
