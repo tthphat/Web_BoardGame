@@ -1,168 +1,170 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import GameMatrix from '../components/games/GameMatrix';
 import GameControls from '../components/games/GameControls';
 import ColorPalette from '../components/games/ColorPalette';
 import { useMemoryGame } from '../hooks/useMemoryGame';
 import { useDrawing } from '../hooks/useDrawing';
 import { toast } from 'sonner';
+import { GAME_SCREENS, getGameConfig } from '../config/gameRegistry';
 
 const DashboardPage = () => {
-  // Danh sách các màn hình
-  const screens = ['SNAKE', 'DRAWING', 'CARO5', 'CARO4', 'TICTACTOE', 'MATCH3', 'MEMORY'];
-  // State lưu chỉ số màn hình hiện tại (0 là HEART)
+  // Danh sách các màn hình từ registry
+  const screens = GAME_SCREENS;
+  
+  // State lưu chỉ số màn hình hiện tại
   const [currentScreenIndex, setCurrentScreenIndex] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
   const [score, setScore] = useState(0);
+  
+  // Game state chung cho tất cả games (thay vì nhiều state riêng lẻ)
+  const [gameState, setGameState] = useState({});
+  
+  // Hooks cho games cần quản lý ở Dashboard level
   const memoryGame = useMemoryGame();
-  const [ticTacToeState, setTicTacToeState] = useState({ currentPlayer: 'X', winner: null });
-  const [caroState, setCaroState] = useState({ currentPlayer: 'BLUE', winner: null });
-  const [caro5State, setCaro5State] = useState({ currentPlayer: 'BLUE', winner: null });
-  const [snakeState, setSnakeState] = useState({ isGameOver: false, direction: 'LEFT' });
-
-  // Hàm chuyển màn hình sang TRÁI - Memoized
-  const handlePrevScreen = useCallback(() => {
-    setIsPlaying(false);
-    setScore(0);
-    setTicTacToeState({ currentPlayer: 'X', winner: null });
-    setCaroState({ currentPlayer: 'BLUE', winner: null });
-    setCaro5State({ currentPlayer: 'BLUE', winner: null });
-    setCurrentScreenIndex((prev) => (prev - 1 + screens.length) % screens.length);
-  }, [screens.length]);
-
-  // Hàm chuyển màn hình sang PHẢI - Memoized
-  const handleNextScreen = useCallback(() => {
-    setIsPlaying(false);
-    setScore(0);
-    setTicTacToeState({ currentPlayer: 'X', winner: null });
-    setCaroState({ currentPlayer: 'BLUE', winner: null });
-    setCaro5State({ currentPlayer: 'BLUE', winner: null });
-    setCurrentScreenIndex((prev) => (prev + 1) % screens.length);
-  }, [screens.length]);
-
+  
   const currentScreenName = screens[currentScreenIndex];
-
-  // Drawing hook
+  const currentConfig = getGameConfig(currentScreenName);
+  
+  // Drawing hook - cần screen name
   const drawingGame = useDrawing(isPlaying && currentScreenName === 'DRAWING');
 
-  // Callback đồng bộ Score - Memoized
+  // Reset game state khi đổi màn
+  const resetGameState = () => {
+    const config = getGameConfig(screens[currentScreenIndex]);
+    setGameState(config?.initialState || {});
+    setIsPlaying(false);
+    setScore(0);
+  };
+
+  // Hàm chuyển màn hình sang TRÁI
+  const handlePrevScreen = () => {
+    resetGameState();
+    setCurrentScreenIndex((prev) => (prev - 1 + screens.length) % screens.length);
+  };
+
+  // Hàm chuyển màn hình sang PHẢI
+  const handleNextScreen = () => {
+    resetGameState();
+    setCurrentScreenIndex((prev) => (prev + 1) % screens.length);
+  };
+
+  // Xử lý nút Enter (bắt đầu/reset game)
+  const handleEnter = () => {
+    const config = currentConfig;
+    
+    if (!config) {
+      toast.error("Game chưa được implement!");
+      return;
+    }
+
+    // Nếu game đã kết thúc và có resetGame -> reset
+    if (gameState.winner && gameState.resetGame) {
+      gameState.resetGame();
+      setGameState({ ...config.initialState, resetGame: gameState.resetGame });
+      return;
+    }
+
+    // Snake game - restart logic
+    if (currentScreenName === 'SNAKE') {
+      if (gameState.isGameOver && gameState.resetGame) {
+        // Đã game over -> reset trực tiếp, không toggle isPlaying
+        gameState.resetGame();
+        setScore(0);
+        setGameState(prev => ({ ...prev, isGameOver: false }));
+        return;
+      }
+      // Chưa chơi -> bắt đầu chơi
+      if (!isPlaying) {
+        setIsPlaying(true);
+        setScore(0);
+        return;
+      }
+      return;
+    }
+
+    // Bắt đầu game mới
+    if (!isPlaying) {
+      setIsPlaying(true);
+      setScore(0);
+      setGameState(config.initialState);
+      
+      // Memory game cần init riêng
+      if (currentScreenName === 'MEMORY') {
+        memoryGame.initGame();
+      }
+    }
+  };
+
+  // Xử lý nút Back (dừng game)
+  const handleBack = () => {
+    if (isPlaying) {
+      setIsPlaying(false);
+      setScore(0);
+      setGameState(currentConfig?.initialState || {});
+    }
+  };
+
+  // Lấy text trạng thái từ registry
+  const getStatusText = () => {
+    if (!currentConfig) return '';
+    
+    // Drawing cần state từ hook
+    if (currentScreenName === 'DRAWING') {
+      return currentConfig.getStatusText(drawingGame, isPlaying);
+    }
+    
+    return currentConfig.getStatusText(gameState, isPlaying);
+  };
+
+  // Callback khi game state thay đổi
+  const handleGameStateUpdate = useCallback((newState) => {
+    setGameState(prev => ({ ...prev, ...newState }));
+  }, []);
+
+  // Callback khi score thay đổi
   const handleScoreUpdate = useCallback((newScore) => {
     setScore(newScore);
   }, []); /* GameMatrix gọi callback này liên tục. Nếu function đổi reference: 
   GameMatrix sẽ re-render lại. Không dùng useCallback sẽ không crash nhưng GameMatrix sẽ
   re-render liên tục */
 
-  // Callback đồng bộ Game State - Memoized
-  const handleGameStateUpdate = useCallback((newState) => {
-    if (currentScreenName === 'TICTACTOE') {
-      setTicTacToeState(newState);
-    } else if (currentScreenName === 'CARO4') {
-      setCaroState(newState);
-    } else if (currentScreenName === 'CARO5') {
-      setCaro5State(newState);
-    } else if (currentScreenName === 'SNAKE') {
-      // Chỉ update nếu thực sự có thay đổi quan trọng để tránh render loop
-      setSnakeState(prev => {
-        if (prev.isGameOver === newState.isGameOver &&
-          prev.direction === newState.direction &&
-          prev.resetGame === newState.resetGame) {
-          return prev;
-        }
-        return newState;
-      });
-    }
-  }, [currentScreenName]);
-
-  const handleEnter = useCallback(() => {
-    if (currentScreenName === 'TICTACTOE') {
-      if (ticTacToeState.winner && ticTacToeState.resetGame) {
-        ticTacToeState.resetGame();
-        setTicTacToeState(prev => ({ ...prev, winner: null, currentPlayer: 'X' }));
-      } else if (!isPlaying) {
-        setIsPlaying(true);
-        setTicTacToeState({ currentPlayer: 'X', winner: null, resetGame: null });
-      }
-    } else if (currentScreenName === 'CARO4') {
-      if (caroState.winner && caroState.resetGame) {
-        caroState.resetGame();
-        setCaroState(prev => ({ ...prev, winner: null, currentPlayer: 'BLUE' }));
-      } else if (!isPlaying) {
-        setIsPlaying(true);
-        setCaroState({ currentPlayer: 'BLUE', winner: null, resetGame: null });
-      }
-    } else if (currentScreenName === 'CARO5') {
-      if (caro5State.winner && caro5State.resetGame) {
-        caro5State.resetGame();
-        setCaro5State(prev => ({ ...prev, winner: null, currentPlayer: 'BLUE' }));
-      } else if (!isPlaying) {
-        setIsPlaying(true);
-        setCaro5State({ currentPlayer: 'BLUE', winner: null, resetGame: null });
-      }
-    } else if (currentScreenName === 'SNAKE') {
-      // ĐỂ ĐẢM BẢO RESTART: Luôn cho phép restart khi bấm Enter ở màn hình Snake
-      toast.success("RESTARTING SNAKE...");
-
-      // Reset triệt để bằng cách tắt/bật
-      setIsPlaying(false);
-      setScore(0);
-      setSnakeState(prev => ({ ...prev, isGameOver: false }));
-
-      setTimeout(() => {
-        setIsPlaying(true);
-      }, 20);
-    } else if (currentScreenName === 'MEMORY' && !isPlaying) {
-      setIsPlaying(true);
-      setScore(0);
-      memoryGame.initGame();
-    } else if (currentScreenName === 'DRAWING' && !isPlaying) {
-      setIsPlaying(true);
-    } else if (!isPlaying) {
-      setIsPlaying(true);
-      setScore(0);
-    }
-  }, [currentScreenName, isPlaying, snakeState.isGameOver, ticTacToeState, caroState, caro5State, memoryGame]);
-
-  // Keyboard controls
-  const handleEnterRef = useRef();
-
-  // Luôn cập nhật ref với hàm mới nhất để listener không bao giờ bị stale
-  useEffect(() => {
-    handleEnterRef.current = handleEnter;
-  }, [handleEnter]);
-
+  // Keyboard controls cho Snake
   useEffect(() => {
     const handleKeyDown = (e) => {
-      // 1. Phím Enter hoặc NumpadEnter
+      // Enter key cho tất cả games
       if (e.key === 'Enter') {
         e.preventDefault();
-        if (handleEnterRef.current) {
-          handleEnterRef.current();
-        }
+        handleEnter();
         return;
       }
 
-      // 2. Chỉ xử lý di chuyển nếu đang chơi Snake
-      if (!isPlaying || currentScreenName !== 'SNAKE' || !snakeState.changeDirection) return;
+      // Arrow keys chỉ cho Snake
+      if (!isPlaying || currentScreenName !== 'SNAKE' || !gameState.changeDirection) return;
 
       switch (e.key) {
         case 'ArrowUp':
         case 'w':
         case 'W':
-          snakeState.changeDirection('UP');
+          e.preventDefault();
+          gameState.changeDirection('UP');
           break;
         case 'ArrowDown':
         case 's':
         case 'S':
-          snakeState.changeDirection('DOWN');
+          e.preventDefault();
+          gameState.changeDirection('DOWN');
           break;
         case 'ArrowLeft':
         case 'a':
         case 'A':
-          snakeState.changeDirection('LEFT');
+          e.preventDefault();
+          gameState.changeDirection('LEFT');
           break;
         case 'ArrowRight':
         case 'd':
         case 'D':
-          snakeState.changeDirection('RIGHT');
+          e.preventDefault();
+          gameState.changeDirection('RIGHT');
           break;
         default:
           break;
@@ -171,38 +173,7 @@ const DashboardPage = () => {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isPlaying, currentScreenName, snakeState.changeDirection]);
-  // Rất quan trọng: Re-bind khi isPlaying hoặc changeDirection đổi để đảm bảo capture đúng context
-
-
-  const getStatusText = () => {
-    if (!isPlaying) return '';
-    if (currentScreenName === 'TICTACTOE') {
-      if (ticTacToeState.winner === 'DRAW') return '- DRAW!';
-      if (ticTacToeState.winner) return `- ${ticTacToeState.winner} WINS!`;
-      return `- ${ticTacToeState.currentPlayer}'s turn`;
-    }
-    if (currentScreenName === 'CARO4') {
-      if (caroState.winner === 'DRAW') return '- HÒA!';
-      if (caroState.winner === 'BLUE') return '- XANH THẮNG!';
-      if (caroState.winner === 'RED') return '- ĐỎ THẮNG!';
-      return `- Lượt ${caroState.currentPlayer === 'BLUE' ? 'XANH' : 'ĐỎ'}`;
-    }
-    if (currentScreenName === 'CARO5') {
-      if (caro5State.winner === 'DRAW') return '- HÒA!';
-      if (caro5State.winner === 'BLUE') return '- XANH THẮNG!';
-      if (caro5State.winner === 'RED') return '- ĐỎ THẮNG!';
-      return `- Lượt ${caro5State.currentPlayer === 'BLUE' ? 'XANH' : 'ĐỎ'}`;
-    }
-    if (currentScreenName === 'DRAWING') {
-      return `- ${drawingGame.isErasing ? 'ERASING' : drawingGame.selectedColor}`;
-    }
-    if (currentScreenName === 'SNAKE') {
-      if (snakeState.isGameOver) return '- GAME OVER! (PRESS ENTER TO RESTART)';
-      return '- HUNTING... (USE ARROWS OR ASWD)';
-    }
-    return '(PLAYING)';
-  };
+  }, [isPlaying, currentScreenName, gameState.changeDirection, handleEnter]);
 
   return (
     <div className="h-full w-full flex items-center justify-center p-4 overflow-hidden">
@@ -212,20 +183,18 @@ const DashboardPage = () => {
 
           <div className="flex-1 bg-black border-2 border-t-black border-l-black border-b-white border-r-white relative flex flex-col items-center justify-center overflow-hidden p-4">
             <div className="absolute top-4 left-4 text-green-500 font-mono text-xs z-10 opacity-70">
-              {/* Hiển thị tên màn hình hiện tại */}
               <div>GAME:</div>
               <div>{currentScreenName} {getStatusText()}</div>
             </div >
 
             <div className="scale-75 md:scale-100 lg:scale-110 transition-transform">
-              {/* Truyền tên màn hình hiện tại vào Matrix */}
               <GameMatrix
                 screen={currentScreenName}
                 isPlaying={isPlaying}
                 onScoreUpdate={handleScoreUpdate}
                 onCardClick={memoryGame.handleCardClick}
                 activeGameState={memoryGame}
-                botEnabled={true}  // Bật bot cho TicTacToe
+                botEnabled={true}
                 onGameStateUpdate={handleGameStateUpdate}
                 drawingState={drawingGame}
               />
@@ -256,18 +225,11 @@ const DashboardPage = () => {
                 </div>
               )}
 
-              {/* Truyền hàm xử lý bấm nút vào GameControls */}
+              {/* Game Controls */}
               <GameControls
                 onLeft={handlePrevScreen}
                 onRight={handleNextScreen}
-                onBack={useCallback(() => {
-                  if (isPlaying) {
-                    setIsPlaying(false);
-                    setScore(0);
-                    setTicTacToeState({ currentPlayer: 'X', winner: null, resetGame: null });
-                    setCaroState({ currentPlayer: 'BLUE', winner: null, resetGame: null });
-                  }
-                }, [isPlaying])}
+                onBack={handleBack}
                 onEnter={handleEnter}
               />
             </div>

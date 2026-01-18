@@ -1,25 +1,36 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 
 export const useSnake = (enabled, rows, cols) => {
-    // State quản lý toàn bộ trò chơi
-    const [gameState, setGameState] = useState({
-        snake: [{ r: 10, c: 10 }, { r: 10, c: 11 }, { r: 10, c: 12 }],
-        food: { r: 5, c: 5 },
-        direction: 'LEFT',
-        isGameOver: false,
-        score: 0
-    });
+    // CRITICAL: Calculate initial position based on actual board size
+    const calcInitialState = useCallback(() => {
+        const midR = Math.floor(rows / 2) || 7;
+        const midC = Math.floor(cols / 2) || 7;
+        
+        const initialSnake = [
+            { r: midR, c: midC },
+            { r: midR, c: midC + 1 },
+            { r: midR, c: midC + 2 }
+        ];
+        
+        return {
+            snake: initialSnake,
+            food: { r: Math.max(1, midR - 3), c: midC },
+            direction: 'LEFT',
+            isGameOver: false,
+            score: 0
+        };
+    }, [rows, cols]);
+   
+    const [gameState, setGameState] = useState(() => calcInitialState());
 
     const intervalRef = useRef(null);
     const nextDirectionRef = useRef('LEFT');
-    // Refs để tracking logic nhanh mà không cần render lại
     const lastSnakeRef = useRef(gameState.snake);
     const lastDirRef = useRef('LEFT');
 
     const generateFood = useCallback((currentSnake) => {
         let newFood;
         let attempts = 0;
-        // Giới hạn số lần thử để tránh treo trình duyệt nếu không còn chỗ trống
         while (attempts < 100) {
             newFood = {
                 r: Math.floor(Math.random() * rows) + 1,
@@ -29,12 +40,12 @@ export const useSnake = (enabled, rows, cols) => {
             if (!onSnake) return newFood;
             attempts++;
         }
-        return { r: 1, c: 1 }; // Fallback
+        return { r: 1, c: 1 };
     }, [rows, cols]);
 
     const resetGame = useCallback(() => {
-        const midR = Math.floor(rows / 2) || 10;
-        const midC = Math.floor(cols / 2) || 10;
+        const midR = Math.floor(rows / 2) || 7;
+        const midC = Math.floor(cols / 2) || 7;
         const initialSnake = [
             { r: midR, c: midC },
             { r: midR, c: midC + 1 },
@@ -56,7 +67,7 @@ export const useSnake = (enabled, rows, cols) => {
         });
     }, [generateFood, rows, cols]);
 
-    // Tự động reset khi "enabled" (bật mode play)
+    // Auto reset when enabled
     useEffect(() => {
         if (enabled) {
             resetGame();
@@ -78,12 +89,12 @@ export const useSnake = (enabled, rows, cols) => {
             if (currentDir === 'LEFT') newHead.c -= 1;
             if (currentDir === 'RIGHT') newHead.c += 1;
 
-            // Kiểm tra va chạm tường
+            // Check wall collision
             if (newHead.r < 1 || newHead.r > rows || newHead.c < 1 || newHead.c > cols) {
                 return { ...prev, isGameOver: true };
             }
 
-            // Kiểm tra va chạm thân
+            // Check self collision
             if (currentSnake.some(s => s.r === newHead.r && s.c === newHead.c)) {
                 return { ...prev, isGameOver: true };
             }
@@ -92,7 +103,7 @@ export const useSnake = (enabled, rows, cols) => {
             let newFood = prev.food;
             let newScore = prev.score;
 
-            // Kiểm tra ăn mồi
+            // Check if ate food
             if (newHead.r === prev.food.r && newHead.c === prev.food.c) {
                 newScore += 10;
                 newFood = generateFood(newSnake);
@@ -112,13 +123,11 @@ export const useSnake = (enabled, rows, cols) => {
     }, [rows, cols, generateFood]);
 
     useEffect(() => {
-        // Stop interval if not enabled or game over
         if (!enabled || gameState.isGameOver) {
             if (intervalRef.current) clearInterval(intervalRef.current);
             return;
         }
 
-        // Tốc độ 150ms để vừa tay
         intervalRef.current = setInterval(moveSnake, 150);
         return () => {
             if (intervalRef.current) clearInterval(intervalRef.current);
@@ -127,7 +136,6 @@ export const useSnake = (enabled, rows, cols) => {
 
     const changeDirection = useCallback((newDir) => {
         const opposites = { 'UP': 'DOWN', 'DOWN': 'UP', 'LEFT': 'RIGHT', 'RIGHT': 'LEFT' };
-        // Không cho phép quay đầu 180 độ
         if (newDir !== opposites[lastDirRef.current]) {
             nextDirectionRef.current = newDir;
         }
