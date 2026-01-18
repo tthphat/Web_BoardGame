@@ -14,7 +14,16 @@ import authRoute from "./routes/auth.route.js";
 import userRoute from "./routes/user.route.js";
 import adminRoute from "./routes/admin.route.js"; // Import route
 
-// ...
+import { checkApiKey } from "./middlewares/apiKey.middleware.js";
+import { verifyToken } from "./middlewares/auth.middleware.js";
+
+const app = express();
+
+app.use(cors());
+app.use(express.json());
+app.use(cookieParser());
+
+app.use("/api/auth", authRoute); // login, register không cần check api key
 
 app.use(checkApiKey); // middleware kiểm tra api key
 
