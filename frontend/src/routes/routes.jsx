@@ -8,6 +8,7 @@ import RegisterPage from "../pages/auth/RegisterPage";
 import AdminMainLayout from "../layouts/AdminMainLayout";
 import VerifyEmail from "../components/register/VerifyEmail";
 import ProfilePage from "../pages/user/ProfilePage";
+import AchievementPage from "../pages/user/AchievementPage";
 import FriendLayout from "../layouts/FriendLayout";
 import MyFriends from "../components/friends/MyFriends";
 import FriendReuqests from "../components/friends/FriendReuqests";
@@ -72,7 +73,7 @@ export const router = createBrowserRouter([
             },
             {
                 path: "/trophy",
-                element: <DemoPage title="Achievements" description="Các danh hiệu bạn đã đạt được." />
+                element: <AchievementPage />
             },
             {
                 path: "/ranking",
