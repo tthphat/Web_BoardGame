@@ -71,7 +71,14 @@ export async function editProfileApi(payload) {
 
 // Get all users
 export async function getAllUsersApi(page = 1, limit = 10) {
-    const response = await fetch(`/api/user/all?page=${page}&limit=${limit}`);
+    const response = await fetch(`/api/user/all?page=${page}&limit=${limit}`, {
+        method: "GET",
+        credentials: "include",
+        headers: {
+            "Content-Type": "application/json",
+            "x-api-key": import.meta.env.VITE_API_KEY,
+        },
+    });
     const data = await response.json();
 
     if (!response.ok) {
