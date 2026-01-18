@@ -18,6 +18,7 @@ export const UserService = {
             return {
                 data: {
                     user: {
+                        id: user.id,
                         email: user.email,
                         role: user.role,
                         username: user.username,
@@ -67,6 +68,30 @@ export const UserService = {
             return {
                 data: {
                     user: editedUser
+                }
+            };
+        } catch (error) {
+            throw error;
+        }
+    },
+
+    // =============
+    // Get Me
+    // =============
+    async getMe(id) {
+        try {
+            const { data: user, error } = await UserModel.findUserById(id);
+            if (error || !user) {
+                throw new Error("User not found");
+            }
+            console.log("Backend-user.service.js-getMe: ", user);
+            return {
+                data: {
+                    user: {
+                        id: user.id,
+                        email: user.email,
+                        role: user.role
+                    }
                 }
             };
         } catch (error) {

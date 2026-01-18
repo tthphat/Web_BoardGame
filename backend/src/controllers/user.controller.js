@@ -37,5 +37,21 @@ export const UserController = {
             next(error);
         }
     },
+
+    // =============
+    // Get User, remember me
+    // =============
+    async getMe(req, res, next) {
+        try {
+            const user = await UserService.getMe(req.user.id);
+            res.json({
+                data: {
+                    user: user.data.user
+                }
+            });
+        } catch (error) {
+            next(error);
+        }
+    },
 }
 

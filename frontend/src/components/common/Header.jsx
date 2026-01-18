@@ -43,7 +43,7 @@ const Header = ({ onNavigate, onLogout }) => {
       {/* User Actions (Bên phải) */}
       <div className="relative">
         <HeaderItem
-          icon={<User size={20} className={`stroke-3 ${user ? 'text-green-500' : 'text-red-500'}`} />}
+          icon={<User size={20} className={user ? 'text-green-600' : 'text-red-600'} />}
           active={isDropdownOpen}
           onClick={handleUserIconClick}
         />

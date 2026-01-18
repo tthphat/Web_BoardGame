@@ -34,7 +34,7 @@ export const AuthService = {
                     role: user.role
                 },
                 process.env.JWT_SECRET,
-                { expiresIn: "7d" }
+                { expiresIn: "24h" }
             );
 
             return {
@@ -195,7 +195,7 @@ export const AuthService = {
                     email: user.email,
                 },
                 process.env.JWT_SECRET,
-                { expiresIn: "7d" }
+                { expiresIn: "24h" }
             );
 
             return {
