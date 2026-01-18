@@ -81,14 +81,63 @@ function UserList() {
                 </div>
 
                 {/* Users list */}
-                <div className="users-list">
-                    {users.map((user) => (
-                        <div key={user.id} className="user">
-                            <p>{user.username}</p>
-                            <p>{user.email}</p>
-                            <p>{user.role}</p>
-                        </div>
-                    ))}
+                <div className="users-list flex-1 overflow-y-auto min-h-0 mt-4 border-2 border-gray-400 bg-white">
+                    <table className="w-full text-left border-collapse">
+                        <thead className="bg-[#c0c0c0] sticky top-0 z-10 shadow-sm">
+                            <tr>
+                                <th className="p-3 border-b-2 border-gray-600 font-mono text-sm uppercase tracking-wider">Username</th>
+                                <th className="p-3 border-b-2 border-gray-600 font-mono text-sm uppercase tracking-wider">Email</th>
+                                <th className="p-3 border-b-2 border-gray-600 font-mono text-sm uppercase tracking-wider text-center">Role</th>
+                                <th className="p-3 border-b-2 border-gray-600 font-mono text-sm uppercase tracking-wider text-center">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody className="divide-y divide-gray-200">
+                            {users.length > 0 ? (
+                                users.map((user) => (
+                                    <tr
+                                        key={user.id}
+                                        className="hover:bg-blue-50 transition-colors cursor-default font-mono text-sm group"
+                                    >
+                                        <td className="p-3 border-r border-dashed border-gray-300 group-hover:border-blue-200">
+                                            <div className="font-bold text-gray-800">{user.username}</div>
+                                        </td>
+                                        <td className="p-3 border-r border-dashed border-gray-300 group-hover:border-blue-200 text-gray-600">
+                                            {user.email}
+                                        </td>
+                                        <td className="p-3 border-r border-dashed border-gray-300 group-hover:border-blue-200 text-center">
+                                            <span className={`
+                                                px-2 py-0.5 text-xs border border-gray-400 font-bold
+                                                ${user.role === 'admin' ? 'bg-red-100 text-red-800' : 'bg-gray-100 text-gray-600'}
+                                            `}>
+                                                {user.role}
+                                            </span>
+                                        </td>
+                                        <td className="p-3 text-center">
+                                            {user.role !== 'admin' && (
+                                                <button
+                                                    className="
+                                                        px-3 py-1 text-xs border border-blue-600 text-blue-600 
+                                                        hover:bg-blue-600 hover:text-white transition-all
+                                                        active:scale-95 font-bold uppercase
+                                                    "
+                                                    onClick={() => console.log("Add friend:", user.id)}
+                                                    title="Send Friend Request"
+                                                >
+                                                    + Add
+                                                </button>
+                                            )}
+                                        </td>
+                                    </tr>
+                                ))
+                            ) : (
+                                <tr>
+                                    <td colSpan="3" className="p-8 text-center text-gray-500 font-mono italic">
+                                        No users found.
+                                    </td>
+                                </tr>
+                            )}
+                        </tbody>
+                    </table>
                 </div>
 
                 {/* Phân trang */}
