@@ -1,6 +1,6 @@
 import { PaginationSection } from "../common/PaginationSection";
 import { getAllUsersApi } from "@/services/user.service";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 
 
 function UserList() {
@@ -9,6 +9,19 @@ function UserList() {
     const [search, setSearch] = useState("");
     const [page, setPage] = useState(1);
     const limit = 10;
+
+    const searchRef = useRef("");
+
+    const handleSearch = () => {
+        setPage(1);
+        setSearch(searchRef.current.value);
+    };
+
+    const handleClearSearch = () => {
+        searchRef.current.value = ""; // clear UI
+        setPage(1);
+        setSearch("");               // trigger fetch all
+    };
 
     useEffect(() => {
         const fetchUsers = async () => {
@@ -28,9 +41,42 @@ function UserList() {
             <div className="flex flex-col justify-between h-full">
                 {/* Searchbar */}
                 <div className="search-bar flex justify-end">
-                    <div className="flex gap-2 font-mono">
-                        <input type="text" placeholder="Search..." className="w-[300px] p-2 border border-gray-600" value={search} onChange={(e) => setSearch(e.target.value)} />
-                        <button className="p-2 border border-gray-600 transition-all hover:bg-blue-800 hover:text-white">Search</button>
+                    <div className="relative flex items-center gap-2 font-mono">
+                        <input
+                            type="text"
+                            placeholder="Search..."
+                            className="w-[300px] p-2 pr-8 border border-gray-600"
+                            ref={searchRef}
+                            onChange={(e) => {
+                                if (e.target.value === "" && search !== "") {
+                                    setPage(1);
+                                    setSearch("");
+                                }
+                            }}
+                            onKeyDown={(e) => {
+                                if (e.key === "Enter") {
+                                    handleSearch();
+                                }
+                            }}
+                        />
+
+                        {/* Clear button */}
+                        {search && (
+                            <button
+                                onClick={handleClearSearch}
+                                type="button"
+                                className="absolute right-[90px] text-gray-400 hover:text-red-600"
+                            >
+                                ✕
+                            </button>
+                        )}
+
+                        <button
+                            onClick={handleSearch}
+                            className="p-2 border border-gray-600 transition-all hover:bg-blue-800 hover:text-white"
+                        >
+                            Search
+                        </button>
                     </div>
                 </div>
 
