@@ -2,9 +2,9 @@ import { NavLink, Outlet } from "react-router-dom";
 
 function FriendLayout() {
     const navItems = [
-        { path: '/friends', label: 'Panel', exact: true },
-        { path: '/friends/requests', label: 'Requests' },
-        { path: '/friends/list', label: 'Friends' }
+        { path: '/friends/user-list', label: 'Panel', exact: true },
+        { path: '/friends/friend-requests', label: 'Requests' },
+        { path: '/friends/my-friends', label: 'Friends' }
     ];
 
     return (
