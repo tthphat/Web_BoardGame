@@ -131,4 +131,37 @@ export const UserService = {
             throw error;
         }
     },
+
+    // =============
+    // Get Friend Requests
+    // =============
+    async getFriendRequests(id, page, limit, search) {
+        try {
+            const offset = (page - 1) * limit;
+
+            const { data: count, error: countError } = await UserModel.countFriendRequests(id, search);
+            if (countError) {
+                throw new Error("Failed to count friend requests");
+            }
+
+            const { data: friendRequests, error } = await UserModel.getFriendRequests(id, offset, limit, search);
+            if (error) {
+                throw new Error("Failed to get friend requests");
+            }
+
+            return {
+                data: {
+                    friendRequests,
+                    pagination: {
+                        page,
+                        limit,
+                        totalPages: Math.ceil(count / limit),
+                        total: count
+                    }
+                }
+            };
+        } catch (error) {
+            throw error;
+        }
+    },
 };

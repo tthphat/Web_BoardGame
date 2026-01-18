@@ -8,6 +8,7 @@ router.get("/profile", UserController.getProfile);
 router.patch("/profile", UserController.editProfile);
 router.get("/me", UserController.getMe);
 router.get("/all", UserController.getAllUsers);
+router.get("/friend-requests", UserController.getFriendRequests);
 
 
 export default router;  

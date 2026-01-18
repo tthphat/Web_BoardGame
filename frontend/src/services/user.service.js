@@ -92,3 +92,26 @@ export async function getAllUsersApi(page, limit, search) {
     return data;
 }
 
+// Get friend requests
+export async function getFriendRequestsApi(page, limit, search) {
+    console.log("Fontend-User-Service: Get friend requests API input: ", page, limit, search);
+
+    const response = await fetch(`/api/user/friend-requests?page=${page}&limit=${limit}&search=${search}`, {
+        method: "GET",
+        credentials: "include",
+        headers: {
+            "Content-Type": "application/json",
+            "x-api-key": import.meta.env.VITE_API_KEY,
+        },
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+        throw new Error(data.message || data.error || "Get friend requests failed");
+    }
+
+    console.log("Fontend-User-Service: Get friend requests API output: ", data);
+    return data;
+}
+
