@@ -189,10 +189,9 @@ export const UserModel = {
                     "u.id as friend_id",
                     "u.username",
                     "u.email",
-                    "u.avatar",
-                    "f.created_at"
+                    "f.accepted_at"
                 )
-                .orderBy("f.created_at", "desc")
+                .orderBy("f.accepted_at", "desc")
                 .offset(offset)
                 .limit(limit);
 

@@ -126,7 +126,7 @@ function FriendRequests() {
                             {requests?.length > 0 ? (
                                 requests.map((request) => (
                                     <tr
-                                        key={request.id}
+                                        key={request.sender_id}
                                         className="hover:bg-blue-50 transition-colors cursor-default font-mono text-sm group"
                                     >
                                         <td className="p-3 border-r border-dashed border-gray-300 group-hover:border-blue-200">
