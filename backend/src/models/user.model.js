@@ -65,6 +65,36 @@ export const UserModel = {
         } catch (error) {
             return { data: null, error };
         }
+    },
+
+    // Get all users
+    async getAllUsers(offset, limit, search) {
+        try {
+            const users = await knex("users")
+                .where("username", "like", `%${search}%`)
+                .orWhere("email", "like", `%${search}%`)
+                .select("id", "username", "email", "role", "created_at", "updated_at")
+                .offset(offset)
+                .limit(limit);
+
+            return { data: users, error: null };
+        } catch (error) {
+            return { data: null, error };
+        }
+    },
+
+    // Count users
+    async countUsers(search) {
+        try {
+            const count = await knex("users")
+                .where("username", "like", `%${search}%`)
+                .orWhere("email", "like", `%${search}%`)
+                .count("id");
+
+            return { data: count[0].count, error: null };
+        } catch (error) {
+            return { data: null, error };
+        }
     }
 
 }
