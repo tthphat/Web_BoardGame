@@ -68,16 +68,41 @@ export const UserModel = {
     },
 
     // Get all users
-    async getAllUsers(offset, limit, search) {
+    async getAllUsersFriend(currentUserId, offset, limit, search = "") {
         try {
-            const users = await knex("users")
-                .where((qb) => {
-                    qb.where("username", "ilike", `%${search}%`)
-                        .orWhere("email", "ilike", `%${search}%`);
+            const users = await knex("users as u")
+                .leftJoin("friends as f", function () {
+                    this.on(function () {
+                        this.on("f.sender_id", "=", knex.raw("?", [currentUserId]))
+                            .andOn("f.receiver_id", "=", "u.id");
+                    }).orOn(function () {
+                        this.on("f.receiver_id", "=", knex.raw("?", [currentUserId]))
+                            .andOn("f.sender_id", "=", "u.id");
+                    });
                 })
-                .andWhere("role", "!=", "admin")
-                .andWhere("state", "active")
-                .select("id", "username", "email", "role", "created_at", "updated_at")
+                .where("u.state", "active")
+                .andWhere("u.role", "!=", "admin")
+                .andWhere("u.id", "!=", currentUserId)
+                .andWhere((qb) => {
+                    qb.where("u.username", "ilike", `%${search}%`)
+                        .orWhere("u.email", "ilike", `%${search}%`);
+                })
+                .select(
+                    "u.id",
+                    "u.username",
+                    "u.email",
+                    "u.role",
+                    "u.created_at",
+                    "f.status as friend_status",
+                    knex.raw(`
+                CASE
+                    WHEN f.status IS NULL THEN 'none'
+                    WHEN f.status = 'pending' AND f.sender_id = ? THEN 'sent'
+                    WHEN f.status = 'pending' AND f.receiver_id = ? THEN 'received'
+                    WHEN f.status = 'accepted' THEN 'friend'
+                END as friend_state
+                `, [currentUserId, currentUserId])
+                )
                 .offset(offset)
                 .limit(limit);
 
@@ -88,18 +113,28 @@ export const UserModel = {
     },
 
     // Count users
-    async countUsers(search) {
+    async countUsersFriend(currentUserId, search = "") {
         try {
-            const count = await knex("users")
-                .where((qb) => {
-                    qb.where("username", "ilike", `%${search}%`)
-                        .orWhere("email", "ilike", `%${search}%`);
+            const count = await knex("users as u")
+                .leftJoin("friends as f", function () {
+                    this.on(function () {
+                        this.on("f.sender_id", "=", knex.raw("?", [currentUserId]))
+                            .andOn("f.receiver_id", "=", "u.id");
+                    }).orOn(function () {
+                        this.on("f.receiver_id", "=", knex.raw("?", [currentUserId]))
+                            .andOn("f.sender_id", "=", "u.id");
+                    });
                 })
-                .andWhere("role", "!=", "admin")
-                .andWhere("state", "active")
-                .count("id");
+                .where("u.state", "active")
+                .andWhere("u.role", "!=", "admin")
+                .andWhere("u.id", "!=", currentUserId)
+                .andWhere((qb) => {
+                    qb.where("u.username", "ilike", `%${search}%`)
+                        .orWhere("u.email", "ilike", `%${search}%`);
+                })
+                .countDistinct("u.id as count");
 
-            return { data: count[0].count, error: null };
+            return { data: Number(count[0].count), error: null };
         } catch (error) {
             return { data: null, error };
         }

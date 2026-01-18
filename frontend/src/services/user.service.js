@@ -70,10 +70,10 @@ export async function editProfileApi(payload) {
 }
 
 // Get all users
-export async function getAllUsersApi(page, limit, search) {
+export async function getAllUsersFriendApi(page, limit, search) {
     console.log("Fontend-User-Service: Get all users API input: ", page, limit, search);
 
-    const response = await fetch(`/api/user/all?page=${page}&limit=${limit}&search=${search}`, {
+    const response = await fetch(`/api/user/all-users?page=${page}&limit=${limit}&search=${search}`, {
         method: "GET",
         credentials: "include",
         headers: {
@@ -138,3 +138,26 @@ export async function getMyFriendsApi(page, limit, search) {
     return data;
 }
 
+// Add friend
+export async function addFriendApi(userId) {
+    console.log("Fontend-User-Service: Add friend API input: ", userId);
+
+    const response = await fetch(`/api/user/friend-requests`, {
+        method: "POST",
+        credentials: "include",
+        headers: {
+            "Content-Type": "application/json",
+            "x-api-key": import.meta.env.VITE_API_KEY,
+        },
+        body: JSON.stringify({ userId }),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+        throw new Error(data.message || data.error || "Add friend failed");
+    }
+
+    console.log("Fontend-User-Service: Add friend API output: ", data);
+    return data;
+}

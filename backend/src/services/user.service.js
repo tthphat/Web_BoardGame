@@ -102,16 +102,16 @@ export const UserService = {
     // =============
     // Get All Users
     // =============
-    async getAllUsers(page, limit, search) {
+    async getAllUsersFriend(currentUserId, page, limit, search) {
         try {
             const offset = (page - 1) * limit;
 
-            const { data: count, error: countError } = await UserModel.countUsers(search);
+            const { data: count, error: countError } = await UserModel.countUsersFriend(currentUserId, search);
             if (countError) {
                 throw new Error("Failed to count users");
             }
 
-            const { data: users, error } = await UserModel.getAllUsers(offset, limit, search);
+            const { data: users, error } = await UserModel.getAllUsersFriend(currentUserId, offset, limit, search);
             if (error) {
                 throw new Error("Failed to get all users");
             }
