@@ -182,10 +182,6 @@ const DashboardPage = () => {
         <div className="flex-1 flex flex-row border-2 border-t-[#808080] border-l-[#808080] border-b-white border-r-white dark:border-t-black dark:border-l-black dark:border-b-[#555] dark:border-r-[#555] p-1 overflow-hidden">
 
           <div className="flex-1 bg-black border-2 border-t-black border-l-black border-b-white border-r-white relative flex flex-col items-center justify-center overflow-hidden p-4">
-            <div className="absolute top-4 left-4 text-green-500 font-mono text-xs z-10 opacity-70">
-              <div>GAME:</div>
-              <div>{currentScreenName} {getStatusText()}</div>
-            </div >
 
             <div className="scale-75 md:scale-100 lg:scale-110 transition-transform">
               <GameMatrix
@@ -218,10 +214,15 @@ const DashboardPage = () => {
                   onClear={drawingGame.clearCanvas}
                 />
               ) : (
-                <div className="w-full bg-black border-2 border-gray-500 p-2 text-green-500 font-mono text-xs mb-4">
-                  <div className="flex justify-between"><span>SCORE</span><span>{score.toString().padStart(4, '0')}</span></div>
-                  <div className="flex justify-between"><span>HI-SC</span><span>9999</span></div>
-                  <div className="flex justify-between mt-2"><span>LEVEL</span><span>01</span></div>
+                <div className="w-full bg-black border-2 border-gray-500 p-3 text-green-500 font-mono text-sm mb-4">
+                  <div className="text-center mb-2 border-b border-gray-600 pb-2">
+                    <div className="text-yellow-400 font-bold">{currentConfig?.name || currentScreenName}</div>
+                    <div className="text-xs text-green-400">{getStatusText()}</div>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>SCORE</span>
+                    <span className="text-cyan-400">{score.toString().padStart(4, '0')}</span>
+                  </div>
                 </div>
               )}
 
@@ -232,10 +233,6 @@ const DashboardPage = () => {
                 onBack={handleBack}
                 onEnter={handleEnter}
               />
-            </div>
-
-            <div className="p-2 text-center border-t-2 border-gray-400">
-              <div className="text-[10px] text-gray-500 font-mono">INSERT COIN</div>
             </div>
           </div >
         </div >
