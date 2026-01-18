@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useSettings } from '../../contexts/SettingsContext';
-import { Keyboard, Grid, Save, RotateCcw } from 'lucide-react';
+import { Keyboard, Grid, Save, RotateCcw, AlertTriangle } from 'lucide-react';
 import { toast } from 'sonner';
+import { useBlocker } from 'react-router-dom';
 
 const UserSettings = () => {
     const {
@@ -22,6 +23,16 @@ const UserSettings = () => {
         setLocalBoardId(boardConfigId);
     }, [controls, boardConfigId]);
 
+    // Check for unsaved changes
+    const isDirty = useMemo(() => {
+        return localControls !== controls || localBoardId !== boardConfigId;
+    }, [localControls, localBoardId, controls, boardConfigId]);
+
+    // Block navigation if dirty
+    const blocker = useBlocker(
+        ({ currentLocation, nextLocation }) => isDirty && currentLocation.pathname !== nextLocation.pathname
+    );
+
     const handleSave = () => {
         setControls(localControls);
         setBoardConfigId(localBoardId);
@@ -31,17 +42,16 @@ const UserSettings = () => {
     const handleReset = () => {
         // Reset to defaults
         const defaultControls = 'ARROWS';
-        const defaultBoardId = null; // or availableConfigs[0]?.id if required
+        const defaultBoardId = null;
 
         setLocalControls(defaultControls);
         setLocalBoardId(defaultBoardId);
-
 
         toast.info("Settings reset to default. Click Save to apply.");
     };
 
     return (
-        <div className="p-1 font-mono space-y-4">
+        <div className="p-1 font-mono space-y-4 relative">
             {/* Header */}
             <div className="bg-[#000080] text-white px-2 py-1 text-sm font-bold flex items-center justify-between border-2 border-t-white border-l-white border-b-black border-r-black">
                 <span>USER_PREFERENCES</span>
@@ -52,7 +62,7 @@ const UserSettings = () => {
                 {/* 1. Control Settings */}
                 <div className="bg-[#c0c0c0] p-1 border-2 border-t-white border-l-white border-b-black border-r-black">
                     <div className="bg-[#e0e0e0] p-4 border-2 border-t-[#808080] border-l-[#808080] border-b-white border-r-white h-full">
-                        <div className="flex items-center gap-2 mb-4 text-[#000080] font-bold border-b border-gray-400 pb-2">
+                        <div className="flex items-center gap-2 mb-4 text-[#000080] dark:text-[#000080] font-bold border-b border-gray-400 pb-2">
                             <Keyboard size={20} />
                             <h3>CONTROLS CONFIGURATION</h3>
                         </div>
@@ -70,8 +80,8 @@ const UserSettings = () => {
                                     onChange={() => setLocalControls('ARROWS')}
                                 />
                                 <div>
-                                    <p className="font-bold group-hover:text-blue-700">ARROW KEYS</p>
-                                    <p className="text-xs text-gray-500">Use ↑ ↓ ← → to move</p>
+                                    <p className="font-bold group-hover:text-blue-700 dark:group-hover:text-blue-700 text-black dark:text-black">ARROW KEYS</p>
+                                    <p className="text-xs text-gray-500 dark:text-gray-500">Use ↑ ↓ ← → to move</p>
                                 </div>
                             </label>
 
@@ -87,8 +97,8 @@ const UserSettings = () => {
                                     onChange={() => setLocalControls('WASD')}
                                 />
                                 <div>
-                                    <p className="font-bold group-hover:text-blue-700">WASD KEYS</p>
-                                    <p className="text-xs text-gray-500">Use W A S D to move</p>
+                                    <p className="font-bold group-hover:text-blue-700 dark:group-hover:text-blue-700 text-black dark:text-black">WASD KEYS</p>
+                                    <p className="text-xs text-gray-500 dark:text-gray-500">Use W A S D to move</p>
                                 </div>
                             </label>
                         </div>
@@ -98,18 +108,18 @@ const UserSettings = () => {
                 {/* 2. Board Settings */}
                 <div className="bg-[#c0c0c0] p-1 border-2 border-t-white border-l-white border-b-black border-r-black">
                     <div className="bg-[#e0e0e0] p-4 border-2 border-t-[#808080] border-l-[#808080] border-b-white border-r-white h-full">
-                        <div className="flex items-center gap-2 mb-4 text-[#000080] font-bold border-b border-gray-400 pb-2">
+                        <div className="flex items-center gap-2 mb-4 text-[#000080] dark:text-[#000080] font-bold border-b border-gray-400 pb-2">
                             <Grid size={20} />
                             <h3>BOARD DISPLAY CONFIG</h3>
                         </div>
 
                         <div className="space-y-2">
-                            <p className="text-sm mb-2">Select your preferred board size for supported games (Snake, etc.):</p>
+                            <p className="text-sm mb-2 text-black dark:text-black">Select your preferred board size for supported games (Snake, etc.):</p>
 
                             <select
                                 value={localBoardId || ''}
                                 onChange={(e) => setLocalBoardId(e.target.value ? parseInt(e.target.value) : null)}
-                                className="w-full p-2 bg-white border-2 border-t-[#808080] border-l-[#808080] border-b-white border-r-white outline-none font-mono"
+                                className="w-full p-2 bg-white border-2 border-t-[#808080] border-l-[#808080] border-b-white border-r-white outline-none font-mono text-black"
                             >
                                 {availableConfigs.map(config => (
                                     <option key={config.id} value={config.id}>
@@ -145,6 +155,46 @@ const UserSettings = () => {
                     SAVE SETTINGS
                 </button>
             </div>
+
+            {/* Unsaved Changes Warning Modal */}
+            {blocker.state === "blocked" && (
+                <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+                    <div className="bg-[#c0c0c0] p-1 border-2 border-t-white border-l-white border-b-black border-r-black w-full max-w-sm shadow-2xl">
+                        <div className="bg-[#000080] text-white px-2 py-1 text-sm font-bold flex items-center gap-2">
+                            <AlertTriangle size={16} className="text-yellow-400" />
+                            <span>WARNING</span>
+                        </div>
+                        <div className="p-4 bg-gray-100 text-black text-center">
+                            <p className="font-bold mb-2">UNSAVED CHANGES DETECTED!</p>
+                            <p className="text-sm mb-6">Do you want to save your changes before leaving?</p>
+
+                            <div className="flex flex-col gap-2">
+                                <button
+                                    onClick={() => {
+                                        handleSave();
+                                        blocker.proceed();
+                                    }}
+                                    className="w-full py-2 bg-green-200 border-2 border-t-white border-l-white border-b-black border-r-black active:border-t-black active:border-l-black active:border-b-white active:border-r-white font-bold hover:bg-green-300"
+                                >
+                                    YES - SAVE & LEAVE
+                                </button>
+                                <button
+                                    onClick={() => blocker.proceed()}
+                                    className="w-full py-2 bg-red-200 border-2 border-t-white border-l-white border-b-black border-r-black active:border-t-black active:border-l-black active:border-b-white active:border-r-white font-bold hover:bg-red-300"
+                                >
+                                    NO - DISCARD CHANGES
+                                </button>
+                                <button
+                                    onClick={() => blocker.reset()}
+                                    className="w-full py-2 bg-gray-300 border-2 border-t-white border-l-white border-b-black border-r-black active:border-t-black active:border-l-black active:border-b-white active:border-r-white font-bold hover:bg-gray-400"
+                                >
+                                    CANCEL - STAY HERE
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };
