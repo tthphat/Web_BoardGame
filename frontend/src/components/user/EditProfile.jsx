@@ -1,6 +1,6 @@
 import { SquarePen } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogClose, DialogDescription } from "@/components/ui/dialog";
-import { editProfileApi } from "@/services/auth.service";
+import { editProfileApi } from "@/services/user.service";
 import { useState } from "react";
 import { editProfileSchema } from "@/lib/editProfile.schema";
 import { toast } from "sonner";

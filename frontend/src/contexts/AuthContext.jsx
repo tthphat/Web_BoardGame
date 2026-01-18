@@ -1,12 +1,27 @@
 import { loginApi, registerApi, verifyEmailApi, logoutApi } from "@/services/auth.service";
-import { useContext, createContext, useState } from "react";
+import { useContext, createContext, useState, useEffect } from "react";
 import { toast } from "sonner";
+import { getUserApi } from "@/services/user.service";
 
 const AuthContext = createContext(null);
 
 function AuthProvider({ children }) {
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchUser = async () => {
+            try {
+                const user = await getUserApi();
+                setUser(user.data.user);
+            } catch (error) {
+                console.error("Failed to fetch user:", error);
+            }
+        };
+        fetchUser();
+        setLoading(false);
+    }, []);
+
 
     // Login
     const login = async (payload) => {

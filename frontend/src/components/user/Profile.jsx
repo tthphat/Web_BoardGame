@@ -1,12 +1,10 @@
-import { getProfileApi } from "@/services/auth.service";
+import { getProfileApi } from "@/services/user.service";
 import { useState, useEffect } from "react";
-import { useAuth } from "@/contexts/AuthContext";
 import EditProfile from "@/components/user/EditProfile";
 
 
 function Profile() {
     const [profile, setProfile] = useState(null);
-    const { user, loading } = useAuth();
 
     const fetchProfile = async () => {
         try {
