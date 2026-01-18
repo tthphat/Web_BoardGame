@@ -4,58 +4,53 @@ import { toast } from "sonner";
 
 function AddFriend({ friend_state, user_id }) {
 
-    const [allowAdd, setAllowAdd] = useState(false);
-
-    const handelFriendState = (friend_state) => {
-        if (friend_state !== "none") {
-            setAllowAdd(false);
-        } else {
-            setAllowAdd(true);
-        }
-    }
+    const [currentState, setCurrentState] = useState(friend_state);
 
     useEffect(() => {
-        handelFriendState(friend_state);
+        setCurrentState(friend_state);
     }, [friend_state]);
 
-    const handleColorState = (friend_state) => {
-        if (friend_state === "sent") {
+    const handleColorState = (state) => {
+        if (state === "sent") {
             return "bg-blue-600 text-white border-blue-600";
-        } else if (friend_state === "friend") {
+        } else if (state === "friend") {
             return "bg-green-600 text-white border-green-600";
-        } else if (friend_state === "received") {
+        } else if (state === "received") {
             return "bg-yellow-600 text-white border-yellow-600";
         } else {
-            return "";
+            return "bg-white text-blue-600 border-blue-600 hover:bg-blue-600 hover:text-white";
         }
     }
 
-    const handleAddFriend = () => {
+    const handleAddFriend = async () => {
         try {
-            addFriendApi(user_id);
-            setAllowAdd(false);
+            await addFriendApi(user_id);
+            setCurrentState("sent");
+            toast.success("Friend request sent!");
         } catch (error) {
             console.error("Error adding friend:", error);
             toast.error("Failed to add friend");
         }
     };
 
+    const isActionable = currentState === "none";
+
     return (
         <div>
             <button
                 className={
-                    `px-3 py-1 text-xs border text-blue-600 
+                    `px-3 py-1 text-xs border transition-all
                     active:scale-95 font-bold uppercase
                     cursor-pointer
-                    ${handleColorState(friend_state)}`
+                    ${handleColorState(currentState)}`
                 }
-                onClick={handleAddFriend}
-                title="Send Friend Request"
-                disabled={!allowAdd}
+                onClick={isActionable ? handleAddFriend : undefined}
+                title={currentState === "none" ? "Send Friend Request" : currentState}
+                disabled={!isActionable}
             >
-                {allowAdd ? "+ Add" : friend_state}
+                {currentState === "none" ? "+ Add" : currentState}
             </button>
-        </div>
+        </div >
     );
 }
 
