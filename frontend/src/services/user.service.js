@@ -69,3 +69,15 @@ export async function editProfileApi(payload) {
     return data;
 }
 
+// Get all users
+export async function getAllUsersApi(page = 1, limit = 10) {
+    const response = await fetch(`/api/user/all?page=${page}&limit=${limit}`);
+    const data = await response.json();
+
+    if (!response.ok) {
+        throw new Error(data.message || data.error || "Failed to fetch users");
+    }
+
+    return data;
+}
+

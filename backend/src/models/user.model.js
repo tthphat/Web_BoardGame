@@ -65,6 +65,35 @@ export const UserModel = {
         } catch (error) {
             return { data: null, error };
         }
+    },
+
+    // Find all users with pagination and achievement stats
+    async findAllUsers(limit, offset) {
+        try {
+            const users = await knex("users")
+                .select(
+                    "users.id",
+                    "users.username",
+                    "users.email",
+                    "users.role",
+                    "users.state",
+                    "users.created_at"
+                )
+                .count("user_achievements.id as achievement_count")
+                .leftJoin("user_achievements", "users.id", "user_achievements.user_id")
+                .groupBy("users.id")
+                .orderBy("users.created_at", "desc")
+                .limit(limit)
+                .offset(offset);
+
+            const totalResult = await knex("users").count("id as count").first();
+            const total = totalResult.count;
+
+            return { data: { users, total }, error: null };
+        } catch (error) {
+            console.error("Error in findAllUsers:", error);
+            return { data: null, error };
+        }
     }
 
 }

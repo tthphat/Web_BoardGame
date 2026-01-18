@@ -39,7 +39,7 @@ export const UserController = {
     },
 
     // =============
-    // Get User, remember me
+    // Get Me, remember me
     // =============
     async getMe(req, res, next) {
         try {
@@ -49,6 +49,21 @@ export const UserController = {
                     user: user.data.user
                 }
             });
+        } catch (error) {
+            next(error);
+        }
+    },
+
+    // =============
+    // Get All Users (Admin)
+    // =============
+    async getAllUsers(req, res, next) {
+        try {
+            const page = parseInt(req.query.page) || 1;
+            const limit = parseInt(req.query.limit) || 10;
+
+            const result = await UserService.getAllUsers(page, limit);
+            res.json(result);
         } catch (error) {
             next(error);
         }

@@ -98,4 +98,34 @@ export const UserService = {
             throw error;
         }
     },
+
+    // =============
+    // Get All Users
+    // =============
+    async getAllUsers(page = 1, limit = 10) {
+        try {
+            const offset = (page - 1) * limit;
+            const { data, error } = await UserModel.findAllUsers(limit, offset);
+
+            if (error) {
+                throw new Error("Failed to get users");
+            }
+
+            const totalPages = Math.ceil(data.total / limit);
+
+            return {
+                data: {
+                    users: data.users,
+                    meta: {
+                        total: parseInt(data.total),
+                        page: parseInt(page),
+                        limit: parseInt(limit),
+                        totalPages: totalPages
+                    }
+                }
+            };
+        } catch (error) {
+            throw error;
+        }
+    },
 };
