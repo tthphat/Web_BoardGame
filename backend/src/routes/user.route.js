@@ -8,6 +8,7 @@ router.get("/profile", UserController.getProfile);
 router.patch("/profile", UserController.editProfile);
 router.get("/me", UserController.getMe);
 router.get("/all", UserController.getAllUsers);
+router.patch("/:id/state", UserController.updateUserState);
 
 
 export default router;  

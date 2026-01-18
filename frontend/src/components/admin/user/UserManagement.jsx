@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { getAllUsersApi } from '@/services/user.service';
+import { getAllUsersApi, updateUserStateApi } from '@/services/user.service';
 import {
     Pagination,
     PaginationContent,
@@ -60,22 +60,30 @@ const UserManagement = () => {
     // 3. Hàm thực thi khi bấm YES trong Modal
     const handleConfirmAction = async () => {
         const { userId, currentState } = confirmModal;
-        const newState = currentState === 'active' ? 'blocked' : 'active';
+        // User requested 'lock' for block, 'active' for unblock.
+        const newState = currentState === 'active' ? 'lock' : 'active';
         const actionName = currentState === 'active' ? 'BLOCK' : 'UNBLOCK';
 
-        // --- XỬ LÝ UI (Giả lập) ---
-        // Cập nhật State bảng ngay lập tức
-        setUsers(prevUsers => prevUsers.map(user => 
-            user.id === userId ? { ...user, state: newState } : user
-        ));
+        try {
+            await updateUserStateApi(userId, newState);
 
-        // Thông báo Toast
-        toast.success(`ACTION COMPLETED`, {
-            description: `User [${confirmModal.username}] has been ${actionName}ED.`
-        });
+            // Cập nhật State bảng ngay lập tức
+            setUsers(prevUsers => prevUsers.map(user =>
+                user.id === userId ? { ...user, state: newState } : user
+            ));
 
-        // Đóng Modal
-        closeConfirmModal();
+            // Thông báo Toast
+            toast.success(`ACTION COMPLETED`, {
+                description: `User [${confirmModal.username}] has been ${actionName}ED.`
+            });
+        } catch (error) {
+            toast.error("Failed to update user state", {
+                description: error.message
+            });
+        } finally {
+            // Đóng Modal
+            closeConfirmModal();
+        }
     };
 
     const handlePageChange = (page) => {
@@ -143,8 +151,8 @@ const UserManagement = () => {
 
                         {/* Pagination Area */}
                         <div className="mt-2 shrink-0 flex justify-center bg-[#c0c0c0] dark:bg-[#2d2d2d] p-1 border-t-2 border-white dark:border-[#555]">
-                             {/* ... (Code Pagination giữ nguyên như cũ) ... */}
-                             <Pagination>
+                            {/* ... (Code Pagination giữ nguyên như cũ) ... */}
+                            <Pagination>
                                 <PaginationContent className="gap-1">
                                     <PaginationItem>
                                         <PaginationPrevious onClick={() => handlePageChange(meta.page - 1)} className={`h-8 rounded-none border border-black bg-[#e0e0e0] hover:bg-white active:bg-gray-400 ${meta.page === 1 ? 'pointer-events-none opacity-50' : 'cursor-pointer'}`} />
@@ -169,13 +177,13 @@ const UserManagement = () => {
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-[2px]">
                     {/* Modal Box: Style Windows 95 Dialog */}
                     <div className="w-[400px] max-w-[90%] bg-[#c0c0c0] dark:bg-[#2d2d2d] p-1 border-2 border-t-white border-l-white border-b-black border-r-black shadow-[10px_10px_0px_rgba(0,0,0,0.5)]">
-                        
+
                         {/* Title Bar */}
                         <div className="bg-[#000080] dark:bg-[#000050] px-2 py-1 flex justify-between items-center mb-4 cursor-default select-none">
                             <span className="text-white font-bold text-xs uppercase tracking-wider">
                                 SYSTEM_CONFIRM.EXE
                             </span>
-                            <button 
+                            <button
                                 onClick={closeConfirmModal}
                                 className="bg-[#c0c0c0] text-black text-[10px] font-bold px-1.5 border border-t-white border-l-white border-b-black border-r-black active:border-t-black active:border-l-black active:border-b-white active:border-r-white"
                             >
@@ -185,19 +193,19 @@ const UserManagement = () => {
 
                         {/* Content */}
                         <div className="px-6 py-4 flex flex-col items-center gap-4 text-center">
-                            
+
                             {/* Icon Warning */}
                             <div className="flex items-center gap-3">
                                 <AlertTriangle size={36} className="text-yellow-600 dark:text-yellow-400" />
                                 <h3 className="font-bold text-lg dark:text-white">ARE YOU SURE?</h3>
                             </div>
-                            
+
                             {/* Message */}
                             <p className="text-sm dark:text-gray-300">
                                 You are about to <span className="font-bold uppercase underline decoration-2 decoration-red-500">
                                     {confirmModal.currentState === 'active' ? 'BLOCK' : 'UNBLOCK'}
                                 </span> the user:
-                                <br/>
+                                <br />
                                 <span className="inline-block mt-2 bg-white dark:bg-black px-2 py-1 border border-gray-500 font-bold font-mono text-blue-800 dark:text-blue-300">
                                     {confirmModal.username}
                                 </span>
@@ -206,15 +214,15 @@ const UserManagement = () => {
                             {/* Buttons */}
                             <div className="flex gap-4 mt-4 w-full justify-center">
                                 {/* YES Button */}
-                                <button 
+                                <button
                                     onClick={handleConfirmAction}
                                     className="w-24 py-1.5 bg-[#c0c0c0] border-2 border-t-white border-l-white border-b-black border-r-black text-black font-bold uppercase text-sm shadow-[2px_2px_0px_black] active:translate-y-[2px] active:shadow-none active:border-t-black active:border-l-black active:border-b-white active:border-r-white transition-all"
                                 >
                                     Yes
                                 </button>
-                                
+
                                 {/* NO Button */}
-                                <button 
+                                <button
                                     onClick={closeConfirmModal}
                                     className="w-24 py-1.5 bg-[#c0c0c0] border-2 border-t-white border-l-white border-b-black border-r-black text-black font-bold uppercase text-sm shadow-[2px_2px_0px_black] active:translate-y-[2px] active:shadow-none active:border-t-black active:border-l-black active:border-b-white active:border-r-white transition-all"
                                 >

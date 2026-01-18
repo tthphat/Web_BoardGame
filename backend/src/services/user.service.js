@@ -128,4 +128,17 @@ export const UserService = {
             throw error;
         }
     },
+
+    // =============
+    // Update User State (Block/Unblock)
+    // =============
+    async updateUserState(userId, state) {
+        try {
+            const { data, error } = await UserModel.updateUser(userId, { state });
+            if (error) throw error;
+            return { data };
+        } catch (error) {
+            throw error;
+        }
+    }
 };

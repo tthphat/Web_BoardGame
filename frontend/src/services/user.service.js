@@ -88,3 +88,24 @@ export async function getAllUsersApi(page = 1, limit = 10) {
     return data;
 }
 
+// Update User State
+export async function updateUserStateApi(userId, state) {
+    const response = await fetch(`/api/user/${userId}/state`, {
+        method: "PATCH",
+        credentials: "include",
+        headers: {
+            "Content-Type": "application/json",
+            "x-api-key": import.meta.env.VITE_API_KEY,
+        },
+        body: JSON.stringify({ state }),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+        throw new Error(data.message || data.error || "Failed to update user state");
+    }
+
+    return data;
+}
+

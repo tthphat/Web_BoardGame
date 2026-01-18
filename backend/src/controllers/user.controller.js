@@ -68,5 +68,25 @@ export const UserController = {
             next(error);
         }
     },
+
+    // =============
+    // Update User State (Block/Unblock)
+    // =============
+    async updateUserState(req, res, next) {
+        try {
+            const { id } = req.params;
+            const { state } = req.body;
+
+            // Basic validation
+            if (!state) {
+                return res.status(400).json({ error: "State is required" });
+            }
+
+            const result = await UserService.updateUserState(id, state);
+            res.json(result);
+        } catch (error) {
+            next(error);
+        }
+    }
 }
 
