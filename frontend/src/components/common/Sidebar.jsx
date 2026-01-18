@@ -1,4 +1,4 @@
-import { User, Users, MessageSquare, Trophy, BarChart, Moon, Gamepad2 } from 'lucide-react';
+import { User, Users, MessageSquare, Trophy, BarChart, Moon, Gamepad2, Settings } from 'lucide-react';
 import React, { useState } from 'react';
 import MenuItem from './MenuItem';
 import { useAuth } from '@/contexts/AuthContext';
@@ -15,6 +15,7 @@ const Sidebar = ({ activeItem, setActiveItem }) => {
         { id: 'Messages', icon: <MessageSquare size={20} />, label: 'Messages' },
         { id: 'Achievements', icon: <Trophy size={20} />, label: 'Trophy' },
         { id: 'Ranking', icon: <BarChart size={20} />, label: 'Ranking' },
+        { id: 'Settings', icon: <Settings size={20} />, label: 'Settings' },
     ]
 
     if (!user) {

@@ -20,5 +20,15 @@ export const GameController = {
         } catch (error) {
             next(error);
         }
+        // ...
+    },
+
+    async getBoardConfigs(req, res, next) {
+        try {
+            const result = await GameService.getBoardConfigs();
+            res.json(result);
+        } catch (error) {
+            next(error);
+        }
     }
 };
