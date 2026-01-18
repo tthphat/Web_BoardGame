@@ -120,8 +120,8 @@ function UserList() {
                                 ))
                             ) : (
                                 <tr>
-                                    <td colSpan="3" className="p-8 text-center text-gray-500 font-mono italic">
-                                        No users found.
+                                    <td colSpan="4" className="p-8 text-center text-gray-500 font-mono italic">
+                                        No users found. Please try again.
                                     </td>
                                 </tr>
                             )}
