@@ -10,6 +10,9 @@ import VerifyEmail from "../components/register/VerifyEmail";
 import ProfilePage from "../pages/user/ProfilePage";
 import AchievementPage from "../pages/user/AchievementPage";
 import FriendLayout from "../layouts/FriendLayout";
+import MyFriends from "../components/friends/MyFriends";
+import FriendReuqests from "../components/friends/FriendReuqests";
+import UserList from "../components/friends/UserList";
 
 export const router = createBrowserRouter([
     { path: "/login", element: <LoginPage /> },
@@ -44,7 +47,25 @@ export const router = createBrowserRouter([
             },
             {
                 path: "/friends",
-                element: <FriendLayout />
+                element: <FriendLayout />,
+                children: [
+                    {
+                        index: true,
+                        element: <Navigate to="/friends/user-list" replace />
+                    },
+                    {
+                        path: "/friends/user-list",
+                        element: <UserList />
+                    },
+                    {
+                        path: "/friends/my-friends",
+                        element: <MyFriends />
+                    },
+                    {
+                        path: "/friends/friend-requests",
+                        element: <FriendReuqests />
+                    }
+                ]
             },
             {
                 path: "/messages",
