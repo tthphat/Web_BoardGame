@@ -97,6 +97,8 @@ export const AdminService = {
             console.error("AdminService.getRecentActivities error:", error);
             throw error;
         }
+
+    },
 // ... (previous code)
 
     // =============
@@ -144,4 +146,4 @@ export const AdminService = {
                 throw error;
             }
         }
-    };
+};
