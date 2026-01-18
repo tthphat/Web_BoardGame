@@ -118,4 +118,18 @@ export const AuthController = {
         }
     },
 
+    // =============
+    // Logout
+    // =============
+    async logout(req, res, next) {
+        try {
+            await AuthService.logout();
+            res.clearCookie("access_token");
+            res.json({
+                message: "Logout successfully"
+            });
+        } catch (error) {
+            next(error);
+        }
+    },
 }
