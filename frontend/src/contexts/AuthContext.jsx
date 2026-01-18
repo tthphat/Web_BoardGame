@@ -1,5 +1,6 @@
-import { loginApi, registerApi, verifyEmailApi } from "@/services/auth.service";
+import { loginApi, registerApi, verifyEmailApi, logoutApi } from "@/services/auth.service";
 import { useContext, createContext, useState } from "react";
+import { toast } from "sonner";
 
 const AuthContext = createContext(null);
 
@@ -40,6 +41,20 @@ function AuthProvider({ children }) {
             const response = await verifyEmailApi(payload);
             setUser(response.data.user);
         } catch (error) {
+            throw error;
+        } finally {
+            setLoading(false);
+        }
+    };
+
+
+    const logout = async () => {
+        setLoading(true);
+        try {
+            const response = await logoutApi();
+            setUser(null);
+        } catch (error) {
+            toast.error(error.message);
             throw error;
         } finally {
             setLoading(false);
