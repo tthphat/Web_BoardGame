@@ -5,7 +5,8 @@ import {
 
 import {
     addUserAchievement,
-    getUserAchievements
+    getUserAchievements,
+    getUserAchievementProgress
 } from "../models/userAchievement.model.js";
 
 export class AchievementService {
@@ -22,7 +23,10 @@ export class AchievementService {
         return achievement;
     }
 
-    static async getUserAchievementsService(knex, userId, gameSlug, searchName) {
+    static async getUserAchievementsService(knex, userId, gameSlug, searchName, includeUnearned = false) {
+        if (includeUnearned) {
+            return await getUserAchievementProgress(knex, userId, gameSlug, searchName);
+        }
         return await getUserAchievements(knex, userId, gameSlug, searchName);
     }
 
