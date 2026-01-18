@@ -12,7 +12,7 @@ import cookieParser from "cookie-parser";
 
 import authRoute from "./routes/auth.route.js";
 import userRoute from "./routes/user.route.js";
-import apiKeyMiddleware from "./middlewares/apiKey.middleware.js";
+import { checkApiKey } from "./middlewares/apiKey.middleware.js";
 import { verifyToken } from "./middlewares/auth.middleware.js";
 
 const app = express();
@@ -23,7 +23,7 @@ app.use(cookieParser());
 
 app.use("/api/auth", authRoute); // login, register không cần check api key
 
-app.use(apiKeyMiddleware); // middleware kiểm tra api key
+app.use(checkApiKey); // middleware kiểm tra api key
 
 app.use("/api/achievements", verifyToken, achievementRoute);
 app.use("/api/games", verifyToken, gameRoute);
