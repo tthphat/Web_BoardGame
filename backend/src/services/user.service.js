@@ -98,4 +98,71 @@ export const UserService = {
             throw error;
         }
     },
+
+    // =============
+    // Get All Users
+    // =============
+    async getAllUsers(page, limit, search) {
+        try {
+            const offset = (page - 1) * limit;
+
+            const { data: count, error: countError } = await UserModel.countUsers(search);
+            if (countError) {
+                throw new Error("Failed to count users");
+            }
+
+            const { data: users, error } = await UserModel.getAllUsers(offset, limit, search);
+            if (error) {
+                throw new Error("Failed to get all users");
+            }
+
+            return {
+                data: {
+                    users,
+                    pagination: {
+                        page,
+                        limit,
+                        totalPages: Math.ceil(count / limit),
+                        total: count
+                    }
+                }
+            };
+        } catch (error) {
+            throw error;
+        }
+    },
+
+    // =============
+    // Get Friend Requests
+    // =============
+    async getFriendRequests(id, page, limit, search) {
+        try {
+            const offset = (page - 1) * limit;
+
+            const { data: count, error: countError } = await UserModel.countFriendRequests(id, search);
+            if (countError) {
+                throw new Error("Failed to count friend requests");
+            }
+
+            const { data: friendRequests, error } = await UserModel.getFriendRequests(id, offset, limit, search);
+            console.log("Backend-user.service.js-getFriendRequests: ", friendRequests);
+            if (error) {
+                throw new Error("Failed to get friend requests");
+            }
+
+            return {
+                data: {
+                    friendRequests,
+                    pagination: {
+                        page,
+                        limit,
+                        totalPages: Math.ceil(count / limit),
+                        total: count
+                    }
+                }
+            };
+        } catch (error) {
+            throw error;
+        }
+    },
 };

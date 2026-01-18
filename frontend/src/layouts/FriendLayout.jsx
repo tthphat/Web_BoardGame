@@ -2,9 +2,9 @@ import { NavLink, Outlet } from "react-router-dom";
 
 function FriendLayout() {
     const navItems = [
-        { path: '/friends', label: 'Panel', exact: true },
-        { path: '/friends/requests', label: 'Requests' },
-        { path: '/friends/list', label: 'Friends' }
+        { path: '/friends/user-list', label: 'Panel', exact: true },
+        { path: '/friends/friend-requests', label: 'Requests' },
+        { path: '/friends/my-friends', label: 'Friends' }
     ];
 
     return (
@@ -16,7 +16,7 @@ function FriendLayout() {
                 </div>
 
                 {/* Main Content Area */}
-                <div className="flex-1 flex flex-col gap-4 p-4 bg-[#c0c0c0]">
+                <div className="flex-1 flex flex-col gap-4 p-4 bg-[#c0c0c0] min-h-0">
                     {/* Navigation Tabs */}
                     <div className="flex gap-2 border-b-2 border-white/50 pb-2">
                         {navItems.map((item) => (
@@ -39,7 +39,7 @@ function FriendLayout() {
                     </div>
 
                     {/* Content Panel */}
-                    <div className="flex-1 bg-white border-inset border-2 border-gray-600 p-4 shadow-inner overflow-auto">
+                    <div className="flex-1 bg-white border-inset border-2 border-gray-600 p-4 shadow-inner overflow-hidden min-h-0 flex flex-col">
                         <Outlet />
                     </div>
 
