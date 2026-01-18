@@ -207,15 +207,6 @@ const DashboardPage = () => {
     return '(PLAYING)';
   };
 
-  // Xử lý nút vật lý Left/Right
-  const handleOnLeft = useCallback(() => {
-    handlePrevScreen();
-  }, [handlePrevScreen]);
-
-  const handleOnRight = useCallback(() => {
-    handleNextScreen();
-  }, [handleNextScreen]);
-
   return (
     <div className="h-full w-full flex items-center justify-center p-4 overflow-hidden">
       <div className="bg-[#c0c0c0] dark:bg-[#2d2d2d] p-1 border-2 border-t-white border-l-white border-b-black border-r-black shadow-xl w-full max-w-6xl h-full max-h-[90vh] flex flex-col">
@@ -270,8 +261,8 @@ const DashboardPage = () => {
 
               {/* Truyền hàm xử lý bấm nút vào GameControls */}
               <GameControls
-                onLeft={handleOnLeft}
-                onRight={handleOnRight}
+                onLeft={handlePrevScreen}
+                onRight={handleNextScreen}
                 onBack={useCallback(() => {
                   if (isPlaying) {
                     setIsPlaying(false);
