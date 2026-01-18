@@ -1,4 +1,3 @@
-import { User, Users, MessageSquare, Trophy, BarChart, Moon, Gamepad2 } from 'lucide-react';
 import { User, Users, MessageSquare, Trophy, BarChart, Moon, Gamepad2, Settings } from 'lucide-react';
 import React, { useState } from 'react';
 import MenuItem from './MenuItem';

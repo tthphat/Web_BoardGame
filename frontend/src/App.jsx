@@ -3,7 +3,8 @@ import { RouterProvider } from 'react-router-dom';
 import { router } from './routes/routes';
 import { SettingsProvider } from './contexts/SettingsContext';
 
-// ...
+import AuthProvider from './contexts/AuthContext';
+import { Toaster } from './components/ui/toaster';
 
 function App() {
     return (
