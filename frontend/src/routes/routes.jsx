@@ -1,3 +1,4 @@
+import AdminRoute from "./AdminRoute";
 import { createBrowserRouter, Navigate } from "react-router-dom";
 import MainLayout from "../components/common/MainLayout";
 import DashboardPage from "../pages/DashboardPage";
@@ -8,6 +9,7 @@ import AdminMainLayout from "../layouts/AdminMainLayout";
 import VerifyEmail from "../components/register/VerifyEmail";
 import ProfilePage from "../pages/user/ProfilePage";
 import AchievementPage from "../pages/user/AchievementPage";
+import FriendLayout from "../layouts/FriendLayout";
 
 export const router = createBrowserRouter([
     { path: "/login", element: <LoginPage /> },
@@ -18,7 +20,11 @@ export const router = createBrowserRouter([
 
     {
         path: "/admin",
-        element: <AdminMainLayout />
+        element: (
+            <AdminRoute>
+                <AdminMainLayout />
+            </AdminRoute>
+        )
     },
     {
         path: "/",
@@ -38,7 +44,7 @@ export const router = createBrowserRouter([
             },
             {
                 path: "/friends",
-                element: <DemoPage title="Friends List" description="Danh sách bạn bè sẽ hiện ở đây." />
+                element: <FriendLayout />
             },
             {
                 path: "/messages",

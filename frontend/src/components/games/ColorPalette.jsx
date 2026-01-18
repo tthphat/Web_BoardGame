@@ -75,11 +75,6 @@ const ColorPalette = ({
           CLEAR
         </button>
       </div>
-
-      {/* Hiển thị màu đang chọn */}
-      <div className="text-center text-green-500 font-mono text-[10px]">
-        {isErasing ? '🧽 ERASING' : `🎨 ${selectedColor}`}
-      </div>
     </div>
   );
 };

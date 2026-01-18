@@ -20,9 +20,16 @@ function Login() {
 
     const onSubmit = async (data) => {
         try {
-            await login(data);
+            const response = await login(data);
+            const user = response.data.user;
             toast.success("Login successfully");
-            navigate("/");
+
+            if (user.role === 'admin') {
+                navigate("/admin");
+            } else {
+                navigate("/");
+                // await login(data);
+            }
         } catch (error) {
             toast.error("Login failed");
             setError("email", { message: error.message });

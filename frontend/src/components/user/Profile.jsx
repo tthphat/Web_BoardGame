@@ -1,12 +1,9 @@
-import { getProfileApi } from "@/services/auth.service";
+import { getProfileApi } from "@/services/user.service";
 import { useState, useEffect } from "react";
-import { useAuth } from "@/contexts/AuthContext";
 import EditProfile from "@/components/user/EditProfile";
-
 
 function Profile() {
     const [profile, setProfile] = useState(null);
-    const { user, loading } = useAuth();
 
     const fetchProfile = async () => {
         try {
@@ -22,69 +19,69 @@ function Profile() {
     }, []);
 
     return (
-        <div className="w-full h-full flex items-center justify-center">
-            <div className="w-full h-full bg-primary-background p-1 border-2 border-white border-b-primary-border border-r-primary-border shadow-md">
-                <div className="w-full h-full flex flex-col gap-6 bg-secondary-background p-6 border-2 border-primary-border border-b-white border-r-white">
-                    {/* Title */}
-                    <div>
-                        <h1 className="text-2xl font-bold text-primary-text mb-2 font-mono">Profile</h1>
-                        <p className="text-secondary-text font-mono">Only you can see this information. Edit your profile here.</p>
+        <div className="w-full h-full flex items-center justify-center p-4">
+            <div className="w-full max-w-2xl bg-[#c0c0c0] p-1 border-t-2 border-l-2 border-white border-b-2 border-r-2 border-black shadow-xl flex flex-col">
+                {/* Header Bar */}
+                <div className="bg-gradient-to-r from-blue-900 to-blue-700 p-2 flex items-center justify-between mb-4">
+                    <span className="text-white font-bold font-mono tracking-widest pl-2">USER PROFILE</span>
+                </div>
+
+                {/* Main Content */}
+                <div className="p-4 flex flex-col gap-4">
+                    {/* Info Block */}
+                    <div className="border-2 border-gray-600 p-4 bg-[#c0c0c0]">
+                        <legend className="px-2 font-bold font-mono text-sm transform -translate-y-6 bg-[#c0c0c0] w-max">USER INFORMATION</legend>
+
+                        <div className="flex flex-col gap-4 -mt-2">
+                            {/* Username */}
+                            <div className="flex items-center gap-4">
+                                <label className="w-24 font-mono font-bold text-sm">Username:</label>
+                                <div className="flex-1 bg-white border-2 border-inset border-gray-600 p-1 px-2 font-mono flex justify-between items-center shadow-inner">
+                                    <span>{profile?.username || "LOADING..."}</span>
+                                    <EditProfile data={profile?.username} field="username" onSuccess={fetchProfile} />
+                                </div>
+                            </div>
+
+                            {/* Email */}
+                            <div className="flex items-center gap-4">
+                                <label className="w-24 font-mono font-bold text-sm">Email:</label>
+                                <div className="flex-1 bg-white border-2 border-inset border-gray-600 p-1 px-2 font-mono flex justify-between items-center shadow-inner">
+                                    <span>{profile?.email || "LOADING..."}</span>
+                                    <EditProfile data={profile?.email} field="email" onSuccess={fetchProfile} />
+                                </div>
+                            </div>
+
+                            {/* Password */}
+                            <div className="flex items-center gap-4">
+                                <label className="w-24 font-mono font-bold text-sm">Password:</label>
+                                <div className="flex-1 bg-white border-2 border-inset border-gray-600 p-1 px-2 font-mono flex justify-between items-center shadow-inner">
+                                    <span>**********</span>
+                                    <EditProfile data="" field="password" onSuccess={fetchProfile} />
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
-                    {/* Content */}
-                    <div className="flex flex-col gap-4">
-                        {/* Username*/}
-                        <div className="grid grid-cols-[100px_1fr] gap-4 p-1 border-2 border-white border-b-primary-border border-r-primary-border shadow-md">
-                            <label className="text-primary-text font-mono"><strong>Username:</strong></label>
-                            <div className="flex justify-between items-center p-3 border-2 border-primary-border border-b-white border-r-white">
-                                <div className="flex flex-col gap-2">
-                                    <input type="text" value={profile?.username || ""} readOnly className="bg-transparent focus:outline-none text-primary-text" />
-                                </div>
-                                <EditProfile data={profile?.username} field="username" onSuccess={fetchProfile} />
-                            </div>
-                        </div>
+                    {/* System Info Block */}
+                    <div className="border-2 border-gray-600 p-4 bg-[#c0c0c0] mt-2">
+                        <legend className="px-2 font-bold font-mono text-sm transform -translate-y-6 bg-[#c0c0c0] w-max">SYSTEM DATA</legend>
 
-                        {/* Email */}
-                        <div className="grid grid-cols-[100px_1fr] gap-4 p-1 border-2 border-white border-b-primary-border border-r-primary-border shadow-md">
-                            <label className="text-primary-text font-mono"><strong>Email:</strong></label>
-                            <div className="flex justify-between items-center p-3 border-2 border-primary-border border-b-white border-r-white">
-                                <div className="flex flex-col gap-2">
-                                    <input type="text" value={profile?.email || ""} readOnly className="bg-transparent focus:outline-none text-primary-text" />
-                                </div>
-                                <EditProfile data={profile?.email} field="email" onSuccess={fetchProfile} />
+                        <div className="flex flex-col gap-2 -mt-2">
+                            <div className="flex justify-between font-mono text-sm">
+                                <span>CREATED AT:</span>
+                                <span>{profile?.created_at ? new Date(profile.created_at).toLocaleString("vi-VN") : "UNKNOWN"}</span>
+                            </div>
+                            <div className="flex justify-between font-mono text-sm">
+                                <span>USER ROLE:</span>
+                                <span className="font-bold text-blue-800">{profile?.role?.toUpperCase() || "GUEST"}</span>
                             </div>
                         </div>
+                    </div>
 
-                        {/* Password */}
-                        <div className="grid grid-cols-[100px_1fr] gap-4 p-1 border-2 border-white border-b-primary-border border-r-primary-border shadow-md">
-                            <label className="text-primary-text font-mono"><strong>Password:</strong></label>
-                            <div className="flex justify-between items-center p-3 border-2 border-primary-border border-b-white border-r-white">
-                                <div className="flex flex-col gap-2">
-                                    <input type="text" value="**********" readOnly className="bg-transparent focus:outline-none text-primary-text" />
-                                </div>
-                                <EditProfile data="" field="password" onSuccess={fetchProfile} />
-                            </div>
-                        </div>
-
-                        {/* Created At */}
-                        <div className="grid grid-cols-[100px_1fr] gap-4 p-1 border-2 border-white border-b-primary-border border-r-primary-border shadow-md">
-                            <label className="text-primary-text font-mono"><strong>Created At:</strong></label>
-                            <div className="p-3 border-2 border-primary-border border-b-white border-r-white">
-                                <div className="flex flex-col gap-2">
-                                    <input type="text" value={profile?.created_at ? new Date(profile.created_at).toLocaleString("vi-VN") : ""} readOnly className="bg-transparent focus:outline-none text-primary-text" />
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Role */}
-                        <div className="grid grid-cols-[100px_1fr] gap-4 p-1 border-2 border-white border-b-primary-border border-r-primary-border shadow-md">
-                            <label className="text-primary-text font-mono"><strong>Role:</strong></label>
-                            <div className="p-3 border-2 border-primary-border border-b-white border-r-white">
-                                <div className="flex flex-col gap-2">
-                                    <input type="text" value={profile?.role?.toUpperCase() || ""} readOnly className="bg-transparent focus:outline-none text-primary-text" />
-                                </div>
-                            </div>
-                        </div>
+                    {/* Footer Status */}
+                    <div className="border-t-2 border-gray-500 pt-2 flex justify-between text-xs font-mono text-gray-600 mt-2">
+                        <span>ID: {profile?.id || "N/A"}</span>
+                        <span>SECURE CONNECTION</span>
                     </div>
                 </div>
             </div>
