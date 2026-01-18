@@ -39,7 +39,7 @@ export const UserController = {
     },
 
     // =============
-    // Get User, remember me
+    // Get Me, remember me
     // =============
     async getMe(req, res, next) {
         try {
@@ -76,6 +76,24 @@ export const UserController = {
     },
 
     // =============
+    // Update User State (Block/Unblock)
+    // =============
+    async updateUserState(req, res, next) {
+        try {
+            const { id } = req.params;
+            const { state } = req.body;
+
+            // Basic validation
+            if (!state) {
+                return res.status(400).json({ error: "State is required" });
+            }
+
+            const result = await UserService.updateUserState(id, state);
+            res.json(result);
+        } catch (error) {
+            next(error);
+        }
+    },
     // Get Friend Requests
     // =============
     async getFriendRequests(req, res, next) {

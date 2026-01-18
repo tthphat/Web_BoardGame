@@ -70,7 +70,8 @@ export async function editProfileApi(payload) {
 }
 
 // Get all users
-export async function getAllUsersApi(page, limit, search) {
+// Get all users
+export async function getAllUsersApi(page = 1, limit = 10, search = "") {
     console.log("Fontend-User-Service: Get all users API input: ", page, limit, search);
 
     const response = await fetch(`/api/user/all?page=${page}&limit=${limit}&search=${search}`, {
@@ -85,15 +86,36 @@ export async function getAllUsersApi(page, limit, search) {
     const data = await response.json();
 
     if (!response.ok) {
-        throw new Error(data.message || data.error || "Get all users failed");
+        throw new Error(data.message || data.error || "Failed to get users");
     }
 
     console.log("Fontend-User-Service: Get all users API output: ", data);
     return data;
 }
 
+// Update User State
+export async function updateUserStateApi(userId, state) {
+    const response = await fetch(`/api/user/${userId}/state`, {
+        method: "PATCH",
+        credentials: "include",
+        headers: {
+            "Content-Type": "application/json",
+            "x-api-key": import.meta.env.VITE_API_KEY,
+        },
+        body: JSON.stringify({ state }),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+        throw new Error(data.message || data.error || "Failed to update user state");
+    }
+
+    return data;
+}
+
 // Get friend requests
-export async function getFriendRequestsApi(page, limit, search) {
+export async function getFriendRequestsApi(page = 1, limit = 10, search = "") {
     console.log("Fontend-User-Service: Get friend requests API input: ", page, limit, search);
 
     const response = await fetch(`/api/user/friend-requests?page=${page}&limit=${limit}&search=${search}`, {

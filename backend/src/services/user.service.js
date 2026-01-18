@@ -133,6 +133,17 @@ export const UserService = {
     },
 
     // =============
+    // Update User State (Block/Unblock)
+    // =============
+    async updateUserState(userId, state) {
+        try {
+            const { data, error } = await UserModel.updateUser(userId, { state });
+            if (error) throw error;
+            return { data };
+        } catch (error) {
+            throw error;
+        }
+    },
     // Get Friend Requests
     // =============
     async getFriendRequests(id, page, limit, search) {

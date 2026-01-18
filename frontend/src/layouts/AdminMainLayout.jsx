@@ -5,7 +5,8 @@ import AdminSidebar from '../components/admin/AdminSidebar';
 import AdminDashboardMock from '../components/admin/AdminDashboardMock';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
-import {toast} from 'sonner';
+import { toast } from 'sonner';
+import UserManagement from '../components/admin/user/UserManagement';
 
 // Import các trang placeholder cho các mục chưa làm
 const PlaceholderPage = ({ title }) => (
@@ -39,7 +40,7 @@ const AdminMainLayout = () => {
             case 'Dashboard':
                 return <AdminDashboardMock />;
             case 'UserMgmt':
-                return <PlaceholderPage title="User Management" />;
+                return <UserManagement />;
             case 'GameConfig':
                 return <PlaceholderPage title="Game Configuration" />;
             case 'Statistics':

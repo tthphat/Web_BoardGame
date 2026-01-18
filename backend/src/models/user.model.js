@@ -67,22 +67,35 @@ export const UserModel = {
         }
     },
 
-    // Get all users
+    // Get all users with pagination, search, and achievement count
     async getAllUsers(offset, limit, search) {
         try {
-            const users = await knex("users")
+            const query = knex("users")
+                .select(
+                    "users.id",
+                    "users.username",
+                    "users.email",
+                    "users.role",
+                    "users.state",
+                    "users.created_at",
+                    "users.updated_at"
+                )
+                .count("user_achievements.id as achievement_count")
+                .leftJoin("user_achievements", "users.id", "user_achievements.user_id")
                 .where((qb) => {
-                    qb.where("username", "ilike", `%${search}%`)
-                        .orWhere("email", "ilike", `%${search}%`);
+                    qb.where("users.username", "ilike", `%${search}%`)
+                        .orWhere("users.email", "ilike", `%${search}%`);
                 })
-                .andWhere("role", "!=", "admin")
-                .andWhere("state", "active")
-                .select("id", "username", "email", "role", "created_at", "updated_at")
-                .offset(offset)
-                .limit(limit);
+                .andWhere("users.role", "!=", "admin")
+                .groupBy("users.id")
+                .orderBy("users.created_at", "desc")
+                .limit(limit)
+                .offset(offset);
 
+            const users = await query;
             return { data: users, error: null };
         } catch (error) {
+            console.error("Error in getAllUsers:", error);
             return { data: null, error };
         }
     },
@@ -96,7 +109,7 @@ export const UserModel = {
                         .orWhere("email", "ilike", `%${search}%`);
                 })
                 .andWhere("role", "!=", "admin")
-                .andWhere("state", "active")
+                // Removed .andWhere("state", "active") to include blocked users
                 .count("id");
 
             return { data: count[0].count, error: null };
