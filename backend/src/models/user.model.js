@@ -76,6 +76,7 @@ export const UserModel = {
                         .orWhere("email", "ilike", `%${search}%`);
                 })
                 .andWhere("role", "!=", "admin")
+                .andWhere("state", "active")
                 .select("id", "username", "email", "role", "created_at", "updated_at")
                 .offset(offset)
                 .limit(limit);
@@ -95,6 +96,7 @@ export const UserModel = {
                         .orWhere("email", "ilike", `%${search}%`);
                 })
                 .andWhere("role", "!=", "admin")
+                .andWhere("state", "active")
                 .count("id");
 
             return { data: count[0].count, error: null };
