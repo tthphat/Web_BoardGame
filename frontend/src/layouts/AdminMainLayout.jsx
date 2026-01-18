@@ -5,6 +5,7 @@ import AdminSidebar from '../components/admin/AdminSidebar';
 import AdminDashboardMock from '../components/admin/AdminDashboardMock';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import {toast} from 'sonner';
 
 // Import các trang placeholder cho các mục chưa làm
 const PlaceholderPage = ({ title }) => (
@@ -26,8 +27,9 @@ const AdminMainLayout = () => {
         try {
             await logout();
             navigate("/dashboard");
+            toast.info('Logout successfully');
         } catch (error) {
-            console.error("Logout failed:", error);
+            toast.error(error.message);
         }
     };
 

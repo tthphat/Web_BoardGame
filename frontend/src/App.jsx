@@ -7,7 +7,7 @@ import { Toaster } from './components/ui/toaster';
 function App() {
     return (
         <AuthProvider>
-            <Toaster richColors position="top-right" />
+            <Toaster  position="top-center" duration={2000}/>
             <RouterProvider router={router} />
         </AuthProvider>
     );
