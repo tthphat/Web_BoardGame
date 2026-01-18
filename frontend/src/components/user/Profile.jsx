@@ -29,7 +29,7 @@ function Profile() {
                 {/* Main Content */}
                 <div className="p-4 flex flex-col gap-4">
                     {/* Info Block */}
-                    <div className="border-2 border-gray-600 p-4 bg-[#c0c0c0]">
+                    <div className="border-2 border-gray-600 p-4 bg-[#c0c0c0] text-black dark:text-black">
                         <legend className="px-2 font-bold font-mono text-sm transform -translate-y-6 bg-[#c0c0c0] w-max">USER INFORMATION</legend>
 
                         <div className="flex flex-col gap-4 -mt-2">
@@ -63,10 +63,10 @@ function Profile() {
                     </div>
 
                     {/* System Info Block */}
-                    <div className="border-2 border-gray-600 p-4 bg-[#c0c0c0] mt-2">
+                    <div className="border-2 border-gray-600 p-4 bg-[#c0c0c0] mt-2 text-black dark:text-black">
                         <legend className="px-2 font-bold font-mono text-sm transform -translate-y-6 bg-[#c0c0c0] w-max">SYSTEM DATA</legend>
 
-                        <div className="flex flex-col gap-2 -mt-2">
+                        <div className="flex flex-col gap-2 -mt-2 ">
                             <div className="flex justify-between font-mono text-sm">
                                 <span>CREATED AT:</span>
                                 <span>{profile?.created_at ? new Date(profile.created_at).toLocaleString("vi-VN") : "UNKNOWN"}</span>
