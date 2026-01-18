@@ -127,8 +127,7 @@ export const UserModel = {
                     "f.status",
                     "f.created_at",
                     "u.username",
-                    "u.email",
-                    "u.avatar"
+                    "u.email"
                 )
                 .orderBy("f.created_at", "desc") // sort theo mới nhất
                 .offset(offset)

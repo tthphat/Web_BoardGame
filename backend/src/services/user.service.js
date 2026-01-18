@@ -145,6 +145,7 @@ export const UserService = {
             }
 
             const { data: friendRequests, error } = await UserModel.getFriendRequests(id, offset, limit, search);
+            console.log("Backend-user.service.js-getFriendRequests: ", friendRequests);
             if (error) {
                 throw new Error("Failed to get friend requests");
             }
