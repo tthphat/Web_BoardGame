@@ -7,6 +7,7 @@ import RegisterPage from "../pages/auth/RegisterPage";
 import AdminMainLayout from "../layouts/AdminMainLayout";
 import VerifyEmail from "../components/register/VerifyEmail";
 import ProfilePage from "../pages/user/ProfilePage";
+import FriendLayout from "../layouts/FriendLayout";
 
 export const router = createBrowserRouter([
     { path: "/login", element: <LoginPage /> },
@@ -37,7 +38,7 @@ export const router = createBrowserRouter([
             },
             {
                 path: "/friends",
-                element: <DemoPage title="Friends List" description="Danh sách bạn bè sẽ hiện ở đây." />
+                element: <FriendLayout />
             },
             {
                 path: "/messages",

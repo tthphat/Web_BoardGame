@@ -18,6 +18,7 @@ export const UserService = {
             return {
                 data: {
                     user: {
+                        id: user.id,
                         email: user.email,
                         role: user.role,
                         username: user.username,
