@@ -17,8 +17,7 @@ function AuthProvider({ children }) {
             } catch (error) {
                 console.error("Failed to fetch user:", error);
                 await logoutApi();
-                toast.error("Session expired. Pls, login again");
-                window.location.href = "/";
+                setUser(null);
             } finally {
                 setLoading(false);
             }
