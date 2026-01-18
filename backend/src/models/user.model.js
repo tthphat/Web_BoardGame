@@ -101,6 +101,23 @@ export const UserModel = {
     },
 
     // Count users
+    async countUsers(search) {
+        try {
+            const count = await knex("users")
+                .where((qb) => {
+                    qb.where("username", "ilike", `%${search}%`)
+                        .orWhere("email", "ilike", `%${search}%`);
+                })
+                .andWhere("role", "!=", "admin")
+                .count("id");
+
+            return { data: count[0].count, error: null };
+        } catch (error) {
+            return { data: null, error };
+        }
+    },
+
+    // Count users friend
     async countUsersFriend(currentUserId, search = "") {
         try {
             const count = await knex("users as u")
