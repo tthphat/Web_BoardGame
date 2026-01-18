@@ -127,11 +127,11 @@ const AdminDashboardMock = () => {
         {/* 2. Recent Game Sessions (Main Area) */}
         <div className="lg:col-span-2 bg-[#c0c0c0] dark:bg-[#2d2d2d] p-1 border-2 border-t-white border-l-white border-b-black border-r-black flex flex-col">
           <div className="bg-[#000080] text-white px-2 py-1 text-sm font-bold flex justify-between items-center select-none">
-            <span className="flex items-center gap-2"><FileText size={14} /> RECENT_SESSIONS.LOG</span>
-            <div className="flex gap-1">
+            <span className="flex items-center gap-2"><FileText size={14} /> RECENT_SESSIONS</span>
+            {/* <div className="flex gap-1">
               <button className="w-4 h-4 flex items-center justify-center bg-[#c0c0c0] text-black text-[10px] font-bold border border-white border-b-black border-r-black">_</button>
               <button className="w-4 h-4 flex items-center justify-center bg-[#c0c0c0] text-black text-[10px] font-bold border border-white border-b-black border-r-black">X</button>
-            </div>
+            </div> */}
           </div>
           <div className="bg-white dark:bg-black p-0 border-2 border-t-[#808080] border-l-[#808080] border-b-white border-r-white overflow-hidden flex-1">
             <div className="overflow-x-auto">
@@ -174,7 +174,7 @@ const AdminDashboardMock = () => {
         {/* 3. New Registrations (Side) */}
         <div className="bg-[#c0c0c0] dark:bg-[#2d2d2d] p-1 border-2 border-t-white border-l-white border-b-black border-r-black flex flex-col h-full">
           <div className="bg-[#800000] text-white px-2 py-1 text-sm font-bold flex items-center justify-between">
-            <span className="flex items-center gap-2"><UserPlus size={14} /> NEW_RECRUITS.TXT</span>
+            <span className="flex items-center gap-2"><UserPlus size={14} /> NEW_RECRUITS</span>
           </div>
           <div className="bg-white dark:bg-black p-2 border-2 border-t-[#808080] border-l-[#808080] border-b-white border-r-white flex-1 overflow-y-auto max-h-[400px]">
             <ul className="space-y-2 text-xs font-mono">

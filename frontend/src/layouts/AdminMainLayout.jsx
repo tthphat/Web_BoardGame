@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import AdminHeader from '../components/admin/AdminHeader'; // Import từ folder common của bạn
 import Footer from '../components/common/Footer'; // Import từ folder common của bạn
 import AdminSidebar from '../components/admin/AdminSidebar';
-import AdminDashboardMock from '../components/admin/AdminDashboardMock';
+import AdminDashboardMock from '../components/admin/AdminDashboard';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
