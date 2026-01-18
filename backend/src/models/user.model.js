@@ -72,8 +72,8 @@ export const UserModel = {
         try {
             const users = await knex("users")
                 .where((qb) => {
-                    qb.where("username", "like", `%${search}%`)
-                        .orWhere("email", "like", `%${search}%`);
+                    qb.where("username", "ilike", `%${search}%`)
+                        .orWhere("email", "ilike", `%${search}%`);
                 })
                 .andWhere("role", "!=", "admin")
                 .select("id", "username", "email", "role", "created_at", "updated_at")
@@ -91,8 +91,8 @@ export const UserModel = {
         try {
             const count = await knex("users")
                 .where((qb) => {
-                    qb.where("username", "like", `%${search}%`)
-                        .orWhere("email", "like", `%${search}%`);
+                    qb.where("username", "ilike", `%${search}%`)
+                        .orWhere("email", "ilike", `%${search}%`);
                 })
                 .andWhere("role", "!=", "admin")
                 .count("id");
