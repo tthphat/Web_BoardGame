@@ -42,9 +42,13 @@ const RankingPage = () => {
     }, [fetchLeaderboard]);
 
     // Helper to render user row
-    const renderUserRow = (user, index, type = 'full') => {
+    const renderUserRow = (user, index, type = 'full', slug = null) => {
         const isTop3 = index < 3;
         const rankColor = index === 0 ? 'text-yellow-600' : index === 1 ? 'text-gray-400' : index === 2 ? 'text-orange-600' : 'text-gray-600 dark:text-gray-400';
+
+        // Dynamic column checks
+        const showTotal = !['match-3', 'snake', 'memory-card'].includes(slug);
+        const showTime = false;
 
         return (
             <tr key={user.userId} className={`
@@ -58,25 +62,24 @@ const RankingPage = () => {
                 </td>
                 <td className="p-2 border-r border-retro-shadow dark:border-[#555]">
                     <div className="flex items-center gap-2">
-                        {/* Avatar placeholder if needed */}
                         <div className="w-5 h-5 bg-gradient-to-tr from-retro-teal to-retro-navy rounded-sm border border-black flex items-center justify-center text-[10px] text-white">
                             {user.username.charAt(0).toUpperCase()}
                         </div>
-                        <span className="truncate max-w-[100px] md:max-w-[150px]">{user.username}</span>
+                        <span className="truncate max-w-[80px] md:max-w-[120px]">{user.username}</span>
                     </div>
                 </td>
-                <td className="p-2 text-right border-r border-retro-shadow dark:border-[#555]">
-                    {type === 'full' || selectedGame === 'TIC_TAC_TOE' || selectedGame === 'CARO_4' || selectedGame === 'CARO_5'
-                        ? (user.totalScore?.toLocaleString() || '-')
-                        : (user.totalWins?.toLocaleString())
-                    }
-                </td>
+
+                {showTotal && (
+                    <td className="p-2 text-right border-r border-retro-shadow dark:border-[#555]">
+                        {user.totalScore?.toLocaleString() || '-'}
+                    </td>
+                )}
+
                 <td className="p-2 text-right">
-                    {/* Display Best Score for score-based games, or Total Wins usually */}
                     {user.bestScore?.toLocaleString() || '-'}
                 </td>
-                {/* Only show time for Memory if full view */}
-                {selectedGame === 'MEMORY' && type === 'full' && (
+
+                {showTime && (
                     <td className="p-2 text-right border-l border-retro-shadow dark:border-[#555]">
                         {user.bestTimeSeconds ? `${user.bestTimeSeconds}s` : '-'}
                     </td>
@@ -86,8 +89,14 @@ const RankingPage = () => {
     };
 
     // Render a single leaderboard table (Mini or Full)
-    const LeaderboardTable = ({ data, title, type = 'full' }) => {
+    const LeaderboardTable = ({ data, title, type = 'full', slug = null }) => {
         const hasData = data && data.length > 0;
+        const currentSlug = slug || (selectedGame ? GAME_REGISTRY[selectedGame]?.slug : null);
+
+        // Column Logic
+        const showTotal = !['match-3', 'snake', 'memory-card'].includes(currentSlug);
+        const showTime = false;
+        const colCount = 2 + (showTotal ? 1 : 0) + 1 + (showTime ? 1 : 0);
 
         return (
             <div className={`bg-retro-silver border-2 border-t-retro-shadow border-l-retro-shadow border-b-retro-highlight border-r-retro-highlight flex flex-col h-full dark:bg-[#2d2d2d] dark:border-t-[#000] dark:border-l-[#000] dark:border-b-[#555] dark:border-r-[#555]`}>
@@ -103,19 +112,17 @@ const RankingPage = () => {
                             <tr className="bg-[#d0d0d0] text-[10px] uppercase dark:bg-[#333] dark:text-gray-300">
                                 <th className="p-2 border-b-2 border-retro-shadow w-10 text-center dark:border-[#555]">Rank</th>
                                 <th className="p-2 border-b-2 border-retro-shadow dark:border-[#555]">Player</th>
-                                <th className="p-2 border-b-2 border-retro-shadow text-right dark:border-[#555]">Total Score</th>
+                                {showTotal && <th className="p-2 border-b-2 border-retro-shadow text-right dark:border-[#555]">Total Score</th>}
                                 <th className="p-2 border-b-2 border-retro-shadow text-right dark:border-[#555]">Best Score</th>
-                                {selectedGame === 'MEMORY' && type === 'full' && (
-                                    <th className="p-2 border-b-2 border-retro-shadow text-right dark:border-[#555]">Time</th>
-                                )}
+                                {showTime && <th className="p-2 border-b-2 border-retro-shadow text-right dark:border-[#555]">Time</th>}
                             </tr>
                         </thead>
                         <tbody>
                             {hasData ? (
-                                data.map((user, idx) => renderUserRow(user, idx, type))
+                                data.map((user, idx) => renderUserRow(user, idx, type, currentSlug))
                             ) : (
                                 <tr>
-                                    <td colSpan={selectedGame === 'MEMORY' && type === 'full' ? 5 : 4} className="p-8 text-center text-xs text-gray-400 italic">
+                                    <td colSpan={colCount} className="p-8 text-center text-xs text-gray-400 italic">
                                         No data available.
                                     </td>
                                 </tr>
@@ -152,7 +159,7 @@ const RankingPage = () => {
                 >
                     All Games
                 </button>
-                {enabledScreens.filter(key => key !== 'HEART').map((gameKey) => (
+                {enabledScreens.filter(key => key !== 'HEART' && key !== 'FREE_DRAW').map((gameKey) => (
                     <button
                         key={gameKey}
                         onClick={() => setSelectedGame(gameKey)}
@@ -181,7 +188,7 @@ const RankingPage = () => {
                 {loading ? (
                     <div className="h-full flex flex-col items-center justify-center space-y-2 opacity-70">
                         <RefreshCcw className="w-8 h-8 animate-spin text-retro-navy dark:text-blue-400" />
-                        <p className="text-sm font-bold uppercase dark:text-gray-300">Accessing Mainframe...</p>
+                        <p className="text-sm font-bold uppercase dark:text-gray-300">Loading Data...</p>
                     </div>
                 ) : error ? (
                     <div className="h-full flex flex-col items-center justify-center space-y-4">

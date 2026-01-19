@@ -187,8 +187,10 @@ export const UserGameStatsModel = {
      */
     async getAllLeaderboards(limit = 10) {
         try {
-            // Get all enabled games
-            const games = await knex("games").where("enabled", true);
+            // Get all enabled games except free-draw
+            const games = await knex("games")
+                .where("enabled", true)
+                .whereNot("slug", "free-draw");
             const leaderboards = {};
 
             // Fetch leaderboard for each game
