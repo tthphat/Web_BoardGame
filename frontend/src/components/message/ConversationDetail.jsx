@@ -6,12 +6,8 @@ import { getMessagesApi } from "@/services/user.service";
 
 function ConversationDetail() {
     const { id } = useParams();
-    const { user } = useAuth();
-    const [messages, setMessages] = useState([
-        // { id: 1, sender_id: 1, content: "Hello there!", created_at: new Date(Date.now() - 3600000).toISOString() },
-        // { id: 2, sender_id: 999, content: "Hi! How are you?", created_at: new Date(Date.now() - 3000000).toISOString() },
-        // { id: 3, sender_id: 1, content: "I'm doing good, thanks for asking.", created_at: new Date(Date.now() - 1000000).toISOString() },
-    ]);
+    const { user, loading } = useAuth();
+    const [messages, setMessages] = useState([]);
     const [inputMessage, setInputMessage] = useState("");
     const messagesEndRef = useRef(null);
 
@@ -25,7 +21,7 @@ function ConversationDetail() {
         status: "Online"
     };
 
-    const currentUserId = user.id;
+    const currentUserId = user?.id;
 
     // Scroll to bottom when messages change
     const scrollToBottom = () => {
@@ -56,9 +52,9 @@ function ConversationDetail() {
     const fetchMessages = async () => {
         try {
             const res = await getMessagesApi(id, 0, limit);
-            setMessages(res.data);
-            setOffset(res.data.length);
-            setHasMore(res.data.length === limit);
+            setMessages(res.data.messages);
+            setOffset(res.data.messages.length);
+            setHasMore(res.data.messages.length === limit);
         } catch (error) {
             console.error("Error fetching messages:", error);
         }
@@ -74,13 +70,15 @@ function ConversationDetail() {
 
         try {
             const res = await getMessagesApi(id, offset, limit);
-            setMessages((prevMessages) => [...res.data, ...prevMessages]);
-            setOffset((prevOffset) => prevOffset + res.data.length);
-            setHasMore(res.data.length === limit);
+            setMessages((prevMessages) => [...res.data.messages, ...prevMessages]);
+            setOffset((prevOffset) => prevOffset + res.data.messages.length);
+            setHasMore(res.data.messages.length === limit);
         } catch (error) {
             console.error("Error fetching more messages:", error);
         }
     };
+
+    if (loading) return <div className="h-full flex items-center justify-center">Loading...</div>; // Or use Loading component if imported
 
     return (
         <div className="h-full flex flex-col bg-white">

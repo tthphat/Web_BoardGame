@@ -247,5 +247,23 @@ export const UserController = {
         }
     },
 
+    // =============
+    // Get Messages
+    // =============
+    async getMessages(req, res, next) {
+        try {
+            const { id } = req.params;
+            const { offset, limit } = req.query;
+            const messages = await UserService.getMessages(id, offset, limit, req.user.id);
+            res.json({
+                data: {
+                    messages: messages.data.messages,
+                    pagination: messages.data.pagination
+                }
+            });
+        } catch (error) {
+            next(error);
+        }
+    },
 }
 

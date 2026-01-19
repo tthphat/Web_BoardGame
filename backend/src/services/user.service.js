@@ -363,4 +363,24 @@ export const UserService = {
             throw error;
         }
     },
+
+    // =============
+    // Get Messages
+    // =============
+    async getMessages(conversation_id, offset, limit, current_id) {
+        try {
+            const { data: messages, error } = await UserModel.getMessages(conversation_id, offset, limit, current_id);
+            console.log("Backend-user.service.js-getMessages: ", error);
+            if (error) {
+                throw new Error("Failed to get messages");
+            }
+            return {
+                data: {
+                    messages
+                }
+            };
+        } catch (error) {
+            throw error;
+        }
+    },
 };

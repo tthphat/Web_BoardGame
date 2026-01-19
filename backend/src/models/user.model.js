@@ -472,5 +472,35 @@ export const UserModel = {
         }
     },
 
+    // Get Messages
+    async getMessages(conversation_id, offset, limit, user_id) {
+        try {
+            const isMember = await knex("conversation_members")
+                .where({ conversation_id: conversation_id, user_id: user_id })
+                .first();
+
+            if (!isMember) {
+                throw new Error("Forbidden");
+            }
+
+            const messages = await knex("messages as m")
+                .join("users as u", "u.id", "m.sender_id")
+                .where("m.conversation_id", conversation_id)
+                .select(
+                    "m.id",
+                    "m.sender_id",
+                    "u.username as sender_name",
+                    "m.content",
+                    "m.created_at"
+                )
+                .orderBy("m.created_at", "asc")
+                .offset(offset)
+                .limit(limit);
+
+            return { data: messages, error: null };
+        } catch (error) {
+            return { data: null, error };
+        }
+    },
 }
 
