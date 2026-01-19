@@ -493,11 +493,52 @@ export const UserModel = {
                     "m.content",
                     "m.created_at"
                 )
-                .orderBy("m.created_at", "asc")
+                .orderBy("m.created_at", "desc")
                 .offset(offset)
                 .limit(limit);
 
             return { data: messages, error: null };
+        } catch (error) {
+            return { data: null, error };
+        }
+    },
+
+    // Get Partner
+    async getPartner(conversation_id, user_id) {
+        try {
+            const partner = await knex("conversation_members as cm")
+                .join("users as u", "u.id", "cm.user_id")
+                .where("cm.conversation_id", conversation_id)
+                .andWhere("cm.user_id", "!=", user_id)
+                .select(
+                    "u.id",
+                    "u.username",
+                    "u.email",
+                    "u.role",
+                    "u.created_at",
+                    "u.updated_at"
+                )
+                .first();
+
+            return { data: partner, error: null };
+        } catch (error) {
+            return { data: null, error };
+        }
+    },
+
+    // Send Message
+    async sendMessage(conversation_id, content, current_id) {
+        try {
+            const [message] = await knex("messages")
+                .insert({
+                    conversation_id,
+                    sender_id: current_id,
+                    content,
+                    created_at: new Date()
+                })
+                .returning(["id", "conversation_id", "sender_id", "content", "created_at"]);
+
+            return { data: message, error: null };
         } catch (error) {
             return { data: null, error };
         }

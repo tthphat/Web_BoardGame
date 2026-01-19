@@ -20,6 +20,7 @@ router.post("/reject-friend", UserController.rejectFriend);
 router.post("/remove-friend", UserController.removeFriend);
 router.get("/all-my-conversations", UserController.getAllMyConversations);
 router.get("/conversations/:id/messages", UserController.getMessages);
+router.post("/conversations/:id/messages", UserController.sendMessage);
 
 
 export default router;  

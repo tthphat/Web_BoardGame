@@ -1,8 +1,8 @@
 import { useParams } from "react-router-dom";
 import { UserRound, Send, Phone, Video, MoreVertical } from "lucide-react";
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useLayoutEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
-import { getMessagesApi } from "@/services/user.service";
+import { getMessagesApi, sendMessageApi } from "@/services/user.service";
 
 function ConversationDetail() {
     const { id } = useParams();
@@ -10,16 +10,15 @@ function ConversationDetail() {
     const [messages, setMessages] = useState([]);
     const [inputMessage, setInputMessage] = useState("");
     const messagesEndRef = useRef(null);
+    const scrollContainerRef = useRef(null);
+    const prevScrollHeightRef = useRef(0);
 
     const limit = 10;
     const [offset, setOffset] = useState(0);
     const [hasMore, setHasMore] = useState(true);
+    const [partner, setPartner] = useState({});
 
-    // Mock user for UI purposes - replace with real data fetching later
-    const partner = {
-        name: "Partner Name",
-        status: "Online"
-    };
+    const isLoadingMore = useRef("append");
 
     const currentUserId = user?.id;
 
@@ -28,45 +27,30 @@ function ConversationDetail() {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
     };
 
-    useEffect(() => {
-        scrollToBottom();
+    useLayoutEffect(() => {
+        if (isLoadingMore.current === "append") {
+            scrollToBottom();
+        } else if (isLoadingMore.current === "prepend") {
+            const scrollContainer = scrollContainerRef.current;
+            if (scrollContainer) {
+                const newScrollHeight = scrollContainer.scrollHeight;
+                const diff = newScrollHeight - prevScrollHeightRef.current;
+                scrollContainer.scrollTop = diff; // Restore position
+            }
+            isLoadingMore.current = "idle";
+        }
     }, [messages]);
 
-    // Handle send message
-    const handleSendMessage = (e) => {
-        e.preventDefault();
-        if (!inputMessage.trim()) return;
 
-        const newMessage = {
-            id: messages.length + 1,
-            sender_id: currentUserId,
-            content: inputMessage,
-            created_at: new Date().toISOString()
-        };
-
-        setMessages([...messages, newMessage]);
-        setInputMessage("");
-    };
-
-    // fetch messages from API
-    const fetchMessages = async () => {
-        try {
-            const res = await getMessagesApi(id, 0, limit);
-            setMessages(res.data.messages);
-            setOffset(res.data.messages.length);
-            setHasMore(res.data.messages.length === limit);
-        } catch (error) {
-            console.error("Error fetching messages:", error);
-        }
-    };
-
-    useEffect(() => {
-        fetchMessages();
-    }, [id]);
 
     // Handle load more messages
     const handleLoadMore = async () => {
         if (!hasMore) return;
+        isLoadingMore.current = "prepend";
+        // Calculate current scroll height before loading more
+        if (scrollContainerRef.current) {
+            prevScrollHeightRef.current = scrollContainerRef.current.scrollHeight;
+        }
 
         try {
             const res = await getMessagesApi(id, offset, limit);
@@ -77,6 +61,46 @@ function ConversationDetail() {
             console.error("Error fetching more messages:", error);
         }
     };
+
+
+    // Handle send message
+    const handleSendMessage = async (e) => {
+        e.preventDefault();
+
+        if (!inputMessage.trim()) return;
+
+        isLoadingMore.current = "append";
+
+        try {
+            const res = await sendMessageApi(id, inputMessage);
+
+            // dùng message THẬT từ backend
+            setMessages((prev) => [...prev, res.data.message]);
+
+            setInputMessage("");
+        } catch (error) {
+            console.error("Error sending message:", error);
+        }
+    };
+
+
+    // fetch messages from API
+    const fetchMessages = async () => {
+        isLoadingMore.current = "append";
+        try {
+            const res = await getMessagesApi(id, 0, limit);
+            setMessages(res.data.messages);
+            setOffset(res.data.messages.length);
+            setPartner(res.data.partner);
+            setHasMore(res.data.messages.length === limit);
+        } catch (error) {
+            console.error("Error fetching messages:", error);
+        }
+    };
+
+    useEffect(() => {
+        fetchMessages();
+    }, [id]);
 
     if (loading) return <div className="h-full flex items-center justify-center">Loading...</div>; // Or use Loading component if imported
 
@@ -89,10 +113,10 @@ function ConversationDetail() {
                         <UserRound className="w-6 h-6" />
                     </div>
                     <div>
-                        <h3 className="font-bold text-gray-800">{partner.name}</h3>
+                        <h3 className="font-bold text-gray-800">{partner.username}</h3>
                         <div className="flex items-center gap-1.5">
                             <span className="w-2 h-2 rounded-full bg-green-500"></span>
-                            <p className="text-xs text-green-600 font-medium">{partner.status}</p>
+                            <p className="text-xs text-green-600 font-medium">Online</p>
                         </div>
                     </div>
                 </div>
@@ -111,7 +135,18 @@ function ConversationDetail() {
             </div>
 
             {/* Messages Area */}
-            <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50">
+            <div
+                ref={scrollContainerRef}
+                className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50"
+            >
+                {hasMore && (
+                    <div className="flex justify-center mb-8 ">
+                        <button onClick={handleLoadMore} className="p-2 bg-gray-200 cursor-pointer rounded-full text-xs text-blue-600">
+                            Load older messages
+                        </button>
+                    </div>
+                )}
+
                 {messages.map((msg) => {
                     const isMe = msg.sender_id === currentUserId;
                     return (

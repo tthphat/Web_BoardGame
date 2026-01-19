@@ -258,7 +258,26 @@ export const UserController = {
             res.json({
                 data: {
                     messages: messages.data.messages,
-                    pagination: messages.data.pagination
+                    partner: messages.data.partner
+                }
+            });
+        } catch (error) {
+            next(error);
+        }
+    },
+
+    // =============
+    // Send Message
+    // =============
+    async sendMessage(req, res, next) {
+        try {
+            const { id } = req.params;
+            const { content } = req.body;
+            console.log("Backend-user.controller.js-sendMessage: ", id, content, req.user.id);
+            const message = await UserService.sendMessage(id, content, req.user.id);
+            res.json({
+                data: {
+                    message: message.data.message
                 }
             });
         } catch (error) {

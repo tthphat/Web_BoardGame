@@ -17,6 +17,7 @@ import adminRoute from "./routes/admin.route.js"; // Import route
 import { checkApiKey } from "./middlewares/apiKey.middleware.js";
 import { verifyToken } from "./middlewares/auth.middleware.js";
 import { GameController } from "./controllers/game.controller.js";
+import { authorize } from "./middlewares/authorize.middleware.js";
 
 const app = express();
 
@@ -30,11 +31,13 @@ app.get("/api/games/enabled", GameController.getEnabledGames); // enabled games 
 
 app.use(checkApiKey); // middleware kiểm tra api key
 
+
 // Protected routes (Require Auth)
 app.get("/api/games/leaderboard", verifyToken, GameController.getAllLeaderboards); // ranking for each game
 app.get("/api/games/:slug/leaderboard", verifyToken, GameController.getLeaderboard); // specific game ranking
 
-app.use("/api/admin", verifyToken, adminRoute); // Register admin route
+app.use("/api/admin", verifyToken, authorize("admin"), adminRoute); // Register admin route
+
 app.use("/api/achievements", verifyToken, achievementRoute);
 app.use("/api/games", verifyToken, gameRoute);
 app.use("/api/user", verifyToken, userRoute);
