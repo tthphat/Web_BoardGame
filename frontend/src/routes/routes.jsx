@@ -84,6 +84,10 @@ export const router = createBrowserRouter([
                     {
                         path: ":id",
                         element: <ConversationDetail />
+                    },
+                    {
+                        path: "new/:userId",
+                        element: <ConversationDetail />
                     }
                 ]
             },

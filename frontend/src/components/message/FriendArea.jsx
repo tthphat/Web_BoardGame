@@ -68,9 +68,7 @@ function FriendArea() {
     }, [page, search]);
 
 
-    if (loading) {
-        return <Loading message="Loading conversations..." />;
-    }
+
 
     return (
         <div className="w-full h-full bg-white flex flex-col">
@@ -117,71 +115,77 @@ function FriendArea() {
 
             {/* Conversations list */}
             <div className="flex-1 overflow-y-auto">
-                {/* Chưa có conversation */}
-                {conversations.length === 0 && search && (
-                    <div className="divide-y divide-gray-100">
-                        {users.map(user => (
-                            <div
-                                key={user.id}
-                                onClick={() => startNewConversation(user)}
-                                className="flex items-center gap-3 p-3 hover:bg-blue-50 cursor-pointer"
-                            >
-                                <div className="relative flex-shrink-0">
-                                    <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-500">
-                                        <UserRound className="h-6 w-6" />
-                                    </div>
-                                </div>
-                                <div className="flex flex-col justify-between">
-                                    <span>{user.username}</span>
-                                    <span className="text-xs text-gray-400">Start new chat</span>
-                                </div>
+                {loading ? (
+                    <Loading message="Loading conversations..." />
+                ) : (
+                    <>
+                        {/* Chưa có conversation */}
+                        {conversations.length === 0 && search && (
+                            <div className="divide-y divide-gray-100">
+                                {users.map(user => (
+                                    <Link
+                                        to={`/messages/new/${user.id}`}
+                                        key={user.id}
+                                        className="flex items-center gap-3 p-3 hover:bg-blue-50 cursor-pointer"
+                                    >
+                                        <div className="relative flex-shrink-0">
+                                            <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-500">
+                                                <UserRound className="h-6 w-6" />
+                                            </div>
+                                        </div>
+                                        <div className="flex flex-col justify-between">
+                                            <span>{user.username}</span>
+                                            <span className="text-xs text-gray-400">Start new chat</span>
+                                        </div>
+                                    </Link>
+                                ))}
                             </div>
-                        ))}
-                    </div>
-                )}
+                        )}
 
-                {/* Đã tồn tại conversation */}
-                {conversations.length > 0 && (
-                    <div className="divide-y divide-gray-100">
-                        {conversations.map((conversation) => (
-                            <Link to={`/messages/${conversation.conversation_id}`} key={conversation.conversation_id}
-                                className="flex items-center gap-3 p-3 hover:bg-blue-50 cursor-pointer transition-colors group"
-                            >
-                                {/* Avatar */}
-                                <div className="relative flex-shrink-0">
-                                    <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-500">
-                                        <UserRound className="h-6 w-6" />
-                                    </div>
-                                </div>
+                        {/* Đã tồn tại conversation */}
+                        {conversations.length > 0 && (
+                            <div className="divide-y divide-gray-100">
+                                {conversations.map((conversation) => (
+                                    <Link to={`/messages/${conversation.conversation_id}`} key={conversation.conversation_id}
+                                        className="flex items-center gap-3 p-3 hover:bg-blue-50 cursor-pointer transition-colors group"
+                                    >
+                                        {/* Avatar */}
+                                        <div className="relative flex-shrink-0">
+                                            <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-500">
+                                                <UserRound className="h-6 w-6" />
+                                            </div>
+                                        </div>
 
-                                {/* Content */}
-                                <div className="flex-1 min-w-0">
-                                    <div className="flex justify-between items-baseline mb-0.5">
-                                        <h3 className="font-semibold text-gray-900 truncate text-sm">
-                                            {conversation.partner_name}
-                                        </h3>
-                                    </div>
-                                    <div className="flex justify-between items-center gap-2">
-                                        <p className={`text-xs truncate ${conversation.last_message_sender_id !== conversation.partner_id
-                                            ? "text-gray-500"
-                                            : "text-gray-900 font-medium"
-                                            }`}>
-                                            {conversation.last_message_sender_id !== conversation.partner_id && "You: "}
-                                            {conversation.last_message}
-                                        </p>
-                                        <p className="text-xs text-gray-500">{handleLastMessageTime(conversation.last_message_at)}</p>
-                                    </div>
-                                </div>
-                            </Link>
-                        ))}
-                    </div>
-                )}
+                                        {/* Content */}
+                                        <div className="flex-1 min-w-0">
+                                            <div className="flex justify-between items-baseline mb-0.5">
+                                                <h3 className="font-semibold text-gray-900 truncate text-sm">
+                                                    {conversation.partner_name}
+                                                </h3>
+                                            </div>
+                                            <div className="flex justify-between items-center gap-2">
+                                                <p className={`text-xs truncate ${conversation.last_message_sender_id !== conversation.partner_id
+                                                    ? "text-gray-500"
+                                                    : "text-gray-900 font-medium"
+                                                    }`}>
+                                                    {conversation.last_message_sender_id !== conversation.partner_id && "You: "}
+                                                    {conversation.last_message}
+                                                </p>
+                                                <p className="text-xs text-gray-500">{handleLastMessageTime(conversation.last_message_at)}</p>
+                                            </div>
+                                        </div>
+                                    </Link>
+                                ))}
+                            </div>
+                        )}
 
-                {conversations.length === 0 && users.length === 0 && (
-                    <div className="h-full flex flex-col items-center justify-center text-gray-400 p-4 text-center">
-                        <MessageCircleX className="w-12 h-12 mb-2 opacity-50" />
-                        <p className="text-sm">No conversations yet</p>
-                    </div>
+                        {conversations.length === 0 && users.length === 0 && (
+                            <div className="h-full flex flex-col items-center justify-center text-gray-400 p-4 text-center">
+                                <MessageCircleX className="w-12 h-12 mb-2 opacity-50" />
+                                <p className="text-sm">No conversations yet</p>
+                            </div>
+                        )}
+                    </>
                 )}
             </div>
 

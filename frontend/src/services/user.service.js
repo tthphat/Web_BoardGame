@@ -367,4 +367,26 @@ export async function searchUsersApi(search) {
     return data;
 }
 
+// fetch user basic info
+export async function fetchUserApi(userId) {
+    console.log("Fontend-User-Service: Fetch user API input: ", userId);
+
+    const response = await fetch(`/api/user/${userId}`, {
+        method: "GET",
+        credentials: "include",
+        headers: {
+            "Content-Type": "application/json",
+            "x-api-key": import.meta.env.VITE_API_KEY,
+        },
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+        throw new Error(data.message || data.error || "Fetch user failed");
+    }
+
+    console.log("Fontend-User-Service: Fetch user API output: ", data);
+    return data;
+}
 

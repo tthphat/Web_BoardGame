@@ -2,10 +2,10 @@ import { useParams } from "react-router-dom";
 import { UserRound, Send, Phone, Video, MoreVertical } from "lucide-react";
 import { useState, useRef, useEffect, useLayoutEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
-import { getMessagesApi, sendMessageApi } from "@/services/user.service";
+import { fetchUserApi, getMessagesApi, sendMessageApi } from "@/services/user.service";
 
 function ConversationDetail() {
-    const { id } = useParams();
+    const { id, userId } = useParams();
     const { user, loading } = useAuth();
     const [messages, setMessages] = useState([]);
     const [inputMessage, setInputMessage] = useState("");
@@ -21,6 +21,7 @@ function ConversationDetail() {
     const isLoadingMore = useRef("append");
 
     const currentUserId = user?.id;
+    const isNewChat = Boolean(userId);
 
     // Scroll to bottom when messages change
     const scrollToBottom = () => {
@@ -72,11 +73,13 @@ function ConversationDetail() {
         isLoadingMore.current = "append";
 
         try {
-            const res = await sendMessageApi(id, inputMessage);
-
-            // dùng message THẬT từ backend
-            setMessages((prev) => [...prev, res.data.message]);
-
+            if (isNewChat) {
+                const res = await sendFirstMessageApi(userId, inputMessage);
+                navigate(`/messages/${res.data.conversation_id}`);
+            } else {
+                const res = await sendMessageApi(id, inputMessage);
+                setMessages((prev) => [...prev, res.data.message]);
+            }
             setInputMessage("");
         } catch (error) {
             console.error("Error sending message:", error);
@@ -99,8 +102,24 @@ function ConversationDetail() {
     };
 
     useEffect(() => {
+        if (!id) return;
         fetchMessages();
     }, [id]);
+
+    // fetch partner if don't have conversation
+    useEffect(() => {
+        const fetchPartner = async () => {
+            if (isNewChat) {
+                const res = await fetchUserApi(userId);
+                setPartner(res.data.user);
+                setMessages([]);
+                setHasMore(false);
+            }
+        };
+        fetchPartner();
+    }, [userId]);
+
+
 
     if (loading) return <div className="h-full flex items-center justify-center">Loading...</div>; // Or use Loading component if imported
 
@@ -139,7 +158,7 @@ function ConversationDetail() {
                 ref={scrollContainerRef}
                 className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50"
             >
-                {hasMore && (
+                {hasMore && messages.length > 0 && (
                     <div className="flex justify-center mb-8 ">
                         <button onClick={handleLoadMore} className="p-2 bg-gray-200 cursor-pointer rounded-full text-xs text-blue-600">
                             Load older messages
@@ -147,7 +166,7 @@ function ConversationDetail() {
                     </div>
                 )}
 
-                {messages.map((msg) => {
+                {messages?.map((msg) => {
                     const isMe = msg.sender_id === currentUserId;
                     return (
                         <div key={msg.id} className={`flex ${isMe ? "justify-end" : "justify-start"}`}>
