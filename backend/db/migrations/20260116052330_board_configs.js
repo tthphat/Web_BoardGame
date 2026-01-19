@@ -11,7 +11,7 @@ export function up(knex) {
         table.integer("gap").notNullable();
 
         // table.boolean("enabled").defaultTo(true); // soft-delete EXPANDSION future
-
+        table.boolean("is_active").defaultTo(true);
         table.timestamps(true, true);
     });
 }
