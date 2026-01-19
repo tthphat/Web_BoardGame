@@ -15,6 +15,9 @@ import FriendReuqests from "../components/friends/FriendReuqests";
 import UserList from "../components/friends/UserList";
 import SettingsPage from "../pages/SettingsPage";
 import ConversationLayout from "../layouts/ConversationLayout";
+import ConversationDetail from "../components/message/ConversationDetail";
+import ConversationPlaceholder from "../components/message/ConversationPlaceholder";
+
 
 export const router = createBrowserRouter([
     { path: "/login", element: <LoginPage /> },
@@ -71,7 +74,17 @@ export const router = createBrowserRouter([
             },
             {
                 path: "/messages",
-                element: <ConversationLayout />
+                element: <ConversationLayout />,
+                children: [
+                    {
+                        index: true,
+                        element: <ConversationPlaceholder />
+                    },
+                    {
+                        path: ":id",
+                        element: <ConversationDetail />
+                    }
+                ]
             },
             {
                 path: "/trophy",

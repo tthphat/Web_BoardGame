@@ -2,7 +2,8 @@ import { getAllMyConversationsApi } from "@/services/user.service";
 import { useState, useEffect, useRef } from "react";
 import { PaginationSection } from "@/components/common/PaginationSection";
 import Loading from "@/components/common/Loading";
-import { MessageCircleX } from "lucide-react";
+import { MessageCircleX, UserRound } from "lucide-react";
+import { Link } from "react-router-dom";
 
 
 function FriendArea() {
@@ -113,15 +114,13 @@ function FriendArea() {
                 {conversations.length > 0 ? (
                     <div className="divide-y divide-gray-100">
                         {conversations.map((conversation) => (
-                            <div key={conversation.conversation_id}
+                            <Link to={`/messages/${conversation.conversation_id}`} key={conversation.conversation_id}
                                 className="flex items-center gap-3 p-3 hover:bg-blue-50 cursor-pointer transition-colors group"
                             >
                                 {/* Avatar */}
                                 <div className="relative flex-shrink-0">
                                     <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-500">
-                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                                        </svg>
+                                        <UserRound className="h-6 w-6" />
                                     </div>
                                 </div>
 
@@ -143,7 +142,7 @@ function FriendArea() {
                                         <p className="text-xs text-gray-500">{handleLastMessageTime(conversation.last_message_at)}</p>
                                     </div>
                                 </div>
-                            </div>
+                            </Link>
                         ))}
                     </div>
                 ) : (
