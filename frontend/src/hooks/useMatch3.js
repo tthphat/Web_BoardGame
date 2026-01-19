@@ -50,23 +50,46 @@ const MATCH3_SIZE = 13;
 export const useMatch3 = (isPlaying) => {
     const rows = MATCH3_SIZE;
     const cols = MATCH3_SIZE;
-    
+
     const [board, setBoard] = useState([]);
     const [selected, setSelected] = useState(null); // {r, c}
     const [isAnimating, setIsAnimating] = useState(false);
     const [score, setScore] = useState(0);
+    const [timeLeft, setTimeLeft] = useState(60);
+    const [isGameOver, setIsGameOver] = useState(false);
 
     // Initialize board when game starts - logic moved inside useEffect to avoid warning
     useEffect(() => {
         if (!isPlaying) {
             setBoard([]);
+            setTimeLeft(60);
+            setIsGameOver(false);
             return;
         }
 
         const initialBoard = generateBoard(rows, cols);
         setBoard(initialBoard);
         setScore(0);
+        setTimeLeft(60);
+        setIsGameOver(false);
     }, [isPlaying, rows, cols]);
+
+    // Timer effect
+    useEffect(() => {
+        if (!isPlaying || isGameOver || timeLeft <= 0) return;
+
+        const timer = setInterval(() => {
+            setTimeLeft((prev) => {
+                if (prev <= 1) {
+                    setIsGameOver(true);
+                    return 0;
+                }
+                return prev - 1;
+            });
+        }, 1000);
+
+        return () => clearInterval(timer);
+    }, [isPlaying, isGameOver, timeLeft]);
 
     // Tìm tất cả các match (ngang và dọc)
     const findMatches = (currentBoard) => {
@@ -253,11 +276,29 @@ export const useMatch3 = (isPlaying) => {
         }
     };
 
+    // Get serialized game state for saving
+    const getGameState = () => {
+        return {
+            board: board,
+            score: score,
+            timeLeft: timeLeft,
+            isGameOver: isGameOver,
+            config: {
+                type: 'match-3',
+                rows: rows,
+                cols: cols
+            }
+        };
+    };
+
     return {
         board,
         selected,
         handlePixelClick,
         isAnimating,
-        score
+        score,
+        timeLeft,
+        isGameOver,
+        getGameState
     };
 };

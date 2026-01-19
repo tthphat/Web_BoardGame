@@ -14,7 +14,7 @@ import { useSettings } from '../contexts/SettingsContext';
 const DashboardPage = () => {
   // Fetch enabled games from backend
   const { enabledScreens, loading: gamesLoading } = useEnabledGames();
-  
+
   // Auth context for checking login status
   const { user } = useAuth();
 
@@ -35,7 +35,7 @@ const DashboardPage = () => {
 
   const currentScreenName = screens[currentScreenIndex] || 'HEART';
   const currentConfig = getGameConfig(currentScreenName);
-  
+
   // Game stats hook
   const { recordGameEnd, fetchGameStats, currentStats } = useGameStats(currentConfig?.slug, !!user);
 
@@ -50,11 +50,11 @@ const DashboardPage = () => {
     const handleGameEnd = async (result) => {
       console.log(`[GameStats] 🎮 Game End Detected: ${currentScreenName}`, result);
       setGameEndHandled(true);
-      
+
       console.log(`[GameStats] 📤 Calling API to record stats...`);
       const response = await recordGameEnd(result);
       console.log(`[GameStats] 📥 API Response:`, response);
-      
+
       if (response?.stats?.newBestScore) {
         console.log(`[GameStats] 🏆 NEW HIGH SCORE! Best: ${response.stats.bestScore}`);
         toast.success('🎉 New High Score!', {
@@ -69,34 +69,34 @@ const DashboardPage = () => {
     };
 
     // Check for game end conditions
-    // Snake game over
-    if (currentScreenName === 'SNAKE' && gameState.isGameOver) {
-      console.log(`[GameStats] 🐍 Snake Game Over detected! Score: ${score}`);
+    // Snake / Match3 game over
+    if (['SNAKE', 'MATCH3'].includes(currentScreenName) && gameState.isGameOver) {
+      console.log(`[GameStats] 🐍/💎 ${currentScreenName} Game Over detected! Score: ${score}`);
       handleGameEnd({ score, won: false });
     }
-    
+
     // Memory game - check if gameState is 'finished' (all cards matched) or 'timeout'
     if (currentScreenName === 'MEMORY' && (memoryGame.gameState === 'finished' || memoryGame.gameState === 'timeout')) {
       const won = memoryGame.gameState === 'finished';
       const timeUsed = 30 - memoryGame.timeLeft; // TIME_LIMIT is 30 seconds
       console.log(`[GameStats] 🃏 Memory Game ended! State: ${memoryGame.gameState}, Score: ${memoryGame.score}, Time: ${timeUsed}s`);
-      handleGameEnd({ 
-        score: memoryGame.score, 
+      handleGameEnd({
+        score: memoryGame.score,
         won,
         timeSeconds: timeUsed
       });
     }
-    
+
     // TicTacToe/Caro - winner determined
     if (['TICTACTOE', 'CARO4', 'CARO5'].includes(currentScreenName) && gameState.winner) {
       const won = gameState.winner === 'BLUE' || gameState.winner === 'X';
       console.log(`[GameStats] ⭕ ${currentScreenName} ended! Winner: ${gameState.winner}, Player won: ${won}`);
-      handleGameEnd({ 
+      handleGameEnd({
         score: won ? 1 : 0,
         won
       });
     }
-    
+
     // Note: Match3 is a continuous game without a defined "game over" state
     // Stats would need to be recorded differently (e.g., on manual exit or time limit)
   }, [isPlaying, gameState, memoryGame.gameState, memoryGame.score, memoryGame.timeLeft, currentScreenName, score, currentConfig, recordGameEnd, gameEndHandled]);
@@ -331,12 +331,17 @@ const DashboardPage = () => {
                       </>
                     )}
                   </div>
-                  {/* Timer for Memory game */}
-                  {currentScreenName === 'MEMORY' && isPlaying && (
+                  {/* Timer for Memory and Match3 games */}
+                  {['MEMORY', 'MATCH3'].includes(currentScreenName) && isPlaying && (
                     <div className="flex justify-between mt-1">
                       <span>TIME</span>
-                      <span className={`font-bold ${memoryGame.timeLeft <= 10 ? 'text-red-500 animate-pulse' : memoryGame.timeLeft <= 30 ? 'text-yellow-400' : 'text-cyan-400'}`}>
-                        {memoryGame.timeLeft}s
+                      <span className={`font-bold ${(currentScreenName === 'MEMORY' ? memoryGame.timeLeft : (gameState.timeLeft || 0)) <= 10
+                        ? 'text-red-500 animate-pulse'
+                        : (currentScreenName === 'MEMORY' ? memoryGame.timeLeft : (gameState.timeLeft || 0)) <= 30
+                          ? 'text-yellow-400'
+                          : 'text-cyan-400'
+                        }`}>
+                        {currentScreenName === 'MEMORY' ? memoryGame.timeLeft : (gameState.timeLeft || 60)}s
                       </span>
                     </div>
                   )}
