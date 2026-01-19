@@ -124,18 +124,24 @@ function FriendArea() {
                             <div
                                 key={user.id}
                                 onClick={() => startNewConversation(user)}
-                                className="p-3 hover:bg-blue-50 cursor-pointer"
+                                className="flex items-center gap-3 p-3 hover:bg-blue-50 cursor-pointer"
                             >
-                                <UserRound />
-                                <span>{user.username}</span>
-                                <span className="text-xs text-gray-400">Start new chat</span>
+                                <div className="relative flex-shrink-0">
+                                    <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-500">
+                                        <UserRound className="h-6 w-6" />
+                                    </div>
+                                </div>
+                                <div className="flex flex-col justify-between">
+                                    <span>{user.username}</span>
+                                    <span className="text-xs text-gray-400">Start new chat</span>
+                                </div>
                             </div>
                         ))}
                     </div>
                 )}
 
                 {/* Đã tồn tại conversation */}
-                {conversations.length > 0 ? (
+                {conversations.length > 0 && (
                     <div className="divide-y divide-gray-100">
                         {conversations.map((conversation) => (
                             <Link to={`/messages/${conversation.conversation_id}`} key={conversation.conversation_id}
@@ -169,7 +175,9 @@ function FriendArea() {
                             </Link>
                         ))}
                     </div>
-                ) : (
+                )}
+
+                {conversations.length === 0 && users.length === 0 && (
                     <div className="h-full flex flex-col items-center justify-center text-gray-400 p-4 text-center">
                         <MessageCircleX className="w-12 h-12 mb-2 opacity-50" />
                         <p className="text-sm">No conversations yet</p>
