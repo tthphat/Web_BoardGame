@@ -2,6 +2,7 @@
 import { PaginationSection } from "../common/PaginationSection";
 import { getFriendRequestsApi } from "@/services/user.service";
 import { useState, useEffect, useRef } from "react";
+import AcceptRejectFriend from "@/components/friends/AcceptRejectFriend";
 
 
 function FriendRequests() {
@@ -53,6 +54,12 @@ function FriendRequests() {
         return `${years} năm trước`;
     };
 
+    // xử lí xóa khi reject
+    const handleRemoveRequest = (idToRemove) => {
+        setRequests((prevRequests) =>
+            prevRequests.filter(req => req.sender_id !== idToRemove)
+        );
+    };
 
     useEffect(() => {
         const fetchRequests = async () => {
@@ -139,31 +146,10 @@ function FriendRequests() {
                                             {handleDateSent(request.created_at)}
                                         </td>
                                         <td className="p-3 text-center">
-                                            <div className="flex gap-4 justify-center">
-                                                <button
-                                                    className="
-                                                        px-3 py-1 text-xs border border-green-600 text-green-600 
-                                                        hover:bg-green-600 hover:text-white transition-all
-                                                        active:scale-95 font-bold uppercase
-                                                    "
-
-                                                    title="Accept Friend Request"
-                                                >
-                                                    + Accept
-                                                </button>
-
-                                                <button
-                                                    className="
-                                                        px-3 py-1 text-xs border border-red-600 text-red-600 
-                                                        hover:bg-red-600 hover:text-white transition-all
-                                                        active:scale-95 font-bold uppercase
-                                                    "
-
-                                                    title="Reject Friend Request"
-                                                >
-                                                    - Reject
-                                                </button>
-                                            </div>
+                                            <AcceptRejectFriend
+                                                sender_id={request.sender_id}
+                                                onReject={handleRemoveRequest}
+                                            />
                                         </td>
                                     </tr>
                                 ))
