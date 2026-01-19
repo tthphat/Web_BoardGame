@@ -1,6 +1,8 @@
 import { getAllMyConversationsApi } from "@/services/user.service";
 import { useState, useEffect, useRef } from "react";
 import { PaginationSection } from "@/components/common/PaginationSection";
+import Loading from "@/components/common/Loading";
+import { MessageCircleX } from "lucide-react";
 
 
 function FriendArea() {
@@ -9,6 +11,7 @@ function FriendArea() {
     const [search, setSearch] = useState("");
     const [page, setPage] = useState(1);
     const limit = 10;
+    const [loading, setLoading] = useState(false);
 
     const searchRef = useRef("");
 
@@ -23,19 +26,44 @@ function FriendArea() {
         setSearch("");               // trigger fetch all
     };
 
+    const handleLastMessageTime = (last_message_at) => { // tính luôn cả phút, giờ, ngày
+        const date = new Date(last_message_at);
+        const now = new Date();
+        const diffTime = Math.abs(now - date);
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        const diffHours = Math.ceil(diffTime / (1000 * 60 * 60));
+        const diffMinutes = Math.ceil(diffTime / (1000 * 60));
+        if (diffDays > 0) {
+            return `${diffDays} days ago`;
+        } else if (diffHours > 0) {
+            return `${diffHours} hours ago`;
+        } else if (diffMinutes > 0) {
+            return `${diffMinutes} minutes ago`;
+        } else {
+            return "Just now";
+        }
+    }
 
     useEffect(() => {
         const fetchConversations = async () => {
+            setLoading(true);
             try {
                 const data = await getAllMyConversationsApi(page, limit, search);
                 setConversations(data.data.conversations);
                 setTotalPages(data.data.pagination.totalPages);
             } catch (error) {
                 console.error("Error fetching requests:", error);
+            } finally {
+                setLoading(false);
             }
         };
         fetchConversations();
     }, [page, search]);
+
+
+    if (loading) {
+        return <Loading message="Loading conversations..." />;
+    }
 
     return (
         <div className="w-full h-full bg-white flex flex-col">
@@ -85,8 +113,7 @@ function FriendArea() {
                 {conversations.length > 0 ? (
                     <div className="divide-y divide-gray-100">
                         {conversations.map((conversation) => (
-                            <div
-                                key={conversation.conversation_id}
+                            <div key={conversation.conversation_id}
                                 className="flex items-center gap-3 p-3 hover:bg-blue-50 cursor-pointer transition-colors group"
                             >
                                 {/* Avatar */}
@@ -105,22 +132,23 @@ function FriendArea() {
                                             {conversation.partner_name}
                                         </h3>
                                     </div>
-                                    <p className={`text-xs truncate ${conversation.last_message_sender_id !== conversation.partner_id
-                                        ? "text-gray-500"
-                                        : "text-gray-900 font-medium"
-                                        }`}>
-                                        {conversation.last_message_sender_id !== conversation.partner_id && "You: "}
-                                        {conversation.last_message}
-                                    </p>
+                                    <div className="flex justify-between items-center gap-2">
+                                        <p className={`text-xs truncate ${conversation.last_message_sender_id !== conversation.partner_id
+                                            ? "text-gray-500"
+                                            : "text-gray-900 font-medium"
+                                            }`}>
+                                            {conversation.last_message_sender_id !== conversation.partner_id && "You: "}
+                                            {conversation.last_message}
+                                        </p>
+                                        <p className="text-xs text-gray-500">{handleLastMessageTime(conversation.last_message_at)}</p>
+                                    </div>
                                 </div>
                             </div>
                         ))}
                     </div>
                 ) : (
                     <div className="h-full flex flex-col items-center justify-center text-gray-400 p-4 text-center">
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 mb-2 opacity-50" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-                        </svg>
+                        <MessageCircleX className="w-12 h-12 mb-2 opacity-50" />
                         <p className="text-sm">No conversations yet</p>
                     </div>
                 )}
