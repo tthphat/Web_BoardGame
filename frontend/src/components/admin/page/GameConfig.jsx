@@ -4,7 +4,8 @@ import {
     getAllGamesApi,
     updateGameStateApi,
     getAllBoardConfigsApi,
-    updateBoardConfigApi
+    updateBoardConfigApi,
+    activateBoardConfigApi
 } from '../../../services/admin.service';
 import { toast } from 'sonner';
 
@@ -76,13 +77,12 @@ const GameConfig = () => {
     const handleApplyConfig = async (config) => {
         setSaving(config.id);
         try {
-            await updateBoardConfigApi(config.id, {
-                cols: config.cols,
-                rows: config.rows,
-                dot_size: config.dot_size,
-                gap: config.gap
-            });
-            toast.success(`Configuration applied to all games using '${config.code}' successfully!`);
+            await activateBoardConfigApi(config.id);
+            setConfigs(prev => prev.map(c => ({
+                ...c,
+                is_active: c.id === config.id
+            })));
+            toast.success(`Configuration '${config.code}' applied successfully!`);
         } catch (error) {
             toast.error("Failed to apply configuration");
         } finally {

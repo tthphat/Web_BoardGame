@@ -35,14 +35,14 @@ const GameMatrix = ({
   botEnabled = false,
   drawingState
 }) => {
-  // const { activeBoardConfig } = useSettings(); // Removed from context
+  const { activeConfig } = useSettings();
   const defaultConfig = getBoardConfig();
 
   // Use active config from settings if available, otherwise default
-  const cols = defaultConfig.cols;
-  const rows = defaultConfig.rows;
-  const dotSize = defaultConfig.dotSize; // Note: Database uses dot_size, utils uses dotSize
-  const gap = defaultConfig.gap;
+  const cols = activeConfig?.cols || defaultConfig.cols;
+  const rows = activeConfig?.rows || defaultConfig.rows;
+  const dotSize = activeConfig?.dot_size || defaultConfig.dotSize; // Note: Database uses dot_size, utils uses dotSize
+  const gap = activeConfig?.gap || defaultConfig.gap;
 
   // Force re-render key để cập nhật UI khi Match3 board thay đổi
   const [forceRenderKey, setForceRenderKey] = useState(0);

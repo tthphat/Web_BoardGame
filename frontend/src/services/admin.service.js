@@ -105,3 +105,18 @@ export async function updateBoardConfigApi(id, configData) {
     if (!response.ok) throw new Error(data.message || data.error || "Failed to update board config");
     return data;
 }
+
+export async function activateBoardConfigApi(id) {
+    const response = await fetch(`/api/admin/board-configs/${id}/activate`, {
+        method: "PUT",
+        credentials: "include",
+        headers: {
+            "Content-Type": "application/json",
+            "x-api-key": import.meta.env.VITE_API_KEY,
+        },
+    });
+
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.message || data.error || "Failed to activate board config");
+    return data;
+}

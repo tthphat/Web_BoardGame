@@ -42,10 +42,14 @@ export const SettingsProvider = ({ children }) => {
         fetchBoardConfigs();
     }, []);
 
+    // Expose active configuration
+    const activeConfig = availableConfigs.find(c => c.is_active) || null;
+
     const value = {
         controls,
         setControls,
         availableConfigs,
+        activeConfig,
     };
 
     return (
