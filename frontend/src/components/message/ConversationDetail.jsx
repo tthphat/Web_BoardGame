@@ -1,6 +1,6 @@
 import { useParams } from "react-router-dom";
 import { UserRound, Send, Phone, Video, MoreVertical } from "lucide-react";
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useLayoutEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { getMessagesApi, sendMessageApi } from "@/services/user.service";
 
@@ -10,11 +10,15 @@ function ConversationDetail() {
     const [messages, setMessages] = useState([]);
     const [inputMessage, setInputMessage] = useState("");
     const messagesEndRef = useRef(null);
+    const scrollContainerRef = useRef(null);
+    const prevScrollHeightRef = useRef(0);
 
     const limit = 10;
     const [offset, setOffset] = useState(0);
     const [hasMore, setHasMore] = useState(true);
     const [partner, setPartner] = useState({});
+
+    const isLoadingMore = useRef("append");
 
     const currentUserId = user?.id;
 
@@ -23,14 +27,30 @@ function ConversationDetail() {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
     };
 
-    useEffect(() => {
-        scrollToBottom();
+    useLayoutEffect(() => {
+        if (isLoadingMore.current === "append") {
+            scrollToBottom();
+        } else if (isLoadingMore.current === "prepend") {
+            const scrollContainer = scrollContainerRef.current;
+            if (scrollContainer) {
+                const newScrollHeight = scrollContainer.scrollHeight;
+                const diff = newScrollHeight - prevScrollHeightRef.current;
+                scrollContainer.scrollTop = diff; // Restore position
+            }
+            isLoadingMore.current = "idle";
+        }
     }, [messages]);
+
 
 
     // Handle load more messages
     const handleLoadMore = async () => {
         if (!hasMore) return;
+        isLoadingMore.current = "prepend";
+        // Calculate current scroll height before loading more
+        if (scrollContainerRef.current) {
+            prevScrollHeightRef.current = scrollContainerRef.current.scrollHeight;
+        }
 
         try {
             const res = await getMessagesApi(id, offset, limit);
@@ -49,6 +69,8 @@ function ConversationDetail() {
 
         if (!inputMessage.trim()) return;
 
+        isLoadingMore.current = "append";
+
         try {
             const res = await sendMessageApi(id, inputMessage);
 
@@ -64,6 +86,7 @@ function ConversationDetail() {
 
     // fetch messages from API
     const fetchMessages = async () => {
+        isLoadingMore.current = "append";
         try {
             const res = await getMessagesApi(id, 0, limit);
             setMessages(res.data.messages);
@@ -112,7 +135,10 @@ function ConversationDetail() {
             </div>
 
             {/* Messages Area */}
-            <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50">
+            <div
+                ref={scrollContainerRef}
+                className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50"
+            >
                 {hasMore && (
                     <div className="flex justify-center mb-8 ">
                         <button onClick={handleLoadMore} className="p-2 bg-gray-200 cursor-pointer rounded-full text-xs text-blue-600">
