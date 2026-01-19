@@ -98,6 +98,25 @@ export async function getLeaderboardApi(gameSlug, limit = 10) {
     return data;
 }
 
+// Get all leaderboards (public)
+export async function getAllLeaderboardsApi(limit = 5) {
+    const response = await fetch(`/api/games/leaderboard?limit=${limit}`, {
+        method: "GET",
+        headers: {
+            "Content-Type": "application/json",
+            "x-api-key": import.meta.env.VITE_API_KEY,
+        },
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+        throw new Error(data.message || data.error || "Failed to fetch all leaderboards");
+    }
+
+    return data;
+}
+
 // Get current user's game stats (authenticated)
 export async function getUserStatsApi() {
     const response = await fetch("/api/games/my-stats", {
