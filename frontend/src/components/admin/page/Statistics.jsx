@@ -22,40 +22,11 @@ const Statistics = () => {
     const fetchStats = async () => {
         setLoading(true);
         try {
-            // Mock data nếu chưa có API, bạn có thể xóa đoạn if (true) này khi nối API thật
-            if (true) { 
-                // Giả lập dữ liệu để hiển thị UI (Xóa khi chạy thật)
-                setTimeout(() => {
-                    setStats({
-                        gamePopularity: [
-                            { name: 'Snake', value: 400 },
-                            { name: 'Tetris', value: 300 },
-                            { name: 'Minesweeper', value: 300 },
-                            { name: 'Sudoku', value: 200 },
-                        ],
-                        playTrends: Array.from({ length: 10 }).map((_, i) => ({
-                            date: `2024-01-${i + 10}`,
-                            count: Math.floor(Math.random() * 100) + 50
-                        })),
-                        userGrowth: Array.from({ length: 10 }).map((_, i) => ({
-                            date: `2024-01-${i + 10}`,
-                            totalUsers: 100 + i * 10,
-                            newUsers: Math.floor(Math.random() * 5)
-                        })),
-                        globalLeaderboard: [
-                            { username: 'RetroKing', gameName: 'Snake', score: 9999, date: '2024-01-15' },
-                            { username: 'PixelQueen', gameName: 'Tetris', score: 8888, date: '2024-01-14' },
-                            { username: 'Admin', gameName: 'Minesweeper', score: 5000, date: '2024-01-12' },
-                        ]
-                    });
-                    setLoading(false);
-                }, 800);
-            } else {
-                const response = await adminService.getStatistics(period);
-                if (response.data) setStats(response.data);
-            }
+            const response = await adminService.getStatistics(period);
+            if (response.data) setStats(response.data);
         } catch (error) {
             console.error("Failed to fetch statistics:", error);
+        } finally {
             setLoading(false);
         }
     };
@@ -90,13 +61,13 @@ const Statistics = () => {
 
     return (
         <div className="h-full flex flex-col font-mono p-1 space-y-6 overflow-y-auto">
-            
+
             {/* --- HEADER CONTROL PANEL --- */}
             <div className="bg-[#c0c0c0] p-2 border-2 border-t-white border-l-white border-b-black border-r-black flex flex-col md:flex-row justify-between items-center gap-4">
                 <div className="flex items-center gap-4">
                     <div className="bg-white border-2 border-t-[#808080] border-l-[#808080] border-b-white border-r-white px-4 py-2">
                         <h1 className="text-xl font-bold uppercase tracking-wider text-blue-900 flex items-center gap-2">
-                            <Activity size={24} /> SYSTEM_STATS.EXE
+                            <Activity size={24} /> SYSTEM_STATS
                         </h1>
                     </div>
                 </div>
@@ -131,7 +102,7 @@ const Statistics = () => {
                 {/* 1. Game Popularity (Pie Chart) */}
                 <div className="bg-[#c0c0c0] p-1 border-2 border-t-white border-l-white border-b-black border-r-black shadow-lg">
                     <div className="bg-[#000080] text-white px-2 py-1 mb-1 font-bold flex items-center gap-2">
-                        <BarChart3 size={16} className="text-yellow-400"/> GAME_DISTRIBUTION
+                        <BarChart3 size={16} className="text-yellow-400" /> GAME_DISTRIBUTION
                     </div>
                     <div className="bg-[#e0e0e0] p-4 border-2 border-t-[#808080] border-l-[#808080] border-b-white border-r-white h-80">
                         <ResponsiveContainer width="100%" height="100%">
@@ -141,7 +112,7 @@ const Statistics = () => {
                                     cx="50%"
                                     cy="50%"
                                     labelLine={true}
-                                    label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                                    label={({ percent }) => ` ${(percent * 100).toFixed(0)}%`}
                                     outerRadius={80}
                                     fill="#8884d8"
                                     dataKey="value"
@@ -153,7 +124,7 @@ const Statistics = () => {
                                     ))}
                                 </Pie>
                                 <RechartsTooltip content={<RetroTooltip />} />
-                                <Legend layout="vertical" verticalAlign="middle" align="right" wrapperStyle={{ fontFamily: 'monospace' }}/>
+                                <Legend layout="vertical" verticalAlign="middle" align="right" wrapperStyle={{ fontFamily: 'monospace' }} />
                             </PieChart>
                         </ResponsiveContainer>
                     </div>
@@ -162,7 +133,7 @@ const Statistics = () => {
                 {/* 2. Play Count Trends (Line Chart) */}
                 <div className="bg-[#c0c0c0] p-1 border-2 border-t-white border-l-white border-b-black border-r-black shadow-lg">
                     <div className="bg-[#000080] text-white px-2 py-1 mb-1 font-bold flex items-center gap-2">
-                        <Activity size={16} className="text-green-400"/> TRAFFIC_MONITOR
+                        <Activity size={16} className="text-green-400" /> TRAFFIC_MONITOR
                     </div>
                     {/* Chart Container: Nền trắng, lõm xuống */}
                     <div className="bg-white p-4 border-2 border-t-[#808080] border-l-[#808080] border-b-white border-r-white h-80">
@@ -188,7 +159,7 @@ const Statistics = () => {
                 {/* 3. User Growth (Area Chart) */}
                 <div className="bg-[#c0c0c0] p-1 border-2 border-t-white border-l-white border-b-black border-r-black shadow-lg">
                     <div className="bg-[#000080] text-white px-2 py-1 mb-1 font-bold flex items-center gap-2">
-                        <Users size={16} className="text-cyan-400"/> USER_GROWTH
+                        <Users size={16} className="text-cyan-400" /> USER_GROWTH
                     </div>
                     {/* Style Terminal: Nền đen, lưới xanh */}
                     <div className="bg-black p-4 border-2 border-t-[#808080] border-l-[#808080] border-b-white border-r-white h-80">
@@ -223,9 +194,9 @@ const Statistics = () => {
                 {/* 4. Global Leaderboard (Table) */}
                 <div className="bg-[#c0c0c0] p-1 border-2 border-t-white border-l-white border-b-black border-r-black shadow-lg">
                     <div className="bg-[#000080] text-white px-2 py-1 mb-1 font-bold flex items-center gap-2">
-                        <Trophy size={16} className="text-yellow-400"/> HALL_OF_FAME
+                        <Trophy size={16} className="text-yellow-400" /> HALL_OF_FAME
                     </div>
-                    
+
                     <div className="bg-white border-2 border-t-[#808080] border-l-[#808080] border-b-white border-r-white overflow-hidden h-80 flex flex-col">
                         <div className="overflow-auto flex-1">
                             <table className="w-full text-sm font-mono text-left border-collapse">

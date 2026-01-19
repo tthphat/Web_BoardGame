@@ -29,12 +29,10 @@ export const AdminService = {
                 .sum("ugs.total_plays as value")
                 .groupBy("g.name");
 
-            // Calculate percentages
-            const totalPlays = gamePopularity.reduce((sum, item) => sum + parseInt(item.value || 0), 0);
-            const gamePopularityWithPercent = gamePopularity.map(item => ({
+            // Calculate total plays just for logging/meta if needed, but return raw values
+            const gamePopularityWithValues = gamePopularity.map(item => ({
                 name: item.name,
-                value: parseInt(item.value || 0),
-                percent: totalPlays > 0 ? ((parseInt(item.value || 0) / totalPlays) * 100).toFixed(1) : 0
+                value: parseInt(item.value || 0)
             }));
 
             // 2. Play Count Trends (Line Chart)
@@ -114,7 +112,7 @@ export const AdminService = {
 
             return {
                 data: {
-                    gamePopularity: gamePopularityWithPercent,
+                    gamePopularity: gamePopularityWithValues,
                     playTrends,
                     userGrowth,
                     globalLeaderboard
