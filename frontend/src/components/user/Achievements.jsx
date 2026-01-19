@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { getUserAchievementsApi } from '@/services/achievement.service';
 import { Trophy, ShieldAlert, Search, RefreshCcw, Gamepad2 } from 'lucide-react';
-import { GAME_REGISTRY, GAME_SCREENS } from '@/config/gameRegistry';
+import { GAME_REGISTRY } from '@/config/gameRegistry';
+import { useEnabledGames } from '@/hooks/useEnabledGames';
 
 const Achievements = () => {
     const [achievements, setAchievements] = useState([]);
@@ -9,6 +10,9 @@ const Achievements = () => {
     const [error, setError] = useState(null);
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedGame, setSelectedGame] = useState(null); // null means "All Games"
+    
+    // Fetch enabled games from backend
+    const { enabledScreens } = useEnabledGames();
 
     const fetchAchievements = useCallback(async () => {
         setLoading(true);
@@ -59,7 +63,7 @@ const Achievements = () => {
                 >
                     All Games
                 </button>
-                {GAME_SCREENS.filter(key => key !== 'HEART').map((gameKey) => (
+                {enabledScreens.filter(key => key !== 'HEART').map((gameKey) => (
                     <button
                         key={gameKey}
                         onClick={() => setSelectedGame(gameKey)}
