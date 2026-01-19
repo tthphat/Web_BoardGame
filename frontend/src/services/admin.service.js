@@ -120,3 +120,33 @@ export async function activateBoardConfigApi(id) {
     if (!response.ok) throw new Error(data.message || data.error || "Failed to activate board config");
     return data;
 }
+// Get Detailed Statistics
+export async function getStatisticsApi(period = '30d') {
+    const response = await fetch(`/api/admin/statistics?period=${period}`, {
+        method: "GET",
+        credentials: "include",
+        headers: {
+            "Content-Type": "application/json",
+            "x-api-key": import.meta.env.VITE_API_KEY,
+        },
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+        throw new Error(data.message || data.error || "Failed to fetch statistics");
+    }
+
+    return data;
+}
+
+export const adminService = {
+    getDashboardStats: getDashboardStatsApi,
+    getRecentActivities: getRecentActivitiesApi,
+    getAllGames: getAllGamesApi,
+    updateGameState: updateGameStateApi,
+    getAllBoardConfigs: getAllBoardConfigsApi,
+    updateBoardConfig: updateBoardConfigApi,
+    activateBoardConfig: activateBoardConfigApi,
+    getStatistics: getStatisticsApi // Added here
+};
