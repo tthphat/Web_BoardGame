@@ -10,6 +10,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { toast } from 'sonner';
 import { getGameConfig } from '../config/gameRegistry';
 import { useSettings } from '../contexts/SettingsContext';
+import SaveLoadButtons from '../components/games/SaveLoadButtons';
 
 const DashboardPage = () => {
   // Fetch enabled games from backend
@@ -223,9 +224,9 @@ const DashboardPage = () => {
   // Callback khi score thay đổi
   const handleScoreUpdate = useCallback((newScore) => {
     setScore(newScore);
-  }, []); /* GameMatrix gọi callback này liên tục. Nếu function đổi reference: 
-  GameMatrix sẽ re-render lại. Không dùng useCallback sẽ không crash nhưng GameMatrix sẽ
-  re-render liên tục */
+  }, []); /* GameMatrix gọi callback này liên tục. Nếu function đổi reference:
+      GameMatrix sẽ re-render lại. Không dùng useCallback sẽ không crash nhưng GameMatrix sẽ
+      re-render liên tục */
 
   // Keyboard controls cho Snake
   const { controls } = useSettings();
@@ -354,54 +355,12 @@ const DashboardPage = () => {
 
               {/* Save/Load Logic - Part of feature/SaveGame */}
               {user && isPlaying && (
-                <div className="flex gap-4 mb-2 animate-in fade-in slide-in-from-bottom-2 duration-300">
-                  <button
-                    onClick={() => {
-                      if (!gameMatrixRef.current?.getGameState) {
-                        toast.error("Unable to access game state for saving.");
-                        return;
-                      }
-
-                      const gameStateData = gameMatrixRef.current.getGameState();
-
-                      if (!gameStateData) {
-                        toast.error("Game state is empty or invalid.");
-                        return;
-                      }
-
-                      // Format data as requested: data (matrix), time, score
-                      // Prioritize 'board', then 'canvas', then 'snake' (for Snake game)
-                      const matrixData = gameStateData.board || gameStateData.canvas || gameStateData.snake;
-
-                      const consoleOutput = {
-                        data: matrixData,
-                        time: gameStateData.timeLeft,
-                        score: gameStateData.score
-                      };
-
-                      // Log to console as requested
-                      console.log(JSON.stringify(consoleOutput, null, 2));
-
-                      toast.success("Game state logged to Console!");
-                    }}
-                    disabled={gameEndHandled}
-                    className={`
-                      px-4 py-1.5 rounded text-[11px] font-bold uppercase tracking-wider transition-all
-                      border-b-4 shadow-md flex items-center justify-center min-w-[80px]
-                      ${gameEndHandled
-                        ? 'bg-gray-400 border-gray-600 text-gray-200 cursor-not-allowed opacity-60'
-                        : 'bg-green-600 border-green-800 text-white hover:bg-green-500 active:border-b-0 active:translate-y-1'}
-                    `}
-                  >
-                    Save
-                  </button>
-                  <button
-                    onClick={() => toast.info('Loading latest save...')}
-                    className="px-4 py-1.5 bg-blue-600 border-blue-800 text-white hover:bg-blue-500 active:border-b-0 active:translate-y-1 rounded text-[11px] font-bold uppercase tracking-wider transition-all border-b-4 shadow-md flex items-center justify-center min-w-[80px]"
-                  >
-                    Load
-                  </button>
-                </div>
+                <SaveLoadButtons
+                  gameMatrixRef={gameMatrixRef}
+                  screens={screens}
+                  currentScreenIndex={currentScreenIndex}
+                  gameEndHandled={gameEndHandled}
+                />
               )}
 
               {/* Game Controls */}
