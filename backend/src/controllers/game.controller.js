@@ -32,7 +32,7 @@ export const GameController = {
     async toggleGameEnabled(req, res, next) {
         try {
             const { gameId, enabled } = req.body;
-            
+
             if (gameId === undefined || enabled === undefined) {
                 return res.status(400).json({
                     success: false,
@@ -71,7 +71,6 @@ export const GameController = {
             next(error);
         }
     },
-
     async getBoardConfigs(req, res, next) {
         try {
             const result = await GameService.getBoardConfigs();

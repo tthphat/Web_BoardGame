@@ -6,6 +6,7 @@ import swaggerSpec from "./config/swagger.js";
 
 import achievementRoute from "./routes/achievement.route.js";
 import gameRoute from "./routes/game.route.js";
+import { GameController } from "./controllers/game.controller.js";
 
 import errorHandler from "./middlewares/error.middleware.js";
 import cookieParser from "cookie-parser";
