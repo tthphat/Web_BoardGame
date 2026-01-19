@@ -345,5 +345,18 @@ export const UserModel = {
             return { error };
         }
     },
+
+    // Reject friend
+    async rejectFriend(receiverId, senderId) {
+        try {
+            await knex("friends")
+                .where({ receiver_id: receiverId, sender_id: senderId })
+                .delete();
+
+            return { error: null };
+        } catch (error) {
+            return { error };
+        }
+    },
 }
 

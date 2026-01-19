@@ -16,6 +16,7 @@ router.get("/friend-requests", UserController.getFriendRequests);
 router.get("/my-friends", UserController.getMyFriends);
 router.post("/add-friend", UserController.addFriend);
 router.post("/accept-friend", UserController.acceptFriend);
+router.post("/reject-friend", UserController.rejectFriend);
 
 
 export default router;  

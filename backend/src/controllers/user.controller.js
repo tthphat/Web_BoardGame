@@ -192,5 +192,22 @@ export const UserController = {
         }
     },
 
+    // =============
+    // Reject Friend
+    // =============
+    async rejectFriend(req, res, next) {
+        try {
+            const { sender_id } = req.body;
+            const friend = await UserService.rejectFriend(req.user.id, sender_id);
+            res.json({
+                data: {
+                    message: friend.data.message
+                }
+            });
+        } catch (error) {
+            next(error);
+        }
+    },
+
 }
 

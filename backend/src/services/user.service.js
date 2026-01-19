@@ -282,4 +282,23 @@ export const UserService = {
             throw error;
         }
     },
+
+    // =============
+    // Reject Friend
+    // =============
+    async rejectFriend(receiver_id, sender_id) {
+        try {
+            const { error } = await UserModel.rejectFriend(receiver_id, sender_id);
+            if (error) {
+                throw new Error("Failed to reject friend");
+            }
+            return {
+                data: {
+                    message: "Reject friend successfully"
+                }
+            };
+        } catch (error) {
+            throw error;
+        }
+    },
 };
