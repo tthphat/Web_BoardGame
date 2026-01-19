@@ -25,7 +25,7 @@ const MainLayout = () => {
       case path.startsWith('friends'):
         setActiveItem('Friends');
         break;
-      case path === 'messages':
+      case path.startsWith('messages'):
         setActiveItem('Messages');
         break;
       case path === 'trophy':
