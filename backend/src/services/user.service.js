@@ -247,9 +247,19 @@ export const UserService = {
     // =============
     // Add Friend
     // =============
-    async addFriend(id, user_id) {
+    async addFriend(sender_id, receiver_id) {
         try {
-            const { error } = await UserModel.addFriend(id, user_id);
+            // không gửi cho chính mình
+            if (sender_id === receiver_id) {
+                throw new Error("Cannot send friend request to yourself");
+            }
+
+            const existed = await UserModel.checkExistedFriendRequest(sender_id, receiver_id);
+            if (existed) {
+                throw new Error("Friend request already exists");
+            }
+
+            const { error } = await UserModel.addFriend(sender_id, receiver_id);
             if (error) {
                 throw new Error("Failed to add friend");
             }

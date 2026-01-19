@@ -333,6 +333,26 @@ export const UserModel = {
         }
     },
 
+    // Check existed friend request
+    async checkExistedFriendRequest(senderId, receiverId) {
+        try {
+            const existed = await knex("friends")
+                .where(function () {
+                    this.where("sender_id", senderId)
+                        .andWhere("receiver_id", receiverId);
+                })
+                .orWhere(function () {
+                    this.where("sender_id", receiverId)
+                        .andWhere("receiver_id", senderId);
+                })
+                .first();
+
+            return { data: existed, error: null };
+        } catch (error) {
+            return { data: null, error };
+        }
+    },
+
     // Accept friend
     async acceptFriend(receiverId, senderId) {
         try {
