@@ -449,7 +449,7 @@ export const UserService = {
     },
 
     // create new conversation
-    async createNewConversation(friend_id, content, current_id) {
+    async createNewConversation(friend_id, current_id) {
         try {
             const { data: conversation, error } = await UserModel.createNewConversation(friend_id, current_id);
             if (error) {
