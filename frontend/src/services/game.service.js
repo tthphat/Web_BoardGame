@@ -79,10 +79,16 @@ export async function finishGameApi(gameSlug, result) {
     return data;
 }
 
-// Get leaderboard for a game (public)
-export async function getLeaderboardApi(gameSlug, limit = 10) {
-    const response = await fetch(`/api/games/${gameSlug}/leaderboard?limit=${limit}`, {
+// Get leaderboard for a game (protected)
+export async function getLeaderboardApi(gameSlug, limit = 10, options = {}) {
+    let url = `/api/games/${gameSlug}/leaderboard?limit=${limit}`;
+    if (options.filter) url += `&filter=${options.filter}`;
+    if (options.userId) url += `&userId=${options.userId}`;
+    if (options.page) url += `&page=${options.page}`;
+
+    const response = await fetch(url, {
         method: "GET",
+        credentials: "include",
         headers: {
             "Content-Type": "application/json",
             "x-api-key": import.meta.env.VITE_API_KEY,
@@ -93,6 +99,30 @@ export async function getLeaderboardApi(gameSlug, limit = 10) {
 
     if (!response.ok) {
         throw new Error(data.message || data.error || "Failed to fetch leaderboard");
+    }
+
+    return data;
+}
+
+// Get all leaderboards (protected)
+export async function getAllLeaderboardsApi(limit = 5, options = {}) {
+    let url = `/api/games/leaderboard?limit=${limit}`;
+    if (options.filter) url += `&filter=${options.filter}`;
+    if (options.userId) url += `&userId=${options.userId}`;
+
+    const response = await fetch(url, {
+        method: "GET",
+        credentials: "include",
+        headers: {
+            "Content-Type": "application/json",
+            "x-api-key": import.meta.env.VITE_API_KEY,
+        },
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+        throw new Error(data.message || data.error || "Failed to fetch all leaderboards");
     }
 
     return data;

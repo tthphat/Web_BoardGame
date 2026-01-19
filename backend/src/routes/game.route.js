@@ -23,9 +23,6 @@ router.post("/finish", verifyToken, GameController.finishGame);
 // Protected: Get board configs
 router.get("/board-configs", verifyToken, GameController.getBoardConfigs);
 
-// Public: Get leaderboard for a game
-router.get("/:slug/leaderboard", GameController.getLeaderboard);
-
 export default router;
 
 

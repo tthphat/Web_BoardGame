@@ -1,5 +1,6 @@
 import { GameService } from "../services/game.service.js";
 import { UserGameStatsModel } from "../models/userGameStats.model.js";
+import { UserModel } from "../models/user.model.js";
 import knex from "../../db/db.js";
 
 export const GameController = {
@@ -33,7 +34,7 @@ export const GameController = {
     async toggleGameEnabled(req, res, next) {
         try {
             const { gameId, enabled } = req.body;
-            
+
             if (gameId === undefined || enabled === undefined) {
                 return res.status(400).json({
                     success: false,
@@ -87,17 +88,81 @@ export const GameController = {
         try {
             const { slug } = req.params;
             const limit = parseInt(req.query.limit) || 10;
+            const filter = req.query.filter; // 'friends'
+            const targetUserId = req.query.userId; // Specific user ID
 
-            // Get game by slug
-            const game = await knex("games").where({ slug }).first();
+            let allowedUserIds = null;
+
+            // Handle Friends Filter
+            if (filter === 'friends') {
+                if (!req.user) {
+                    return res.status(401).json({ success: false, error: "Authentication required for friends filter" });
+                }
+                // Get friends (limit 1000 for now to be safe)
+                const { data: friends } = await UserModel.getMyFriends(req.user.id, 0, 1000);
+                if (friends) {
+                    allowedUserIds = friends.map(f => f.friend_id);
+                }
+            } else if (targetUserId) {
+                // Filter by specific user
+                allowedUserIds = [targetUserId];
+            }
+
+            // Get game by slug - ONLY ENABLED GAMES
+            const game = await knex("games").where({ slug, enabled: true }).first();
             if (!game) {
                 return res.status(404).json({
                     success: false,
-                    error: "Game not found"
+                    error: "Game not found or disabled"
                 });
             }
 
-            const { data, error } = await UserGameStatsModel.getLeaderboard(game.id, limit);
+            const page = parseInt(req.query.page) || 1;
+            const offset = (page - 1) * limit;
+
+            const { data, error } = await UserGameStatsModel.getLeaderboard(game.id, slug, limit, offset, allowedUserIds);
+            if (error) throw error;
+
+            res.json({
+                success: true,
+                data: data.items,
+                pagination: {
+                    total: data.total,
+                    page,
+                    limit,
+                    totalPages: Math.ceil(data.total / limit)
+                }
+            });
+        } catch (error) {
+            next(error);
+        }
+    },
+
+    // Get leaderboards for all enabled games (public)
+    async getAllLeaderboards(req, res, next) {
+        try {
+            const limit = parseInt(req.query.limit) || 10;
+            const filter = req.query.filter; // 'friends'
+            const targetUserId = req.query.userId; // Specific user ID
+
+            let allowedUserIds = null;
+
+            // Handle Friends Filter
+            if (filter === 'friends') {
+                if (!req.user) {
+                    return res.status(401).json({ success: false, error: "Authentication required for friends filter" });
+                }
+                // Get friends (limit 1000)
+                const { data: friends } = await UserModel.getMyFriends(req.user.id, 0, 1000);
+                if (friends) {
+                    allowedUserIds = friends.map(f => f.friend_id);
+                }
+            } else if (targetUserId) {
+                // Filter by specific user
+                allowedUserIds = [targetUserId];
+            }
+
+            const { data, error } = await UserGameStatsModel.getAllLeaderboards(limit, allowedUserIds);
             if (error) throw error;
 
             res.json({

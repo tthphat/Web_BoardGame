@@ -14,6 +14,7 @@ import MyFriends from "../components/friends/MyFriends";
 import FriendReuqests from "../components/friends/FriendReuqests";
 import UserList from "../components/friends/UserList";
 import SettingsPage from "../pages/SettingsPage";
+import RankingPage from "../pages/RankingPage";
 
 export const router = createBrowserRouter([
     { path: "/login", element: <LoginPage /> },
@@ -78,7 +79,7 @@ export const router = createBrowserRouter([
             },
             {
                 path: "/ranking",
-                element: <DemoPage title="Ranking" description="Bảng xếp hạng toàn server." />
+                element: <RankingPage />
             },
             {
                 path: "/settings",
