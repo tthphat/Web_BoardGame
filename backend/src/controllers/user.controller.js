@@ -301,5 +301,22 @@ export const UserController = {
             next(error);
         }
     },
+
+    // =============
+    // Get User
+    // =============
+    async getUser(req, res, next) {
+        try {
+            const { id } = req.params;
+            const user = await UserService.getUser(id);
+            res.json({
+                data: {
+                    user: user.data.user
+                }
+            });
+        } catch (error) {
+            next(error);
+        }
+    },
 }
 

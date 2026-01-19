@@ -428,4 +428,23 @@ export const UserService = {
             throw error;
         }
     },
+
+    // =============
+    // Get User
+    // =============
+    async getUser(id) {
+        try {
+            const { data: user, error } = await UserModel.getUser(id);
+            if (error) {
+                throw new Error("Failed to get user");
+            }
+            return {
+                data: {
+                    user
+                }
+            };
+        } catch (error) {
+            throw error;
+        }
+    },
 };

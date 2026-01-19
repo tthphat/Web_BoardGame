@@ -371,7 +371,7 @@ export async function searchUsersApi(search) {
 export async function fetchUserApi(userId) {
     console.log("Fontend-User-Service: Fetch user API input: ", userId);
 
-    const response = await fetch(`/api/user/${userId}`, {
+    const response = await fetch(`/api/user/get-user/${userId}`, {
         method: "GET",
         credentials: "include",
         headers: {

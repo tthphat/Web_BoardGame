@@ -576,5 +576,17 @@ export const UserModel = {
         }
     },
 
+    // Get User
+    async getUser(id) {
+        try {
+            const user = await knex("users")
+                .where({ id })
+                .first();
+
+            return { data: user, error: null };
+        } catch (error) {
+            return { data: null, error };
+        }
+    },
 }
 
