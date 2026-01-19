@@ -133,10 +133,24 @@ export const UserGameStatsModel = {
      * @param {number} gameId 
      * @param {string} slug - Game slug to determine sorting logic
      * @param {number} limit 
+     * @param {Array} allowedUserIds - Optional list of user IDs to filter by
      */
-    async getLeaderboard(gameId, slug, limit = 10) {
+    async getLeaderboard(gameId, slug, limit = 10, allowedUserIds = null) {
         try {
-            let query = knex("user_game_stats")
+            // Determine sorting logic based on game slug
+            let orderByClause = "user_game_stats.best_score DESC"; // Default
+            if (["tic-tac-toe", "caro-4", "caro-5"].includes(slug)) {
+                orderByClause = "user_game_stats.total_score DESC";
+            } else if (["snake", "match-3"].includes(slug)) {
+                orderByClause = "user_game_stats.best_score DESC";
+            } else if (slug === "memory-card") {
+                orderByClause = "user_game_stats.best_score DESC, user_game_stats.best_time_seconds ASC";
+            }
+
+            // Create CTE for ranking
+            // Note: Postgres uses double quotes for identifiers, but let's stick to knex raw carefully.
+            // We use DENSE_RANK to handle ties properly.
+            const rankedQuery = knex("user_game_stats")
                 .join("users", "user_game_stats.user_id", "users.id")
                 .join("games", "user_game_stats.game_id", "games.id")
                 .where({ "user_game_stats.game_id": gameId })
@@ -148,34 +162,31 @@ export const UserGameStatsModel = {
                     "user_game_stats.total_plays as totalPlays",
                     "user_game_stats.total_wins as totalWins",
                     "user_game_stats.total_score as totalScore",
-                    "user_game_stats.best_time_seconds as bestTimeSeconds"
+                    "user_game_stats.best_time_seconds as bestTimeSeconds",
+                    knex.raw(`DENSE_RANK() OVER (ORDER BY ${orderByClause}) as "globalRank"`)
                 );
 
-            // Custom sorting logic based on requirement
-            if (["tic-tac-toe", "caro-4", "caro-5"].includes(slug)) {
-                // Tic Tac Toe, Caro 4, Caro 5: Sort by total_score
-                query = query.orderBy("user_game_stats.total_score", "desc");
-            } else if (["snake", "match-3"].includes(slug)) {
-                // Snake and Match 3: Sort by best_score
-                query = query.orderBy("user_game_stats.best_score", "desc");
-            } else if (slug === "memory-card") {
-                // Memory: Sort by best_score (desc), then best_time_seconds (asc - lower is better)
-                query = query.orderBy("user_game_stats.best_score", "desc")
-                    .orderBy("user_game_stats.best_time_seconds", "asc");
-            } else {
-                // Default sorting
-                query = query.orderBy("user_game_stats.best_score", "desc");
+            // Main query selecting from the CTE/Subquery
+            let query = knex.from(rankedQuery.as("ranked"));
+
+            // Filter by specific users if provided (applied AFTER ranking)
+            if (allowedUserIds && Array.isArray(allowedUserIds) && allowedUserIds.length > 0) {
+                query = query.whereIn("userId", allowedUserIds);
             }
+
+            // Sort by rank for consistency in output
+            query = query.orderBy("globalRank", "asc");
 
             const leaderboard = await query.limit(limit);
 
-            // Add rank to each entry
-            const rankedLeaderboard = leaderboard.map((entry, index) => ({
-                rank: index + 1,
-                ...entry
+            // Add relative rank (index based) for friends view compatibility
+            // But we specifically return globalRank for the frontend to use if needed
+            const finalLeaderboard = leaderboard.map((entry, index) => ({
+                ...entry,
+                rank: index + 1 // Keep relative rank as 'rank' for default view
             }));
 
-            return { data: rankedLeaderboard, error: null };
+            return { data: finalLeaderboard, error: null };
         } catch (error) {
             console.error("UserGameStatsModel.getLeaderboard error:", error);
             return { data: null, error };
@@ -184,8 +195,9 @@ export const UserGameStatsModel = {
     /**
      * Get leaderboards for ALL enabled games
      * @param {number} limit 
+     * @param {Array} allowedUserIds - Optional list of user IDs to filter by
      */
-    async getAllLeaderboards(limit = 10) {
+    async getAllLeaderboards(limit = 10, allowedUserIds = null) {
         try {
             // Get all enabled games except free-draw
             const games = await knex("games")
@@ -195,7 +207,7 @@ export const UserGameStatsModel = {
 
             // Fetch leaderboard for each game
             for (const game of games) {
-                const { data } = await this.getLeaderboard(game.id, game.slug, limit);
+                const { data } = await this.getLeaderboard(game.id, game.slug, limit, allowedUserIds);
                 leaderboards[game.slug] = {
                     gameName: game.name,
                     slug: game.slug,
