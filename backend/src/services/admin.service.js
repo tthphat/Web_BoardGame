@@ -99,51 +99,61 @@ export const AdminService = {
         }
 
     },
-// ... (previous code)
+    // ... (previous code)
 
     // =============
     // Game Management
     // =============
     async getAllGames() {
-            try {
-                const { data, error } = await GameModel.findAll();
-                if (error) throw error;
-                return { data };
-            } catch (error) {
-                throw error;
-            }
-        },
+        try {
+            const { data, error } = await GameModel.findAll();
+            if (error) throw error;
+            return { data };
+        } catch (error) {
+            throw error;
+        }
+    },
 
     async updateGameState(id, enabled) {
-            try {
-                const { data, error } = await GameModel.updateState(id, enabled);
-                if (error) throw error;
-                return { data };
-            } catch (error) {
-                throw error;
-            }
-        },
+        try {
+            const { data, error } = await GameModel.updateState(id, enabled);
+            if (error) throw error;
+            return { data };
+        } catch (error) {
+            throw error;
+        }
+    },
 
     // =============
     // Board Config Management
     // =============
     async getAllBoardConfigs() {
-            try {
-                const { data, error } = await BoardConfigModel.findAll();
-                if (error) throw error;
-                return { data };
-            } catch (error) {
-                throw error;
-            }
-        },
+        try {
+            const { data, error } = await BoardConfigModel.findAll();
+            if (error) throw error;
+            return { data };
+        } catch (error) {
+            throw error;
+        }
+    },
 
     async updateBoardConfig(id, configData) {
-            try {
-                const { data, error } = await BoardConfigModel.update(id, configData);
-                if (error) throw error;
-                return { data };
-            } catch (error) {
-                throw error;
-            }
+        try {
+            const { data, error } = await BoardConfigModel.update(id, configData);
+            if (error) throw error;
+            return { data };
+        } catch (error) {
+            throw error;
         }
+    },
+
+    async activateBoardConfig(id) {
+        try {
+            const { data, error } = await BoardConfigModel.activate(id);
+            if (error) throw error;
+            return { data };
+        } catch (error) {
+            throw error;
+        }
+    }
 };
