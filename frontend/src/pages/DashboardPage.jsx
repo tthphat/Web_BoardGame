@@ -37,7 +37,7 @@ const DashboardPage = () => {
   const currentConfig = getGameConfig(currentScreenName);
   
   // Game stats hook
-  const { recordGameEnd } = useGameStats(currentConfig?.slug, !!user);
+  const { recordGameEnd, fetchGameStats, currentStats } = useGameStats(currentConfig?.slug, !!user);
 
   // Drawing hook - cần screen name
   const drawingGame = useDrawing(isPlaying && currentScreenName === 'DRAWING');
@@ -107,6 +107,13 @@ const DashboardPage = () => {
       setScore(memoryGame.score);
     }
   }, [memoryGame.score, currentScreenName, isPlaying]);
+
+  // Fetch stats from DB when game screen changes (for Caro/TicTacToe win count)
+  useEffect(() => {
+    if (user && currentConfig?.slug && ['tic-tac-toe', 'caro-4', 'caro-5'].includes(currentConfig.slug)) {
+      fetchGameStats();
+    }
+  }, [currentConfig?.slug, user, fetchGameStats]);
 
   // Reset game state khi đổi màn
   const resetGameState = () => {
@@ -311,8 +318,21 @@ const DashboardPage = () => {
                     <div className="text-xs text-green-400">{getStatusText()}</div>
                   </div>
                   <div className="flex justify-between">
-                    <span>SCORE</span>
-                    <span className="text-cyan-400">{score.toString().padStart(4, '0')}</span>
+                    {/* Caro/TicTacToe hiển thị WINS từ DB, các game khác hiển thị SCORE */}
+                    {['TICTACTOE', 'CARO4', 'CARO5'].includes(currentScreenName) ? (
+                      <>
+                        <span>WINS</span>
+                        <span className="text-cyan-400">
+                          {/* Hiển thị total_wins từ DB, sau game end sẽ refresh qua currentStats */}
+                          {(currentStats?.total_wins || 0).toString().padStart(4, '0')}
+                        </span>
+                      </>
+                    ) : (
+                      <>
+                        <span>SCORE</span>
+                        <span className="text-cyan-400">{score.toString().padStart(4, '0')}</span>
+                      </>
+                    )}
                   </div>
                   {/* Timer for Memory game */}
                   {currentScreenName === 'MEMORY' && isPlaying && (

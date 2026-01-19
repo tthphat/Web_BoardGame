@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { finishGameApi, getLeaderboardApi, getUserStatsApi } from '../services/game.service';
+import { finishGameApi, getLeaderboardApi, getUserStatsApi, getGameStatsApi } from '../services/game.service';
 
 /**
  * Hook to manage game statistics tracking and leaderboard
@@ -10,6 +10,32 @@ export function useGameStats(gameSlug, isLoggedIn) {
     const [loading, setLoading] = useState(false);
     const [lastResult, setLastResult] = useState(null);
     const [leaderboard, setLeaderboard] = useState([]);
+    const [currentStats, setCurrentStats] = useState(null); // Stats from DB
+
+    /**
+     * Fetch current user's stats for this game from DB
+     * Call this when game screen loads
+     */
+    const fetchGameStats = useCallback(async () => {
+        if (!isLoggedIn || !gameSlug) {
+            console.log('[useGameStats] Skipping fetchGameStats - not logged in or no slug');
+            return null;
+        }
+
+        setLoading(true);
+        try {
+            console.log(`[useGameStats] 📊 Fetching stats for: ${gameSlug}`);
+            const response = await getGameStatsApi(gameSlug);
+            console.log(`[useGameStats] 📊 Stats from DB:`, response.data);
+            setCurrentStats(response.data);
+            return response.data;
+        } catch (error) {
+            console.error('[useGameStats] Failed to fetch game stats:', error);
+            return null;
+        } finally {
+            setLoading(false);
+        }
+    }, [gameSlug, isLoggedIn]);
 
     /**
      * Call when a game ends to record stats
@@ -36,6 +62,17 @@ export function useGameStats(gameSlug, isLoggedIn) {
             const response = await finishGameApi(gameSlug, result);
             console.log(`[useGameStats] ✅ API Success:`, response);
             setLastResult(response.data);
+            
+            // Update currentStats with new values from response
+            if (response.data?.stats) {
+                setCurrentStats(prev => ({
+                    ...prev,
+                    total_wins: response.data.stats.totalWins,
+                    total_plays: response.data.stats.totalPlays,
+                    best_score: response.data.stats.bestScore,
+                }));
+            }
+            
             return response.data;
         } catch (error) {
             console.error('[useGameStats] ❌ Failed to record game stats:', error);
@@ -87,7 +124,9 @@ export function useGameStats(gameSlug, isLoggedIn) {
         loading,
         lastResult,
         leaderboard,
+        currentStats, // Stats từ DB
         recordGameEnd,
+        fetchGameStats, // Gọi khi bắt đầu game để lấy stats
         fetchLeaderboard,
         fetchUserStats,
         // Helper to check if this was a new high score

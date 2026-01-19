@@ -118,4 +118,22 @@ export async function getUserStatsApi() {
     return data;
 }
 
+// Get user's stats for a specific game (authenticated)
+export async function getGameStatsApi(gameSlug) {
+    const response = await fetch(`/api/games/my-stats/${gameSlug}`, {
+        method: "GET",
+        credentials: "include",
+        headers: {
+            "Content-Type": "application/json",
+            "x-api-key": import.meta.env.VITE_API_KEY,
+        },
+    });
 
+    const data = await response.json();
+
+    if (!response.ok) {
+        throw new Error(data.message || data.error || "Failed to fetch game stats");
+    }
+
+    return data;
+}
