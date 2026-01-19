@@ -12,11 +12,7 @@ export const SettingsProvider = ({ children }) => {
         return saved ? JSON.parse(saved) : 'ARROWS'; // 'ARROWS' or 'WASD'
     });
 
-    // 2. Board Config Preference (ID)
-    const [boardConfigId, setBoardConfigId] = useState(() => {
-        const saved = localStorage.getItem('user_board_config_id');
-        return saved ? parseInt(saved) : null; // null means use default
-    });
+
 
     // 3. Available Board Configs (Fetched from API)
     const [availableConfigs, setAvailableConfigs] = useState([]);
@@ -25,11 +21,7 @@ export const SettingsProvider = ({ children }) => {
         localStorage.setItem('user_controls', JSON.stringify(controls));
     }, [controls]);
 
-    useEffect(() => {
-        if (boardConfigId) {
-            localStorage.setItem('user_board_config_id', boardConfigId);
-        }
-    }, [boardConfigId]);
+
 
     // Fetch Board Configs
     const fetchBoardConfigs = async () => {
@@ -40,10 +32,6 @@ export const SettingsProvider = ({ children }) => {
             const data = await response.json();
             if (response.ok) {
                 setAvailableConfigs(data.data);
-                // Set default if none selected
-                if (!boardConfigId && data.data.length > 0) {
-                    // setBoardConfigId(data.data[0].id); // Optional: Auto select first? No, let's keep it null for "Game Default"
-                }
             }
         } catch (error) {
             console.error("Failed to fetch board configs", error);
@@ -57,11 +45,7 @@ export const SettingsProvider = ({ children }) => {
     const value = {
         controls,
         setControls,
-        boardConfigId,
-        setBoardConfigId,
         availableConfigs,
-        // Helper to get actual config object
-        activeBoardConfig: availableConfigs.find(c => c.id === boardConfigId) || null
     };
 
     return (
