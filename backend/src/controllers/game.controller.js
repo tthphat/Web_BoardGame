@@ -1,4 +1,5 @@
 import { GameService } from "../services/game.service.js";
+import { UserGameStatsModel } from "../models/userGameStats.model.js";
 import knex from "../../db/db.js";
 
 export const GameController = {
@@ -76,6 +77,49 @@ export const GameController = {
         try {
             const result = await GameService.getBoardConfigs();
             res.json(result);
+        } catch (error) {
+            next(error);
+        }
+    },
+
+    // Get leaderboard for a specific game (public)
+    async getLeaderboard(req, res, next) {
+        try {
+            const { slug } = req.params;
+            const limit = parseInt(req.query.limit) || 10;
+
+            // Get game by slug
+            const game = await knex("games").where({ slug }).first();
+            if (!game) {
+                return res.status(404).json({
+                    success: false,
+                    error: "Game not found"
+                });
+            }
+
+            const { data, error } = await UserGameStatsModel.getLeaderboard(game.id, limit);
+            if (error) throw error;
+
+            res.json({
+                success: true,
+                data
+            });
+        } catch (error) {
+            next(error);
+        }
+    },
+
+    // Get all game stats for current user
+    async getUserStats(req, res, next) {
+        try {
+            const userId = req.user.id;
+            const { data, error } = await UserGameStatsModel.getAllByUser(userId);
+            if (error) throw error;
+
+            res.json({
+                success: true,
+                data
+            });
         } catch (error) {
             next(error);
         }

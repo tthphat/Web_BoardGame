@@ -227,6 +227,7 @@ export const useTicTacToe = (isPlaying, botEnabled = false) => {
         winner,
         winningLine,
         score,
+        totalWins: score, // Alias for score to display wins in UI
         handlePixelClick,
         getPixelColor,
         resetGame,

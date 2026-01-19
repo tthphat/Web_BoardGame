@@ -59,6 +59,7 @@ export const TicTacToeWrapper = forwardRef(({ isPlaying, botEnabled, onGameState
         currentPlayer: game.currentPlayer,
         winner: game.winner,
         score: game.score,
+        totalWins: game.totalWins, // For UI display
         resetGame: game.resetGame,
       });
     }
@@ -98,6 +99,7 @@ export const Caro4Wrapper = forwardRef(({ isPlaying, botEnabled, onGameStateUpda
         currentPlayer: game.currentPlayer,
         winner: game.winner,
         score: game.score,
+        totalWins: game.totalWins, // For UI display
         resetGame: game.resetGame,
       });
     }
@@ -137,6 +139,7 @@ export const Caro5Wrapper = forwardRef(({ isPlaying, botEnabled, onGameStateUpda
         currentPlayer: game.currentPlayer,
         winner: game.winner,
         score: game.score,
+        totalWins: game.totalWins, // For UI display
         resetGame: game.resetGame,
       });
     }

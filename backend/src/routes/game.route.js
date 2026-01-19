@@ -11,11 +11,18 @@ router.get("/all", verifyToken, authorize("admin"), GameController.getAllGames);
 // Admin: Toggle game enabled status
 router.put("/toggle", verifyToken, authorize("admin"), GameController.toggleGameEnabled);
 
+// Protected: Get user's game stats
+router.get("/my-stats", verifyToken, GameController.getUserStats);
+
 // Protected: Finish game
 router.post("/finish", verifyToken, GameController.finishGame);
 
 // Protected: Get board configs
 router.get("/board-configs", verifyToken, GameController.getBoardConfigs);
 
+// Public: Get leaderboard for a game
+router.get("/:slug/leaderboard", GameController.getLeaderboard);
+
 export default router;
+
 
