@@ -23,6 +23,7 @@ router.get("/conversations/:id/messages", UserController.getMessages);
 router.post("/conversations/:id/messages", UserController.sendMessage);
 router.get("/search", UserController.searchUsers);
 router.get("/get-user/:id", UserController.getUser);
+router.post("/conversations/:id/messages", UserController.createNewConversation); // new conversation
 
 
 export default router;  

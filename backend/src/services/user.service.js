@@ -447,4 +447,21 @@ export const UserService = {
             throw error;
         }
     },
+
+    // create new conversation
+    async createNewConversation(friend_id, content, current_id) {
+        try {
+            const { data: conversation, error } = await UserModel.createNewConversation(friend_id, current_id);
+            if (error) {
+                throw new Error("Failed to create new conversation");
+            }
+            return {
+                data: {
+                    conversation
+                }
+            };
+        } catch (error) {
+            throw error;
+        }
+    },
 };

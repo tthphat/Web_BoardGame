@@ -318,5 +318,24 @@ export const UserController = {
             next(error);
         }
     },
+
+    // =============
+    // Send First Message
+    // =============
+    async createNewConversation(req, res, next) {
+        try {
+            const { id } = req.params;
+            const { content } = req.body;
+            console.log("Backend-user.controller.js-sendMessage: ", id, content, req.user.id);
+            const message = await UserService.createNewConversation(id, content, req.user.id);
+            res.json({
+                data: {
+                    message: message.data.message
+                }
+            });
+        } catch (error) {
+            next(error);
+        }
+    },
 }
 

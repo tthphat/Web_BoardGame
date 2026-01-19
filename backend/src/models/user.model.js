@@ -588,5 +588,40 @@ export const UserModel = {
             return { data: null, error };
         }
     },
+
+    async createNewConversation(friend_id, current_id) {
+        try {
+            const trx = await knex.transaction();
+
+            // Create conversation
+            const [conversation] = await trx("conversations")
+                .insert({
+                    created_at: new Date()
+                })
+                .returning(["id", "created_at"]);
+
+            // Add members
+            await trx("conversation_members").insert([
+                {
+                    conversation_id: conversation.id,
+                    user_id: current_id,
+                    joined_at: new Date()
+                },
+                {
+                    conversation_id: conversation.id,
+                    user_id: friend_id,
+                    joined_at: new Date()
+                }
+            ]);
+
+            await trx.commit();
+
+            return { data: conversation, error: null };
+        } catch (error) {
+            await trx.rollback();
+            return { data: null, error };
+        }
+    },
+
 }
 
