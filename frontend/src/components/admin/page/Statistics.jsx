@@ -87,9 +87,6 @@ const Statistics = () => {
                         </button>
                     ))}
                     <div className="w-[2px] bg-gray-500 mx-2"></div>
-                    <button className="p-1.5 bg-[#c0c0c0] border-2 border-t-white border-l-white border-b-black border-r-black active:border-t-black active:border-l-black shadow-[2px_2px_0px_black] active:translate-y-[2px] active:shadow-none">
-                        <Save size={18} />
-                    </button>
                 </div>
             </div>
 
