@@ -1,9 +1,9 @@
-import { getAllMyConversationsApi, searchUsersApi } from "@/services/user.service";
+import { getAllMyConversationsApi, searchUsersApi, checkExistConversationApi } from "@/services/user.service";
 import { useState, useEffect, useRef } from "react";
 import { PaginationSection } from "@/components/common/PaginationSection";
 import Loading from "@/components/common/Loading";
 import { MessageCircleX, UserRound } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 
 function FriendArea() {
@@ -15,6 +15,17 @@ function FriendArea() {
     const [loading, setLoading] = useState(false);
     const [users, setUsers] = useState([]);
     const searchRef = useRef("");
+    const navigate = useNavigate();
+    const location = useLocation();
+
+    const handleStartNewChat = async (userId) => {
+        const res = await checkExistConversationApi(userId);
+        if (res.data.conversation) {
+            navigate(`/messages/${res.data.conversation.id}`);
+        } else {
+            navigate(`/messages/new/${userId}`);
+        }
+    };
 
     const handleSearch = () => {
         setPage(1);
@@ -123,10 +134,11 @@ function FriendArea() {
                         {conversations.length === 0 && search && (
                             <div className="divide-y divide-gray-100">
                                 {users.map(user => (
-                                    <Link
-                                        to={`/messages/new/${user.id}`}
+                                    <div
                                         key={user.id}
-                                        className="flex items-center gap-3 p-3 hover:bg-blue-50 cursor-pointer"
+                                        onClick={() => handleStartNewChat(user.id)}
+                                        className={`flex items-center gap-3 p-3 hover:bg-blue-50 cursor-pointer ${location.pathname === `/messages/new/${user.id}` ? "bg-blue-50" : ""
+                                            }`}
                                     >
                                         <div className="relative flex-shrink-0">
                                             <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-500">
@@ -137,7 +149,7 @@ function FriendArea() {
                                             <span>{user.username}</span>
                                             <span className="text-xs text-gray-400">Start new chat</span>
                                         </div>
-                                    </Link>
+                                    </div>
                                 ))}
                             </div>
                         )}

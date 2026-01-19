@@ -337,5 +337,6 @@ export const UserController = {
             next(error);
         }
     },
+
 }
 

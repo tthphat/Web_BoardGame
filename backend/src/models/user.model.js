@@ -589,6 +589,7 @@ export const UserModel = {
         }
     },
 
+    // Create new conversation
     async createNewConversation(friend_id, current_id) {
         try {
             const trx = await knex.transaction();
@@ -623,5 +624,20 @@ export const UserModel = {
         }
     },
 
+    // check exist conversation
+    async checkExistConversation(friend_id, current_id) {
+        try {
+            const conversation = await knex("conversation_members as cm")
+                .join("conversation_members as cm2", "cm2.conversation_id", "cm.conversation_id")
+                .where("cm.user_id", current_id)
+                .andWhere("cm2.user_id", friend_id)
+                .select("cm.conversation_id")
+                .first();
+
+            return { data: conversation, error: null };
+        } catch (error) {
+            return { data: null, error };
+        }
+    },
 }
 

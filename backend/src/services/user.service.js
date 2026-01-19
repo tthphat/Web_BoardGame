@@ -451,6 +451,19 @@ export const UserService = {
     // create new conversation
     async createNewConversation(friend_id, content, current_id) {
         try {
+            const { data: existConversation, error: existError } = await UserModel.checkExistConversation(friend_id, current_id);
+            if (existError) {
+                throw new Error("Failed to check exist conversation");
+            }
+
+            if (existConversation) {
+                return {
+                    data: {
+                        conversation_id: existConversation.id
+                    }
+                };
+            }
+
             const { data: conversation, error } = await UserModel.createNewConversation(friend_id, current_id);
             if (error) {
                 throw new Error("Failed to create new conversation");

@@ -414,3 +414,26 @@ export async function sendFirstMessageApi(userId, message) {
     return data;
 }
 
+// check exist conversation
+export async function checkExistConversationApi(userId) {
+    console.log("Fontend-User-Service: Check exist conversation API input: ", userId);
+
+    const response = await fetch(`/api/user/conversations/${userId}/exist`, {
+        method: "GET",
+        credentials: "include",
+        headers: {
+            "Content-Type": "application/json",
+            "x-api-key": import.meta.env.VITE_API_KEY,
+        },
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+        throw new Error(data.message || data.error || "Check exist conversation failed");
+    }
+
+    console.log("Fontend-User-Service: Check exist conversation API output: ", data);
+    return data;
+}
+
