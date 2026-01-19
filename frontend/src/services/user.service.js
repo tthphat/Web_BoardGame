@@ -344,4 +344,27 @@ export async function sendMessageApi(conversation_id, message) {
     return data;
 }
 
+// search users
+export async function searchUsersApi(search) {
+    console.log("Fontend-User-Service: Search users API input: ", search);
+
+    const response = await fetch(`/api/user/search?search=${search}`, {
+        method: "GET",
+        credentials: "include",
+        headers: {
+            "Content-Type": "application/json",
+            "x-api-key": import.meta.env.VITE_API_KEY,
+        },
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+        throw new Error(data.message || data.error || "Search users failed");
+    }
+
+    console.log("Fontend-User-Service: Search users API output: ", data);
+    return data;
+}
+
 

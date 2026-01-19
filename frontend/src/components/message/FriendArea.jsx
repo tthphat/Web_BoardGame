@@ -1,4 +1,4 @@
-import { getAllMyConversationsApi } from "@/services/user.service";
+import { getAllMyConversationsApi, searchUsersApi } from "@/services/user.service";
 import { useState, useEffect, useRef } from "react";
 import { PaginationSection } from "@/components/common/PaginationSection";
 import Loading from "@/components/common/Loading";
@@ -52,6 +52,13 @@ function FriendArea() {
                 const data = await getAllMyConversationsApi(page, limit, search);
                 setConversations(data.data.conversations);
                 setTotalPages(data.data.pagination.totalPages);
+
+                if (search && data.data.conversations.length === 0) {
+                    const userRes = await searchUsersApi(search);
+                    setUsers(userRes.data.users);
+                } else {
+                    setUsers([]);
+                }
             } catch (error) {
                 console.error("Error fetching requests:", error);
             } finally {
@@ -111,6 +118,24 @@ function FriendArea() {
 
             {/* Conversations list */}
             <div className="flex-1 overflow-y-auto">
+                {/* Chưa có conversation */}
+                {conversations.length === 0 && search && (
+                    <div className="divide-y divide-gray-100">
+                        {users.map(user => (
+                            <div
+                                key={user.id}
+                                onClick={() => startNewConversation(user)}
+                                className="p-3 hover:bg-blue-50 cursor-pointer"
+                            >
+                                <UserRound />
+                                <span>{user.username}</span>
+                                <span className="text-xs text-gray-400">Start new chat</span>
+                            </div>
+                        ))}
+                    </div>
+                )}
+
+                {/* Đã tồn tại conversation */}
                 {conversations.length > 0 ? (
                     <div className="divide-y divide-gray-100">
                         {conversations.map((conversation) => (
