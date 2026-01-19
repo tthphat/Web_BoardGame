@@ -159,7 +159,7 @@ const RankingPage = () => {
                 >
                     All Games
                 </button>
-                {enabledScreens.filter(key => key !== 'HEART' && key !== 'FREE_DRAW').map((gameKey) => (
+                {enabledScreens.filter(key => key !== 'HEART' && key !== 'DRAWING').map((gameKey) => (
                     <button
                         key={gameKey}
                         onClick={() => setSelectedGame(gameKey)}
