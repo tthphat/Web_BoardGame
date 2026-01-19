@@ -144,7 +144,7 @@ function MyFriends() {
                 </div>
 
                 {/* Phân trang */}
-                <PaginationSection totalPages={totalPages} currentPage={page} onPageChange={setPage} />
+                <PaginationSection dataLength={friends.length} totalPages={totalPages} currentPage={page} onPageChange={setPage} />
             </div>
         </div>
     );

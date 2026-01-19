@@ -165,7 +165,7 @@ function FriendRequests() {
                 </div>
 
                 {/* Phân trang */}
-                <PaginationSection totalPages={totalPages} currentPage={page} onPageChange={setPage} />
+                <PaginationSection dataLength={requests.length} totalPages={totalPages} currentPage={page} onPageChange={setPage} />
             </div>
         </div>
     );

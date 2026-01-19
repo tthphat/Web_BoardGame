@@ -7,7 +7,10 @@ import {
     PaginationPrevious,
 } from "@/components/ui/pagination";
 
-export function PaginationSection({ page, totalPages, setPage }) {
+export function PaginationSection({ page, totalPages, setPage, dataLength }) {
+
+    if (dataLength === 0) return null;
+
     return (
         <Pagination className="mt-4">
             <PaginationContent>
