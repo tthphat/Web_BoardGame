@@ -14,6 +14,19 @@ export const AdminController = {
     },
 
     // =============
+    // Get Detailed Statistics
+    // =============
+    async getStatistics(req, res, next) {
+        try {
+            const { period } = req.query;
+            const result = await AdminService.getStatistics(period);
+            res.json(result);
+        } catch (error) {
+            next(error);
+        }
+    },
+
+    // =============
     // Get Recent Activities
     // =============
     async getRecentActivities(req, res, next) {

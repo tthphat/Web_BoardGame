@@ -2,9 +2,133 @@ import knex from "../../db/db.js";
 import { GameModel } from "../models/game.model.js";
 import { BoardConfigModel } from "../models/boardConfig.model.js";
 
+import { UserGameStatsModel } from "../models/userGameStats.model.js";
+
 export const AdminService = {
+
+    // =============
+    // Get Detailed Statistics
+    // =============
+    async getStatistics(period = '30d') {
+        try {
+            // Determine date range
+            const endDate = new Date();
+            const startDate = new Date();
+
+            if (period === '7d') startDate.setDate(endDate.getDate() - 7);
+            else if (period === '30d') startDate.setDate(endDate.getDate() - 30);
+            else if (period === '90d') startDate.setDate(endDate.getDate() - 90);
+            else startDate.setDate(endDate.getDate() - 30); // Default 30d
+
+            // 1. Game Popularity (Pie Chart) - Play count % per game
+            const gamePopularity = await knex("game_sessions as gs")
+                .join("games as g", "gs.game_id", "g.id")
+                .where("gs.created_at", ">=", startDate)
+                .select("g.name")
+                .count("gs.id as value")
+                .groupBy("g.name");
+
+            // Calculate percentages
+            const totalPlays = gamePopularity.reduce((sum, item) => sum + parseInt(item.value), 0);
+            const gamePopularityWithPercent = gamePopularity.map(item => ({
+                name: item.name,
+                value: parseInt(item.value),
+                percent: totalPlays > 0 ? ((parseInt(item.value) / totalPlays) * 100).toFixed(1) : 0
+            }));
+
+            // 2. Play Count Trends (Line Chart)
+            const playTrendsQuery = await knex("game_sessions")
+                .where("created_at", ">=", startDate)
+                .select(knex.raw("DATE(created_at) as date"))
+                .count("id as count")
+                .groupByRaw("DATE(created_at)")
+                .orderBy("date", "asc");
+
+            // Fill in missing dates
+            const playTrends = [];
+            for (let d = new Date(startDate); d <= endDate; d.setDate(d.getDate() + 1)) {
+                const dateStr = d.toISOString().split('T')[0];
+                const found = playTrendsQuery.find(item => {
+                    // Handle different date formats returned by drivers (Date object or string)
+                    const itemDate = item.date instanceof Date ? item.date.toISOString().split('T')[0] : item.date;
+                    return itemDate === dateStr;
+                });
+                playTrends.push({
+                    date: dateStr,
+                    count: found ? parseInt(found.count) : 0
+                });
+            }
+
+            // 3. User Growth (Area Chart) - New vs Total
+            // Get daily new users
+            const newUsersQuery = await knex("users")
+                .where("role", "!=", "admin")
+                .andWhere("created_at", ">=", startDate)
+                .select(knex.raw("DATE(created_at) as date"))
+                .count("id as count")
+                .groupByRaw("DATE(created_at)")
+                .orderBy("date", "asc");
+
+            // Get total users count before start date
+            const initialTotalUsersResult = await knex("users")
+                .where("role", "!=", "admin")
+                .andWhere("created_at", "<", startDate)
+                .count("id as count")
+                .first();
+            let runningTotal = parseInt(initialTotalUsersResult.count);
+
+            const userGrowth = [];
+            for (let d = new Date(startDate); d <= endDate; d.setDate(d.getDate() + 1)) {
+                const dateStr = d.toISOString().split('T')[0];
+                const found = newUsersQuery.find(item => {
+                    const itemDate = item.date instanceof Date ? item.date.toISOString().split('T')[0] : item.date;
+                    return itemDate === dateStr;
+                });
+
+                const newCount = found ? parseInt(found.count) : 0;
+                runningTotal += newCount;
+
+                userGrowth.push({
+                    date: dateStr,
+                    newUsers: newCount,
+                    totalUsers: runningTotal
+                });
+            }
+
+            // 4. Global Leaderboard (Top 10 High Scores All Games)
+            // Strategy: Get top score for each user per game, then top 10 overall
+            // Note: Scored differently per game. This is a "Hall of Fame" mixed table.
+
+            const globalLeaderboard = await knex("user_game_stats as ugs")
+                .join("users as u", "ugs.user_id", "u.id")
+                .join("games as g", "ugs.game_id", "g.id")
+                .select(
+                    "u.username",
+                    "g.name as gameName",
+                    "ugs.best_score as score",
+                    "ugs.created_at as date"
+                )
+                .orderBy("ugs.best_score", "desc")
+                .limit(10);
+
+            return {
+                data: {
+                    gamePopularity: gamePopularityWithPercent,
+                    playTrends,
+                    userGrowth,
+                    globalLeaderboard
+                }
+            };
+
+        } catch (error) {
+            console.error("AdminService.getStatistics error:", error);
+            throw error;
+        }
+    },
+
     // =============
     // Get Dashboard Stats
+
     // =============
     async getDashboardStats() {
         try {
