@@ -209,5 +209,22 @@ export const UserController = {
         }
     },
 
+    // =============
+    // Remove Friend
+    // =============
+    async removeFriend(req, res, next) {
+        try {
+            const { friend_id } = req.body;
+            const friend = await UserService.removeFriend(req.user.id, friend_id);
+            res.json({
+                data: {
+                    message: friend.data.message
+                }
+            });
+        } catch (error) {
+            next(error);
+        }
+    },
+
 }
 

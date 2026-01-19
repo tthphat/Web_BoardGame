@@ -311,4 +311,23 @@ export const UserService = {
             throw error;
         }
     },
+
+    // =============
+    // Remove Friend
+    // =============
+    async removeFriend(current_id, friend_id) {
+        try {
+            const { error } = await UserModel.removeFriend(current_id, friend_id);
+            if (error) {
+                throw new Error("Failed to remove friend");
+            }
+            return {
+                data: {
+                    message: "Remove friend successfully"
+                }
+            };
+        } catch (error) {
+            throw error;
+        }
+    },
 };
