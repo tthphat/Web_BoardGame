@@ -226,5 +226,26 @@ export const UserController = {
         }
     },
 
+    // =============
+    // Get All My Conversations
+    // =============
+    async getAllMyConversations(req, res, next) {
+        try {
+            const page = Number(req.query.page) || 1;
+            const limit = Number(req.query.limit) || 10;
+            const search = req.query.search || "";
+
+            const conversations = await UserService.getAllMyConversations(req.user.id, page, limit, search);
+            res.json({
+                data: {
+                    conversations: conversations.data.conversations,
+                    pagination: conversations.data.pagination
+                }
+            });
+        } catch (error) {
+            next(error);
+        }
+    },
+
 }
 

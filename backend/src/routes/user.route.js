@@ -18,6 +18,7 @@ router.post("/add-friend", UserController.addFriend);
 router.post("/accept-friend", UserController.acceptFriend);
 router.post("/reject-friend", UserController.rejectFriend);
 router.post("/remove-friend", UserController.removeFriend);
+router.get("/all-my-conversations", UserController.getAllMyConversations);
 
 
 export default router;  

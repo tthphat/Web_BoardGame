@@ -1,0 +1,137 @@
+import { getAllMyConversationsApi } from "@/services/user.service";
+import { useState, useEffect, useRef } from "react";
+import { PaginationSection } from "@/components/common/PaginationSection";
+
+
+function FriendArea() {
+    const [conversations, setConversations] = useState([]);
+    const [totalPages, setTotalPages] = useState(0);
+    const [search, setSearch] = useState("");
+    const [page, setPage] = useState(1);
+    const limit = 10;
+
+    const searchRef = useRef("");
+
+    const handleSearch = () => {
+        setPage(1);
+        setSearch(searchRef.current.value);
+    };
+
+    const handleClearSearch = () => {
+        searchRef.current.value = ""; // clear UI
+        setPage(1);
+        setSearch("");               // trigger fetch all
+    };
+
+
+    useEffect(() => {
+        const fetchConversations = async () => {
+            try {
+                const data = await getAllMyConversationsApi(page, limit, search);
+                setConversations(data.data.conversations);
+                setTotalPages(data.data.pagination.totalPages);
+            } catch (error) {
+                console.error("Error fetching requests:", error);
+            }
+        };
+        fetchConversations();
+    }, [page, search]);
+
+    return (
+        <div className="w-full h-full bg-white flex flex-col">
+            {/* Search Header */}
+            <div className="search-bar flex justify-end">
+                <div className="relative flex w-full items-center gap-2 font-mono">
+                    <input
+                        type="text"
+                        placeholder="Search..."
+                        className="flex-1 p-2 pr-8 border border-gray-600"
+                        ref={searchRef}
+                        onChange={(e) => {
+                            if (e.target.value === "" && search !== "") {
+                                setPage(1);
+                                setSearch("");
+                            }
+                        }}
+                        onKeyDown={(e) => {
+                            if (e.key === "Enter") {
+                                handleSearch();
+                            }
+                        }}
+                    />
+
+                    {/* Clear button */}
+                    {search && (
+                        <button
+                            onClick={handleClearSearch}
+                            type="button"
+                            className="absolute right-[90px] text-gray-400 hover:text-red-600"
+                        >
+                            ✕
+                        </button>
+                    )}
+
+                    <button
+                        onClick={handleSearch}
+                        className="p-2 border border-gray-600 transition-all hover:bg-blue-800 hover:text-white"
+                    >
+                        Search
+                    </button>
+                </div>
+            </div>
+
+            {/* Conversations list */}
+            <div className="flex-1 overflow-y-auto">
+                {conversations.length > 0 ? (
+                    <div className="divide-y divide-gray-100">
+                        {conversations.map((conversation) => (
+                            <div
+                                key={conversation.conversation_id}
+                                className="flex items-center gap-3 p-3 hover:bg-blue-50 cursor-pointer transition-colors group"
+                            >
+                                {/* Avatar */}
+                                <div className="relative flex-shrink-0">
+                                    <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-500">
+                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                                        </svg>
+                                    </div>
+                                </div>
+
+                                {/* Content */}
+                                <div className="flex-1 min-w-0">
+                                    <div className="flex justify-between items-baseline mb-0.5">
+                                        <h3 className="font-semibold text-gray-900 truncate text-sm">
+                                            {conversation.partner_name}
+                                        </h3>
+                                    </div>
+                                    <p className={`text-xs truncate ${conversation.last_message_sender_id !== conversation.partner_id
+                                        ? "text-gray-500"
+                                        : "text-gray-900 font-medium"
+                                        }`}>
+                                        {conversation.last_message_sender_id !== conversation.partner_id && "You: "}
+                                        {conversation.last_message}
+                                    </p>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                ) : (
+                    <div className="h-full flex flex-col items-center justify-center text-gray-400 p-4 text-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 mb-2 opacity-50" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                        </svg>
+                        <p className="text-sm">No conversations yet</p>
+                    </div>
+                )}
+            </div>
+
+            {/* Pagination */}
+            <div className="p-2 border-t border-gray-200">
+                <PaginationSection dataLength={conversations.length} totalPages={totalPages} currentPage={page} onPageChange={setPage} />
+            </div>
+        </div >
+    );
+}
+
+export default FriendArea;

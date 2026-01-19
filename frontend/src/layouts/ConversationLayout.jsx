@@ -1,5 +1,5 @@
 import { NavLink, Outlet } from "react-router-dom";
-import FriendArea from "@/components/friends/FriendArea";
+import FriendArea from "@/components/message/FriendArea";
 
 function ConversationLayout() {
 

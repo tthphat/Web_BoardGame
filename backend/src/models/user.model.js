@@ -392,5 +392,85 @@ export const UserModel = {
             return { error };
         }
     },
+
+    // Get All My Conversations
+    async getAllMyConversations(currentUserId, offset, limit, search = "") {
+        try {
+            const query = knex("conversation_members as cm")
+                .join("conversation_members as cm2", "cm2.conversation_id", "cm.conversation_id")
+                .join("users as partner", "partner.id", "cm2.user_id")
+                .join("conversations as c", "c.id", "cm.conversation_id")
+                .leftJoin(
+                    knex.raw(`
+                    LATERAL (
+                        SELECT 
+                        m.content,
+                        m.created_at,
+                        m.sender_id,
+                        su.username AS sender_name
+                        FROM messages m
+                        JOIN users su ON su.id = m.sender_id
+                        WHERE m.conversation_id = c.id
+                        ORDER BY m.created_at DESC
+                        LIMIT 1
+                    ) lm ON true
+                    `)
+                )
+                .where("cm.user_id", currentUserId)
+                .andWhere("cm2.user_id", "!=", currentUserId);
+
+            if (search) {
+                query.andWhere((qb) => {
+                    qb.where("partner.username", "ilike", `%${search}%`)
+                        .orWhere("partner.email", "ilike", `%${search}%`);
+                });
+            }
+
+            const conversations = await query
+                .select(
+                    "c.id as conversation_id",
+                    "partner.id as partner_id",
+                    "partner.username as partner_name",
+                    "partner.email as partner_email",
+                    "lm.content as last_message",
+                    "lm.created_at as last_message_at",
+                    "lm.sender_id as last_message_sender_id",
+                    "lm.sender_name as last_message_sender_name"
+                )
+                .orderBy("lm.created_at", "desc")
+                .offset(offset)
+                .limit(limit);
+
+            return { data: conversations, error: null };
+        } catch (error) {
+            return { data: null, error };
+        }
+    },
+
+    // Count Conversations
+    async countConversations(currentUserId, search = "") {
+        try {
+            const query = knex("conversation_members as cm")
+                .join("conversation_members as cm2", "cm2.conversation_id", "cm.conversation_id")
+                .join("users as u", "u.id", "cm2.user_id")
+                .where("cm.user_id", currentUserId)   // tôi là member
+                .andWhere("cm2.user_id", "!=", currentUserId); // người còn lại
+
+            if (search) {
+                query.andWhere((qb) => {
+                    qb.where("u.username", "ilike", `%${search}%`)
+                        .orWhere("u.email", "ilike", `%${search}%`);
+                });
+            }
+
+            const count = await query
+                .countDistinct("cm.conversation_id as count");
+
+            return { data: Number(count[0].count), error: null };
+        } catch (error) {
+            return { data: null, error };
+        }
+    },
+
 }
 
