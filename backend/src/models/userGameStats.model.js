@@ -129,25 +129,45 @@ export const UserGameStatsModel = {
     },
 
     /**
-     * Get leaderboard for a specific game
+     * Get leaderboard for a specific game with custom sorting logic
      * @param {number} gameId 
-     * @param {number} limit - Number of top players to return
+     * @param {string} slug - Game slug to determine sorting logic
+     * @param {number} limit 
      */
-    async getLeaderboard(gameId, limit = 10) {
+    async getLeaderboard(gameId, slug, limit = 10) {
         try {
-            const leaderboard = await knex("user_game_stats")
+            let query = knex("user_game_stats")
                 .join("users", "user_game_stats.user_id", "users.id")
+                .join("games", "user_game_stats.game_id", "games.id")
                 .where({ "user_game_stats.game_id": gameId })
                 .select(
                     "users.id as userId",
                     "users.username",
+                    "games.name as gameName",
                     "user_game_stats.best_score as bestScore",
                     "user_game_stats.total_plays as totalPlays",
                     "user_game_stats.total_wins as totalWins",
+                    "user_game_stats.total_score as totalScore",
                     "user_game_stats.best_time_seconds as bestTimeSeconds"
-                )
-                .orderBy("user_game_stats.best_score", "desc")
-                .limit(limit);
+                );
+
+            // Custom sorting logic based on requirement
+            if (["tic-tac-toe", "caro-4", "caro-5"].includes(slug)) {
+                // Tic Tac Toe, Caro 4, Caro 5: Sort by total_score
+                query = query.orderBy("user_game_stats.total_score", "desc");
+            } else if (["snake", "match-3"].includes(slug)) {
+                // Snake and Match 3: Sort by best_score
+                query = query.orderBy("user_game_stats.best_score", "desc");
+            } else if (slug === "memory-card") {
+                // Memory: Sort by best_score (desc), then best_time_seconds (asc - lower is better)
+                query = query.orderBy("user_game_stats.best_score", "desc")
+                    .orderBy("user_game_stats.best_time_seconds", "asc");
+            } else {
+                // Default sorting
+                query = query.orderBy("user_game_stats.best_score", "desc");
+            }
+
+            const leaderboard = await query.limit(limit);
 
             // Add rank to each entry
             const rankedLeaderboard = leaderboard.map((entry, index) => ({
@@ -161,38 +181,29 @@ export const UserGameStatsModel = {
             return { data: null, error };
         }
     },
-
     /**
-     * Get global leaderboard across all ENABLED games
+     * Get leaderboards for ALL enabled games
      * @param {number} limit 
      */
-    async getGlobalLeaderboard(limit = 10) {
+    async getAllLeaderboards(limit = 10) {
         try {
-            const leaderboard = await knex("user_game_stats")
-                .join("games", "user_game_stats.game_id", "games.id")
-                .join("users", "user_game_stats.user_id", "users.id")
-                .where("games.enabled", true) // Only count enabled games
-                .groupBy("users.id", "users.username")
-                .select(
-                    "users.id as userId",
-                    "users.username",
-                    knex.raw('SUM(user_game_stats.total_wins) as "totalWins"'),
-                    knex.raw('SUM(user_game_stats.total_score) as "totalScore"'),
-                    knex.raw('SUM(user_game_stats.total_plays) as "totalPlays"')
-                )
-                .orderBy("totalWins", "desc")
-                .orderBy("totalScore", "desc")
-                .limit(limit);
+            // Get all enabled games
+            const games = await knex("games").where("enabled", true);
+            const leaderboards = {};
 
-            // Add rank
-            const rankedLeaderboard = leaderboard.map((entry, index) => ({
-                rank: index + 1,
-                ...entry
-            }));
+            // Fetch leaderboard for each game
+            for (const game of games) {
+                const { data } = await this.getLeaderboard(game.id, game.slug, limit);
+                leaderboards[game.slug] = {
+                    gameName: game.name,
+                    slug: game.slug,
+                    players: data
+                };
+            }
 
-            return { data: rankedLeaderboard, error: null };
+            return { data: leaderboards, error: null };
         } catch (error) {
-            console.error("UserGameStatsModel.getGlobalLeaderboard error:", error);
+            console.error("UserGameStatsModel.getAllLeaderboards error:", error);
             return { data: null, error };
         }
     }

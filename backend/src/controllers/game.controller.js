@@ -97,7 +97,7 @@ export const GameController = {
                 });
             }
 
-            const { data, error } = await UserGameStatsModel.getLeaderboard(game.id, limit);
+            const { data, error } = await UserGameStatsModel.getLeaderboard(game.id, slug, limit);
             if (error) throw error;
 
             res.json({
@@ -109,12 +109,12 @@ export const GameController = {
         }
     },
 
-    // Get global leaderboard (public)
-    async getGlobalLeaderboard(req, res, next) {
+    // Get leaderboards for all enabled games (public)
+    async getAllLeaderboards(req, res, next) {
         try {
             const limit = parseInt(req.query.limit) || 10;
 
-            const { data, error } = await UserGameStatsModel.getGlobalLeaderboard(limit);
+            const { data, error } = await UserGameStatsModel.getAllLeaderboards(limit);
             if (error) throw error;
 
             res.json({
