@@ -149,24 +149,24 @@ export const AdminService = {
                 .first();
             const newUsersToday = parseInt(newUsersTodayResult.count);
 
-            // 3. Total Matches (Global)
-            const totalMatchesResult = await knex("game_sessions")
-                .count("id as count")
+            // 3. Total Matches (Global) - Sum of total_plays from user_game_stats
+            const totalMatchesResult = await knex("user_game_stats")
+                .sum("total_plays as count")
                 .first();
-            const totalMatches = parseInt(totalMatchesResult.count);
+            const totalMatches = parseInt(totalMatchesResult.count || 0);
 
-            // 4. Matches by Game (for Dropdown)
-            const matchesByGame = await knex("game_sessions as gs")
-                .join("games as g", "gs.game_id", "g.id")
+            // 4. Matches by Game (for Dropdown) - Sum of total_plays from user_game_stats
+            const matchesByGame = await knex("user_game_stats as ugs")
+                .join("games as g", "ugs.game_id", "g.id")
                 .select("g.id", "g.name")
-                .count("gs.id as count")
+                .sum("ugs.total_plays as count")
                 .groupBy("g.id", "g.name");
 
             // Format matches by game
             const matchesStats = matchesByGame.map(item => ({
                 gameId: item.id,
                 gameName: item.name,
-                count: parseInt(item.count)
+                count: parseInt(item.count || 0)
             }));
 
             return {
