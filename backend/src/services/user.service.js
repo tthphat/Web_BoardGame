@@ -247,16 +247,83 @@ export const UserService = {
     // =============
     // Add Friend
     // =============
-    async addFriend(id, user_id) {
+    async addFriend(sender_id, receiver_id) {
         try {
-            const { data: friend, error } = await UserModel.addFriend(id, user_id);
-            if (error || !friend) {
+            // không gửi cho chính mình
+            if (sender_id === receiver_id) {
+                throw new Error("Cannot send friend request to yourself");
+            }
+
+            const existed = await UserModel.checkExistedFriendRequest(sender_id, receiver_id);
+            if (existed) {
+                throw new Error("Friend request already exists");
+            }
+
+            const { error } = await UserModel.addFriend(sender_id, receiver_id);
+            if (error) {
                 throw new Error("Failed to add friend");
             }
-            console.log("Backend-user.service.js-addFriend: ", friend);
+
             return {
                 data: {
-                    friend
+                    message: "Add friend successfully"
+                }
+            };
+        } catch (error) {
+            throw error;
+        }
+    },
+
+    // =============
+    // Accept Friend
+    // =============
+    async acceptFriend(receiver_id, sender_id) {
+        try {
+            const { error } = await UserModel.acceptFriend(receiver_id, sender_id);
+            if (error) {
+                throw new Error("Failed to accept friend");
+            }
+            return {
+                data: {
+                    message: "Accept friend successfully"
+                }
+            };
+        } catch (error) {
+            throw error;
+        }
+    },
+
+    // =============
+    // Reject Friend
+    // =============
+    async rejectFriend(receiver_id, sender_id) {
+        try {
+            const { error } = await UserModel.rejectFriend(receiver_id, sender_id);
+            if (error) {
+                throw new Error("Failed to reject friend");
+            }
+            return {
+                data: {
+                    message: "Reject friend successfully"
+                }
+            };
+        } catch (error) {
+            throw error;
+        }
+    },
+
+    // =============
+    // Remove Friend
+    // =============
+    async removeFriend(current_id, friend_id) {
+        try {
+            const { error } = await UserModel.removeFriend(current_id, friend_id);
+            if (error) {
+                throw new Error("Failed to remove friend");
+            }
+            return {
+                data: {
+                    message: "Remove friend successfully"
                 }
             };
         } catch (error) {

@@ -167,12 +167,64 @@ export const UserController = {
             const friend = await UserService.addFriend(req.user.id, user_id);
             res.json({
                 data: {
-                    friend: friend.data.friend
+                    message: friend.data.message
                 }
             });
         } catch (error) {
             next(error);
         }
     },
+
+    // =============
+    // Accept Friend
+    // =============
+    async acceptFriend(req, res, next) {
+        try {
+            const { sender_id } = req.body;
+            const friend = await UserService.acceptFriend(req.user.id, sender_id);
+            res.json({
+                data: {
+                    message: friend.data.message
+                }
+            });
+        } catch (error) {
+            next(error);
+        }
+    },
+
+    // =============
+    // Reject Friend
+    // =============
+    async rejectFriend(req, res, next) {
+        try {
+            const { sender_id } = req.body;
+            const friend = await UserService.rejectFriend(req.user.id, sender_id);
+            res.json({
+                data: {
+                    message: friend.data.message
+                }
+            });
+        } catch (error) {
+            next(error);
+        }
+    },
+
+    // =============
+    // Remove Friend
+    // =============
+    async removeFriend(req, res, next) {
+        try {
+            const { friend_id } = req.body;
+            const friend = await UserService.removeFriend(req.user.id, friend_id);
+            res.json({
+                data: {
+                    message: friend.data.message
+                }
+            });
+        } catch (error) {
+            next(error);
+        }
+    },
+
 }
 

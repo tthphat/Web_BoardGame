@@ -318,21 +318,79 @@ export const UserModel = {
     },
 
     // Add friend
-    async addFriend(senderId, receiverId) {
+    async addFriend(sender_id, receiver_id) {
         try {
-            const [friend] = await knex("friends")
+            await knex("friends")
                 .insert({
-                    sender_id: senderId,
-                    receiver_id: receiverId,
+                    sender_id: sender_id,
+                    receiver_id: receiver_id,
                     status: "pending"
                 })
-                .returning(["sender_id", "receiver_id", "status"]);
 
-            return { data: friend, error: null };
+            return { error: null };
+        } catch (error) {
+            return { error };
+        }
+    },
+
+    // Check existed friend request
+    async checkExistedFriendRequest(sender_id, receiver_id) {
+        try {
+            const existed = await knex("friends")
+                .where(function () {
+                    this.where("sender_id", sender_id)
+                        .andWhere("receiver_id", receiver_id);
+                })
+                .orWhere(function () {
+                    this.where("sender_id", receiver_id)
+                        .andWhere("receiver_id", sender_id);
+                })
+                .first();
+
+            return { data: existed, error: null };
         } catch (error) {
             return { data: null, error };
         }
     },
 
+    // Accept friend
+    async acceptFriend(receiver_id, sender_id) {
+        try {
+            await knex("friends")
+                .where({ receiver_id: receiver_id, sender_id: sender_id })
+                .update({ status: "accepted", accepted_at: new Date() })
+
+            return { error: null };
+        } catch (error) {
+            return { error };
+        }
+    },
+
+    // Reject friend
+    async rejectFriend(receiver_id, sender_id) {
+        try {
+            await knex("friends")
+                .where({ receiver_id: receiver_id, sender_id: sender_id })
+                .delete();
+
+            return { error: null };
+        } catch (error) {
+            return { error };
+        }
+    },
+
+    // Remove friend
+    async removeFriend(current_id, friend_id) {
+        try {
+            await knex("friends")
+                .where({ receiver_id: friend_id, sender_id: current_id })
+                .orWhere({ receiver_id: current_id, sender_id: friend_id })
+                .delete();
+
+            return { error: null };
+        } catch (error) {
+            return { error };
+        }
+    },
 }
 

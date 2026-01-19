@@ -130,7 +130,7 @@ function UserList() {
                 </div>
 
                 {/* Phân trang */}
-                <PaginationSection totalPages={totalPages} currentPage={page} onPageChange={setPage} />
+                <PaginationSection dataLength={users.length} totalPages={totalPages} currentPage={page} onPageChange={setPage} />
             </div>
         </div>
     );

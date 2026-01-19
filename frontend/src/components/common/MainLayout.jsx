@@ -18,15 +18,31 @@ const MainLayout = () => {
   useEffect(() => {
     const path = location.pathname.substring(1); // Lấy phần sau dấu /
 
-    switch (path) {
-      case '': setActiveItem('Game'); break; // URL rỗng (Trang chủ) -> Sáng nút Game
-      case 'friends': setActiveItem('Friends'); break;
-      case 'messages': setActiveItem('Messages'); break;
-      case 'trophy': setActiveItem('Achievements'); break;
-      case 'ranking': setActiveItem('Ranking'); break;
-      case 'profile': setActiveItem('Profile'); break;
-      case 'settings': setActiveItem('Settings'); break;
-      default: setActiveItem('Game'); break;
+    switch (true) {
+      case path === '':
+        setActiveItem('Game');
+        break;
+      case path.startsWith('friends'):
+        setActiveItem('Friends');
+        break;
+      case path === 'messages':
+        setActiveItem('Messages');
+        break;
+      case path === 'trophy':
+        setActiveItem('Achievements');
+        break;
+      case path === 'ranking':
+        setActiveItem('Ranking');
+        break;
+      case path === 'profile':
+        setActiveItem('Profile');
+        break;
+      case path === 'settings':
+        setActiveItem('Settings');
+        break;
+      default:
+        setActiveItem('Game');
+        break;
     }
   }, [location.pathname]);
 
@@ -37,7 +53,7 @@ const MainLayout = () => {
     let path = '';
     switch (itemId) {
       case 'Game': path = ''; break;
-      case 'Friends': path = 'friends'; break;
+      case 'Friends': path = 'friends/user-list'; break;
       case 'Messages': path = 'messages'; break;
       case 'Achievements': path = 'trophy'; break;
       case 'Ranking': path = 'ranking'; break;

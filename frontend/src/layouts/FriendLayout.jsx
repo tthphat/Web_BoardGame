@@ -4,7 +4,7 @@ function FriendLayout() {
     const navItems = [
         { path: '/friends/user-list', label: 'Panel', exact: true },
         { path: '/friends/friend-requests', label: 'Requests' },
-        { path: '/friends/my-friends', label: 'Friends' }
+        { path: '/friends/my-friends', label: 'My Friends' }
     ];
 
     return (
