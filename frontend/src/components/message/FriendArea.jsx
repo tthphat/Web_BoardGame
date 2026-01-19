@@ -13,7 +13,7 @@ function FriendArea() {
     const [page, setPage] = useState(1);
     const limit = 10;
     const [loading, setLoading] = useState(false);
-
+    const [users, setUsers] = useState([]);
     const searchRef = useRef("");
 
     const handleSearch = () => {
@@ -49,16 +49,15 @@ function FriendArea() {
         const fetchConversations = async () => {
             setLoading(true);
             try {
-                const data = await getAllMyConversationsApi(page, limit, search);
-                setConversations(data.data.conversations);
-                setTotalPages(data.data.pagination.totalPages);
+                const [convRes, userRes] = await Promise.all([
+                    getAllMyConversationsApi(page, limit, search),
+                    searchUsersApi(search)
+                ]);
 
-                if (search && data.data.conversations.length === 0) {
-                    const userRes = await searchUsersApi(search);
-                    setUsers(userRes.data.users);
-                } else {
-                    setUsers([]);
-                }
+                setConversations(convRes.data.conversations);
+                setTotalPages(convRes.data.pagination.totalPages);
+
+                setUsers(userRes.data.users);
             } catch (error) {
                 console.error("Error fetching requests:", error);
             } finally {
