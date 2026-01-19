@@ -167,3 +167,44 @@ export async function getGameStatsApi(gameSlug) {
 
     return data;
 }
+
+// Save game session (authenticated)
+export async function saveGameSessionApi(slug, state) {
+    const response = await fetch("/api/games/save", {
+        method: "POST",
+        credentials: "include",
+        headers: {
+            "Content-Type": "application/json",
+            "x-api-key": import.meta.env.VITE_API_KEY,
+        },
+        body: JSON.stringify({ slug, state }),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+        throw new Error(data.message || data.error || "Failed to save game");
+    }
+
+    return data;
+}
+
+// Load game session (authenticated)
+export async function loadGameSessionApi(slug) {
+    const response = await fetch(`/api/games/load/${slug}`, {
+        method: "GET",
+        credentials: "include",
+        headers: {
+            "Content-Type": "application/json",
+            "x-api-key": import.meta.env.VITE_API_KEY,
+        },
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+        throw new Error(data.message || data.error || "Failed to load game");
+    }
+
+    return data;
+}

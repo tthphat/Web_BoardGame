@@ -1,5 +1,5 @@
 import { GameSessionModel } from "../models/gameSession.model.js";
-import knex from "../db/db.js";
+import knex from "../../db/db.js";
 
 export const GameSessionService = {
     /**
