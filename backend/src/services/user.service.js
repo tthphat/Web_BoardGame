@@ -370,13 +370,19 @@ export const UserService = {
     async getMessages(conversation_id, offset, limit, current_id) {
         try {
             const { data: messages, error } = await UserModel.getMessages(conversation_id, offset, limit, current_id);
-            console.log("Backend-user.service.js-getMessages: ", error);
             if (error) {
                 throw new Error("Failed to get messages");
             }
+
+            const { data: partner, error: partnerError } = await UserModel.getPartner(conversation_id, current_id);
+            if (partnerError) {
+                throw new Error("Failed to get partner");
+            }
+
             return {
                 data: {
-                    messages
+                    messages,
+                    partner
                 }
             };
         } catch (error) {

@@ -502,5 +502,28 @@ export const UserModel = {
             return { data: null, error };
         }
     },
+
+    // Get Partner
+    async getPartner(conversation_id, user_id) {
+        try {
+            const partner = await knex("conversation_members as cm")
+                .join("users as u", "u.id", "cm.user_id")
+                .where("cm.conversation_id", conversation_id)
+                .andWhere("cm.user_id", "!=", user_id)
+                .select(
+                    "u.id",
+                    "u.username",
+                    "u.email",
+                    "u.role",
+                    "u.created_at",
+                    "u.updated_at"
+                )
+                .first();
+
+            return { data: partner, error: null };
+        } catch (error) {
+            return { data: null, error };
+        }
+    },
 }
 

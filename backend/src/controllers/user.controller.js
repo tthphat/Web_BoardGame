@@ -258,7 +258,7 @@ export const UserController = {
             res.json({
                 data: {
                     messages: messages.data.messages,
-                    pagination: messages.data.pagination
+                    partner: messages.data.partner
                 }
             });
         } catch (error) {

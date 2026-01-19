@@ -14,12 +14,7 @@ function ConversationDetail() {
     const limit = 10;
     const [offset, setOffset] = useState(0);
     const [hasMore, setHasMore] = useState(true);
-
-    // Mock user for UI purposes - replace with real data fetching later
-    const partner = {
-        name: "Partner Name",
-        status: "Online"
-    };
+    const [partner, setPartner] = useState({});
 
     const currentUserId = user?.id;
 
@@ -54,6 +49,7 @@ function ConversationDetail() {
             const res = await getMessagesApi(id, 0, limit);
             setMessages(res.data.messages);
             setOffset(res.data.messages.length);
+            setPartner(res.data.partner);
             setHasMore(res.data.messages.length === limit);
         } catch (error) {
             console.error("Error fetching messages:", error);
@@ -89,10 +85,10 @@ function ConversationDetail() {
                         <UserRound className="w-6 h-6" />
                     </div>
                     <div>
-                        <h3 className="font-bold text-gray-800">{partner.name}</h3>
+                        <h3 className="font-bold text-gray-800">{partner.username}</h3>
                         <div className="flex items-center gap-1.5">
                             <span className="w-2 h-2 rounded-full bg-green-500"></span>
-                            <p className="text-xs text-green-600 font-medium">{partner.status}</p>
+                            <p className="text-xs text-green-600 font-medium">Online</p>
                         </div>
                     </div>
                 </div>
