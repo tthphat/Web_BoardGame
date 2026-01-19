@@ -123,6 +123,39 @@ export const GameController = {
         } catch (error) {
             next(error);
         }
+    },
+
+    // Get stats for a specific game for current user
+    async getGameStats(req, res, next) {
+        try {
+            const userId = req.user.id;
+            const { slug } = req.params;
+
+            // Get game by slug
+            const game = await knex("games").where({ slug }).first();
+            if (!game) {
+                return res.status(404).json({
+                    success: false,
+                    error: "Game not found"
+                });
+            }
+
+            const { data, error } = await UserGameStatsModel.getByUserAndGame(userId, game.id);
+            if (error) throw error;
+
+            res.json({
+                success: true,
+                data: data || {
+                    total_wins: 0,
+                    total_plays: 0,
+                    best_score: 0,
+                    total_score: 0,
+                    best_time_seconds: null
+                }
+            });
+        } catch (error) {
+            next(error);
+        }
     }
 };
 

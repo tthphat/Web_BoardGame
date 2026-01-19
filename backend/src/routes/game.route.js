@@ -14,6 +14,9 @@ router.put("/toggle", verifyToken, authorize("admin"), GameController.toggleGame
 // Protected: Get user's game stats
 router.get("/my-stats", verifyToken, GameController.getUserStats);
 
+// Protected: Get user's stats for a specific game
+router.get("/my-stats/:slug", verifyToken, GameController.getGameStats);
+
 // Protected: Finish game
 router.post("/finish", verifyToken, GameController.finishGame);
 
