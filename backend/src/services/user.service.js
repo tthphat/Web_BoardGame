@@ -389,4 +389,24 @@ export const UserService = {
             throw error;
         }
     },
+
+    // =============
+    // Send Message
+    // =============
+    async sendMessage(conversation_id, content, current_id) {
+        try {
+            const { data: message, error } = await UserModel.sendMessage(conversation_id, content, current_id);
+            console.log("Backend-user.service.js-sendMessage: ", error);
+            if (error) {
+                throw new Error("Failed to send message");
+            }
+            return {
+                data: {
+                    message
+                }
+            };
+        } catch (error) {
+            throw error;
+        }
+    },
 };

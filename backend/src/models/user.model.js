@@ -525,5 +525,23 @@ export const UserModel = {
             return { data: null, error };
         }
     },
+
+    // Send Message
+    async sendMessage(conversation_id, content, current_id) {
+        try {
+            const [message] = await knex("messages")
+                .insert({
+                    conversation_id,
+                    sender_id: current_id,
+                    content,
+                    created_at: new Date()
+                })
+                .returning(["id", "conversation_id", "sender_id", "content", "created_at"]);
+
+            return { data: message, error: null };
+        } catch (error) {
+            return { data: null, error };
+        }
+    },
 }
 

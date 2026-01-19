@@ -331,7 +331,7 @@ export async function sendMessageApi(conversation_id, message) {
             "Content-Type": "application/json",
             "x-api-key": import.meta.env.VITE_API_KEY,
         },
-        body: JSON.stringify({ message }),
+        body: JSON.stringify({ content: message }),
     });
 
     const data = await response.json();

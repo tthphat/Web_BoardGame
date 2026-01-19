@@ -50,13 +50,10 @@ function ConversationDetail() {
         if (!inputMessage.trim()) return;
 
         try {
-            const res = await sendMessageApi({
-                conversation_id: id,
-                content: inputMessage
-            });
+            const res = await sendMessageApi(id, inputMessage);
 
             // dùng message THẬT từ backend
-            setMessages((prev) => [...prev, res.data]);
+            setMessages((prev) => [...prev, res.data.message]);
 
             setInputMessage("");
         } catch (error) {
