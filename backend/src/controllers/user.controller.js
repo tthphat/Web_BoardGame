@@ -284,5 +284,22 @@ export const UserController = {
             next(error);
         }
     },
+
+    // =============
+    // Search Users
+    // =============
+    async searchUsers(req, res, next) {
+        try {
+            const { search } = req.query;
+            const users = await UserService.searchUsers(search, req.user.id);
+            res.json({
+                data: {
+                    users: users.data.users
+                }
+            });
+        } catch (error) {
+            next(error);
+        }
+    },
 }
 

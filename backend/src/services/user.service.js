@@ -409,4 +409,23 @@ export const UserService = {
             throw error;
         }
     },
+
+    // =============
+    // Search Users
+    // =============
+    async searchUsers(search, current_id) {
+        try {
+            const { data: users, error } = await UserModel.searchUsers(search, current_id);
+            if (error) {
+                throw new Error("Failed to search users");
+            }
+            return {
+                data: {
+                    users
+                }
+            };
+        } catch (error) {
+            throw error;
+        }
+    },
 };

@@ -543,5 +543,38 @@ export const UserModel = {
             return { data: null, error };
         }
     },
+
+    // Search user phải là bạn bè
+    async searchUsers(search, current_id) {
+        try {
+            const users = await knex("friends as f")
+                .join("users as u", function () {
+                    this.on("u.id", "=", "f.sender_id")
+                        .orOn("u.id", "=", "f.receiver_id");
+                })
+                .where("f.status", "accepted")
+                .andWhere((qb) => {
+                    qb.where("f.sender_id", current_id)
+                        .orWhere("f.receiver_id", current_id);
+                })
+                .andWhere("u.id", "!=", current_id)
+                .andWhere((qb) => {
+                    qb.where("u.username", "ilike", `%${search}%`)
+                        .orWhere("u.email", "ilike", `%${search}%`);
+                })
+                .select(
+                    "u.id",
+                    "u.username",
+                    "u.email",
+                    "u.created_at"
+                )
+                .limit(10);
+
+            return { data: users, error: null };
+        } catch (error) {
+            return { data: null, error };
+        }
+    },
+
 }
 
