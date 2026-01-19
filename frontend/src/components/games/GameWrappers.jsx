@@ -70,8 +70,8 @@ export const TicTacToeWrapper = forwardRef(({ isPlaying, botEnabled, onGameState
 TicTacToeWrapper.displayName = 'TicTacToeWrapper';
 
 // ===== CARO4 WRAPPER =====
-export const Caro4Wrapper = forwardRef(({ isPlaying, botEnabled, onGameStateUpdate }, ref) => {
-  const game = useCaro(isPlaying, botEnabled);
+export const Caro4Wrapper = forwardRef(({ isPlaying, botEnabled, onGameStateUpdate, rows, cols }, ref) => {
+  const game = useCaro(isPlaying, botEnabled, rows, cols);
   const callbackRef = useRef(onGameStateUpdate);
   const prevStateRef = useRef({ currentPlayer: null, winner: null });
   
@@ -110,8 +110,8 @@ export const Caro4Wrapper = forwardRef(({ isPlaying, botEnabled, onGameStateUpda
 Caro4Wrapper.displayName = 'Caro4Wrapper';
 
 // ===== CARO5 WRAPPER =====
-export const Caro5Wrapper = forwardRef(({ isPlaying, botEnabled, onGameStateUpdate }, ref) => {
-  const game = useCaro5(isPlaying, botEnabled);
+export const Caro5Wrapper = forwardRef(({ isPlaying, botEnabled, onGameStateUpdate, rows, cols }, ref) => {
+  const game = useCaro5(isPlaying, botEnabled, rows, cols);
   const callbackRef = useRef(onGameStateUpdate);
   const prevStateRef = useRef({ currentPlayer: null, winner: null });
   
