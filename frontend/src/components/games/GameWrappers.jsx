@@ -50,17 +50,19 @@ export const TicTacToeWrapper = forwardRef(({ isPlaying, botEnabled, onGameState
     
     const prevState = prevStateRef.current;
     const hasChanged = prevState.currentPlayer !== game.currentPlayer || 
-                       prevState.winner !== game.winner;
+                       prevState.winner !== game.winner ||
+                       prevState.score !== game.score;
     
     if (hasChanged) {
-      prevStateRef.current = { currentPlayer: game.currentPlayer, winner: game.winner };
+      prevStateRef.current = { currentPlayer: game.currentPlayer, winner: game.winner, score: game.score };
       callbackRef.current({
         currentPlayer: game.currentPlayer,
         winner: game.winner,
+        score: game.score,
         resetGame: game.resetGame,
       });
     }
-  }, [game.currentPlayer, game.winner, game.resetGame, isPlaying]);
+  }, [game.currentPlayer, game.winner, game.score, game.resetGame, isPlaying]);
 
   return null;
 });
@@ -87,17 +89,19 @@ export const Caro4Wrapper = forwardRef(({ isPlaying, botEnabled, onGameStateUpda
     
     const prevState = prevStateRef.current;
     const hasChanged = prevState.currentPlayer !== game.currentPlayer || 
-                       prevState.winner !== game.winner;
+                       prevState.winner !== game.winner ||
+                       prevState.score !== game.score;
     
     if (hasChanged) {
-      prevStateRef.current = { currentPlayer: game.currentPlayer, winner: game.winner };
+      prevStateRef.current = { currentPlayer: game.currentPlayer, winner: game.winner, score: game.score };
       callbackRef.current({
         currentPlayer: game.currentPlayer,
         winner: game.winner,
+        score: game.score,
         resetGame: game.resetGame,
       });
     }
-  }, [game.currentPlayer, game.winner, game.resetGame, isPlaying]);
+  }, [game.currentPlayer, game.winner, game.score, game.resetGame, isPlaying]);
 
   return null;
 });
@@ -124,17 +128,19 @@ export const Caro5Wrapper = forwardRef(({ isPlaying, botEnabled, onGameStateUpda
     
     const prevState = prevStateRef.current;
     const hasChanged = prevState.currentPlayer !== game.currentPlayer || 
-                       prevState.winner !== game.winner;
+                       prevState.winner !== game.winner ||
+                       prevState.score !== game.score;
     
     if (hasChanged) {
-      prevStateRef.current = { currentPlayer: game.currentPlayer, winner: game.winner };
+      prevStateRef.current = { currentPlayer: game.currentPlayer, winner: game.winner, score: game.score };
       callbackRef.current({
         currentPlayer: game.currentPlayer,
         winner: game.winner,
+        score: game.score,
         resetGame: game.resetGame,
       });
     }
-  }, [game.currentPlayer, game.winner, game.resetGame, isPlaying]);
+  }, [game.currentPlayer, game.winner, game.score, game.resetGame, isPlaying]);
 
   return null;
 });

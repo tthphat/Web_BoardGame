@@ -36,14 +36,16 @@ export const useCaro = (isPlaying, botEnabled = false) => {
   const [currentPlayer, setCurrentPlayer] = useState('BLUE'); // BLUE đi trước
   const [winner, setWinner] = useState(null);
   const [winningLine, setWinningLine] = useState([]); // [{r, c}, ...]
+  const [score, setScore] = useState(0); // Count player wins
 
-  // Reset game khi bắt đầu chơi
+  // Reset game khi bắt đầu chơi (keep score)
   useEffect(() => {
     if (isPlaying) {
       setBoard(createEmptyBoard());
       setCurrentPlayer('BLUE');
       setWinner(null);
       setWinningLine([]);
+      // Don't reset score - keep counting wins
     }
   }, [isPlaying, createEmptyBoard]);
 
@@ -167,6 +169,10 @@ export const useCaro = (isPlaying, botEnabled = false) => {
     if (winLine) {
       setWinner(currentPlayer);
       setWinningLine(winLine);
+      // Add score when BLUE (player) wins
+      if (currentPlayer === 'BLUE') {
+        setScore(prev => prev + 1);
+      }
       return;
     }
 
@@ -219,6 +225,7 @@ export const useCaro = (isPlaying, botEnabled = false) => {
     currentPlayer,
     winner,
     winningLine,
+    score,
     handlePixelClick,
     getPixelColor,
     resetGame,

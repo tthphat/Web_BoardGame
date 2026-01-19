@@ -33,6 +33,13 @@ const DashboardPage = () => {
   // Drawing hook - cần screen name
   const drawingGame = useDrawing(isPlaying && currentScreenName === 'DRAWING');
 
+  // Sync memoryGame score với score state
+  useEffect(() => {
+    if (currentScreenName === 'MEMORY' && isPlaying) {
+      setScore(memoryGame.score);
+    }
+  }, [memoryGame.score, currentScreenName, isPlaying]);
+
   // Reset game state khi đổi màn
   const resetGameState = () => {
     const config = getGameConfig(screens[currentScreenIndex]);
@@ -121,9 +128,13 @@ const DashboardPage = () => {
     return currentConfig.getStatusText(gameState, isPlaying);
   };
 
-  // Callback khi game state thay đổi
+  // Callback khi game state thay đổi (từ wrappers)
   const handleGameStateUpdate = useCallback((newState) => {
     setGameState(prev => ({ ...prev, ...newState }));
+    // Update score nếu có từ TicTacToe/Caro wrappers
+    if (newState.score !== undefined) {
+      setScore(newState.score);
+    }
   }, []);
 
   // Callback khi score thay đổi
@@ -230,6 +241,15 @@ const DashboardPage = () => {
                     <span>SCORE</span>
                     <span className="text-cyan-400">{score.toString().padStart(4, '0')}</span>
                   </div>
+                  {/* Timer for Memory game */}
+                  {currentScreenName === 'MEMORY' && isPlaying && (
+                    <div className="flex justify-between mt-1">
+                      <span>TIME</span>
+                      <span className={`font-bold ${memoryGame.timeLeft <= 10 ? 'text-red-500 animate-pulse' : memoryGame.timeLeft <= 30 ? 'text-yellow-400' : 'text-cyan-400'}`}>
+                        {memoryGame.timeLeft}s
+                      </span>
+                    </div>
+                  )}
                 </div>
               )}
 

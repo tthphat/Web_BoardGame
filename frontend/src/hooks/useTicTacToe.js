@@ -92,14 +92,16 @@ export const useTicTacToe = (isPlaying, botEnabled = false) => {
     const [currentPlayer, setCurrentPlayer] = useState('X');
     const [winner, setWinner] = useState(null);
     const [winningLine, setWinningLine] = useState([]);
+    const [score, setScore] = useState(0); // Count player wins
 
-    // Reset game when starting
+    // Reset game when starting (keep score)
     useEffect(() => {
         if (isPlaying) {
             setBoard(Array(9).fill(null));
             setCurrentPlayer('X');
             setWinner(null);
             setWinningLine([]);
+            // Don't reset score here - keep counting wins
         }
     }, [isPlaying]);
 
@@ -159,6 +161,10 @@ export const useTicTacToe = (isPlaying, botEnabled = false) => {
         if (result) {
             setWinner(result.winner);
             setWinningLine(result.line);
+            // Add score when player X wins
+            if (result.winner === 'X') {
+                setScore(prev => prev + 1);
+            }
         } else {
             setCurrentPlayer(currentPlayer === 'X' ? 'O' : 'X');
         }
@@ -220,6 +226,7 @@ export const useTicTacToe = (isPlaying, botEnabled = false) => {
         currentPlayer,
         winner,
         winningLine,
+        score,
         handlePixelClick,
         getPixelColor,
         resetGame,

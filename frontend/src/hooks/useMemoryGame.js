@@ -1,8 +1,11 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 
 // Kích thước lưới Memory: 4x4 (16 thẻ)
 const ROWS = 4;
 const COLS = 4;
+
+// Thời gian giới hạn (giây)
+const TIME_LIMIT = 30;
 
 // Danh sách các cặp màu/icon (8 cặp)
 const CARD_TYPES = [
@@ -18,10 +21,40 @@ export const useMemoryGame = () => {
   const [flippedIndices, setFlippedIndices] = useState([]); // Các thẻ đang lật tạm thời
   const [isProcessing, setIsProcessing] = useState(false); // Chặn input khi đang check match
   const [score, setScore] = useState(0);
-  const [gameState, setGameState] = useState('idle'); // 'idle', 'playing', 'finished'
+  const [gameState, setGameState] = useState('idle'); // 'idle', 'playing', 'finished', 'timeout'
+  const [timeLeft, setTimeLeft] = useState(TIME_LIMIT); // Countdown timer
+  
+  const timerRef = useRef(null);
+
+  // Timer countdown logic
+  useEffect(() => {
+    if (gameState === 'playing' && timeLeft > 0) {
+      timerRef.current = setInterval(() => {
+        setTimeLeft(prev => {
+          if (prev <= 1) {
+            clearInterval(timerRef.current);
+            setGameState('timeout'); // Hết giờ
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+    }
+    
+    return () => {
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+      }
+    };
+  }, [gameState]);
 
   // --- INIT GAME ---
   const initGame = useCallback(() => {
+    // Clear timer if exists
+    if (timerRef.current) {
+      clearInterval(timerRef.current);
+    }
+    
     // 1. Tạo 8 cặp thẻ
     let cards = [...CARD_TYPES, ...CARD_TYPES];
     
@@ -43,6 +76,7 @@ export const useMemoryGame = () => {
     setCursor(0);
     setFlippedIndices([]);
     setScore(0);
+    setTimeLeft(TIME_LIMIT); // Reset timer
     setGameState('playing');
     setIsProcessing(false);
   }, []);
@@ -132,6 +166,7 @@ export const useMemoryGame = () => {
     cursor,
     score,
     gameState,
+    timeLeft,
     initGame,
     moveCursor,
     flipCard,
