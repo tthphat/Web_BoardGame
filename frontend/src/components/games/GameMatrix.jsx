@@ -1,4 +1,4 @@
-import React, { useRef, useState, useCallback } from 'react';
+import React, { useRef, useState, useCallback, useEffect } from 'react';
 import { getBoardConfig } from '../../utils/boardConfig';
 import {
   GAME_REGISTRY,
@@ -254,17 +254,49 @@ const GameMatrix = ({
     </>
   );
 
+  // ===== AUTO SCALING =====
+  const containerRef = useRef(null);
+  const [scale, setScale] = useState(1);
+
+  useEffect(() => {
+    const calculateScale = () => {
+      if (!containerRef.current) return;
+
+      const containerWidth = containerRef.current.clientWidth;
+      const containerHeight = containerRef.current.clientHeight;
+
+      // Calculate desired board dimensions
+      const boardWidth = cols * dotSize + (cols - 1) * gap;
+      const boardHeight = rows * dotSize + (rows - 1) * gap;
+
+      // Add some padding (e.g. 20px)
+      const availableW = containerWidth - 40;
+      const availableH = containerHeight - 40;
+
+      const scaleX = availableW / boardWidth;
+      const scaleY = availableH / boardHeight;
+
+      const newScale = Math.min(scaleX, scaleY, 1);
+      setScale(newScale);
+    };
+
+    calculateScale();
+    window.addEventListener('resize', calculateScale);
+    return () => window.removeEventListener('resize', calculateScale);
+  }, [cols, rows, dotSize, gap]);
+
   return (
-    <>
+    <div className="w-full h-full flex items-center justify-center p-4 overflow-hidden" ref={containerRef}>
       {/* Game Wrapper Components */}
       {renderWrappers()}
 
       {/* Render board grid */}
       <div
-        className="grid"
+        className="grid origin-center transition-transform duration-300"
         style={{
           gridTemplateColumns: `repeat(${cols}, ${dotSize}px)`,
           gap: `${gap}px`,
+          transform: `scale(${scale})`
         }}
         key={forceRenderKey}
       >
@@ -283,7 +315,7 @@ const GameMatrix = ({
           );
         })}
       </div>
-    </>
+    </div>
   );
 };
 
