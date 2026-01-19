@@ -117,28 +117,6 @@ export const UserModel = {
         }
     },
 
-    // Count users friend
-    async countUsersFriend(currentUserId, search = "") {
-        try {
-            const count = await knex("users as u")
-                .leftJoin("friends as f", function () {
-                    this.on(function () {
-                        this.on("f.sender_id", "=", knex.raw("?", [currentUserId]))
-                            .andOn("f.receiver_id", "=", "u.id");
-                    }).orOn(function () {
-                        this.on("f.receiver_id", "=", knex.raw("?", [currentUserId]))
-                            .andOn("f.sender_id", "=", "u.id");
-                    });
-                })
-                .andWhere("role", "!=", "admin")
-                // Removed .andWhere("state", "active") to include blocked users
-                .count("id");
-
-            return { data: Number(count[0].count), error: null };
-        } catch (error) {
-            return { data: null, error };
-        }
-    },
 
     // Get all users friend
     async getAllUsersFriend(currentUserId, offset, limit, search = "") {
