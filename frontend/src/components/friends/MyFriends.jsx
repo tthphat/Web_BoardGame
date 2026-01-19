@@ -1,6 +1,7 @@
 import { PaginationSection } from "../common/PaginationSection";
 import { getMyFriendsApi } from "@/services/user.service";
 import { useState, useEffect, useRef } from "react";
+import RemoveFriend from "@/components/friends/RemoveFriend";
 
 
 function MyFriends() {
@@ -39,7 +40,11 @@ function MyFriends() {
         return `${Math.floor(days / 365)} năm`;
     };
 
-
+    const handleRemoveFriend = (friendId) => {
+        setFriends((prevFriends) =>
+            prevFriends.filter(friend => friend.id !== friendId)
+        );
+    }
 
     useEffect(() => {
         const fetchFriends = async () => {
@@ -126,9 +131,7 @@ function MyFriends() {
                                             {getFriendSince(friend.accepted_at)}
                                         </td>
                                         <td className="p-3 border-r border-dashed border-gray-300 group-hover:border-red-200 text-gray-600 text-center">
-                                            <button className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded cursor-pointer">
-                                                Remove
-                                            </button>
+                                            <RemoveFriend friendId={friend.id} onRemove={handleRemoveFriend} />
                                         </td>
                                     </tr>
                                 ))

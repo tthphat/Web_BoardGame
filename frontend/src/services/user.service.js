@@ -251,7 +251,28 @@ export async function rejectFriendApi(sender_id) {
     console.log("Fontend-User-Service: Reject friend API output: ", data);
 }
 
+// remove friend    
+export async function removeFriendApi(friend_id) {
+    console.log("Fontend-User-Service: Remove friend API input: ", friend_id);
 
+    const response = await fetch(`/api/user/remove-friend`, {
+        method: "POST",
+        credentials: "include",
+        headers: {
+            "Content-Type": "application/json",
+            "x-api-key": import.meta.env.VITE_API_KEY,
+        },
+        body: JSON.stringify({ friend_id }),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+        throw new Error(data.message || data.error || "Remove friend failed");
+    }
+
+    console.log("Fontend-User-Service: Remove friend API output: ", data);
+}
 
 
 
