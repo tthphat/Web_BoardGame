@@ -2,19 +2,22 @@ import { useParams } from "react-router-dom";
 import { UserRound, Send, Phone, Video, MoreVertical } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
+import { getMessagesApi } from "@/services/user.service";
 
 function ConversationDetail() {
     const { id } = useParams();
     const { user } = useAuth();
     const [messages, setMessages] = useState([
-        { id: 1, sender_id: 1, content: "Hello there!", created_at: new Date(Date.now() - 3600000).toISOString() },
-        { id: 2, sender_id: 999, content: "Hi! How are you?", created_at: new Date(Date.now() - 3000000).toISOString() },
-        { id: 3, sender_id: 1, content: "I'm doing good, thanks for asking.", created_at: new Date(Date.now() - 1000000).toISOString() },
-        // Mock data usually comes with sender_id. Assuming 'current_user_id' is distinct.
-        // We'll need real data later.
+        // { id: 1, sender_id: 1, content: "Hello there!", created_at: new Date(Date.now() - 3600000).toISOString() },
+        // { id: 2, sender_id: 999, content: "Hi! How are you?", created_at: new Date(Date.now() - 3000000).toISOString() },
+        // { id: 3, sender_id: 1, content: "I'm doing good, thanks for asking.", created_at: new Date(Date.now() - 1000000).toISOString() },
     ]);
     const [inputMessage, setInputMessage] = useState("");
     const messagesEndRef = useRef(null);
+
+    const limit = 10;
+    const [offset, setOffset] = useState(0);
+    const [hasMore, setHasMore] = useState(true);
 
     // Mock user for UI purposes - replace with real data fetching later
     const partner = {
@@ -24,6 +27,7 @@ function ConversationDetail() {
 
     const currentUserId = user.id;
 
+    // Scroll to bottom when messages change
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
     };
@@ -32,6 +36,7 @@ function ConversationDetail() {
         scrollToBottom();
     }, [messages]);
 
+    // Handle send message
     const handleSendMessage = (e) => {
         e.preventDefault();
         if (!inputMessage.trim()) return;
@@ -47,6 +52,35 @@ function ConversationDetail() {
         setInputMessage("");
     };
 
+    // fetch messages from API
+    const fetchMessages = async () => {
+        try {
+            const res = await getMessagesApi(id, 0, limit);
+            setMessages(res.data);
+            setOffset(res.data.length);
+            setHasMore(res.data.length === limit);
+        } catch (error) {
+            console.error("Error fetching messages:", error);
+        }
+    };
+
+    useEffect(() => {
+        fetchMessages();
+    }, [id]);
+
+    // Handle load more messages
+    const handleLoadMore = async () => {
+        if (!hasMore) return;
+
+        try {
+            const res = await getMessagesApi(id, offset, limit);
+            setMessages((prevMessages) => [...res.data, ...prevMessages]);
+            setOffset((prevOffset) => prevOffset + res.data.length);
+            setHasMore(res.data.length === limit);
+        } catch (error) {
+            console.error("Error fetching more messages:", error);
+        }
+    };
 
     return (
         <div className="h-full flex flex-col bg-white">

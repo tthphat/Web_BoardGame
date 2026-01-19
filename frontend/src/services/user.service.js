@@ -297,6 +297,28 @@ export async function getAllMyConversationsApi(page, limit, search) {
     return data;
 }
 
+// get messages in a conversation
+export async function getMessagesApi(conversation_id, offset, limit) {
+    console.log("Fontend-User-Service: Get messages API input: ", conversation_id, offset, limit);
+
+    const response = await fetch(`/api/user/conversations/${conversation_id}/messages?offset=${offset}&limit=${limit}`, {
+        method: "GET",
+        credentials: "include",
+        headers: {
+            "Content-Type": "application/json",
+            "x-api-key": import.meta.env.VITE_API_KEY,
+        },
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+        throw new Error(data.message || data.error || "Get messages failed");
+    }
+
+    console.log("Fontend-User-Service: Get messages API output: ", data);
+    return data;
+}
 
 
 
