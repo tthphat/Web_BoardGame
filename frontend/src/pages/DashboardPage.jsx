@@ -21,6 +21,9 @@ const DashboardPage = () => {
   // Danh sách các màn hình từ backend (filtered)
   const screens = enabledScreens;
 
+  // Ref to GameMatrix for saving state
+  const gameMatrixRef = useRef(null);
+
   // State lưu chỉ số màn hình hiện tại
   const [currentScreenIndex, setCurrentScreenIndex] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -289,6 +292,7 @@ const DashboardPage = () => {
               botEnabled={true}
               onGameStateUpdate={handleGameStateUpdate}
               drawingState={drawingGame}
+              ref={gameMatrixRef}
             />
           </div >
 
@@ -352,7 +356,34 @@ const DashboardPage = () => {
               {user && isPlaying && (
                 <div className="flex gap-4 mb-2 animate-in fade-in slide-in-from-bottom-2 duration-300">
                   <button
-                    onClick={() => toast.success('Game progress saved locally!')}
+                    onClick={() => {
+                      if (!gameMatrixRef.current?.getGameState) {
+                        toast.error("Unable to access game state for saving.");
+                        return;
+                      }
+
+                      const gameStateData = gameMatrixRef.current.getGameState();
+
+                      if (!gameStateData) {
+                        toast.error("Game state is empty or invalid.");
+                        return;
+                      }
+
+                      // Format data as requested: data (matrix), time, score
+                      // Prioritize 'board', then 'canvas', then 'snake' (for Snake game)
+                      const matrixData = gameStateData.board || gameStateData.canvas || gameStateData.snake;
+
+                      const consoleOutput = {
+                        data: matrixData,
+                        time: gameStateData.timeLeft,
+                        score: gameStateData.score
+                      };
+
+                      // Log to console as requested
+                      console.log(JSON.stringify(consoleOutput, null, 2));
+
+                      toast.success("Game state logged to Console!");
+                    }}
                     disabled={gameEndHandled}
                     className={`
                       px-4 py-1.5 rounded text-[11px] font-bold uppercase tracking-wider transition-all
