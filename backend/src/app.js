@@ -27,6 +27,8 @@ app.use(cookieParser());
 // Public routes (no auth or api key required)
 app.use("/api/auth", authRoute); // login, register
 app.get("/api/games/enabled", GameController.getEnabledGames); // enabled games list
+app.get("/api/games/leaderboard", GameController.getGlobalLeaderboard); // global leaderboard
+app.get("/api/games/:slug/leaderboard", GameController.getLeaderboard); // game leaderboard
 
 app.use(checkApiKey); // middleware kiểm tra api key
 

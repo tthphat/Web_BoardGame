@@ -33,7 +33,7 @@ export const GameController = {
     async toggleGameEnabled(req, res, next) {
         try {
             const { gameId, enabled } = req.body;
-            
+
             if (gameId === undefined || enabled === undefined) {
                 return res.status(400).json({
                     success: false,
@@ -88,16 +88,33 @@ export const GameController = {
             const { slug } = req.params;
             const limit = parseInt(req.query.limit) || 10;
 
-            // Get game by slug
-            const game = await knex("games").where({ slug }).first();
+            // Get game by slug - ONLY ENABLED GAMES
+            const game = await knex("games").where({ slug, enabled: true }).first();
             if (!game) {
                 return res.status(404).json({
                     success: false,
-                    error: "Game not found"
+                    error: "Game not found or disabled"
                 });
             }
 
             const { data, error } = await UserGameStatsModel.getLeaderboard(game.id, limit);
+            if (error) throw error;
+
+            res.json({
+                success: true,
+                data
+            });
+        } catch (error) {
+            next(error);
+        }
+    },
+
+    // Get global leaderboard (public)
+    async getGlobalLeaderboard(req, res, next) {
+        try {
+            const limit = parseInt(req.query.limit) || 10;
+
+            const { data, error } = await UserGameStatsModel.getGlobalLeaderboard(limit);
             if (error) throw error;
 
             res.json({

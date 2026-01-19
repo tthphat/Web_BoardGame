@@ -141,7 +141,6 @@ export const UserGameStatsModel = {
                 .select(
                     "users.id as userId",
                     "users.username",
-                    "users.avatar_url as avatarUrl",
                     "user_game_stats.best_score as bestScore",
                     "user_game_stats.total_plays as totalPlays",
                     "user_game_stats.total_wins as totalWins",
@@ -159,6 +158,41 @@ export const UserGameStatsModel = {
             return { data: rankedLeaderboard, error: null };
         } catch (error) {
             console.error("UserGameStatsModel.getLeaderboard error:", error);
+            return { data: null, error };
+        }
+    },
+
+    /**
+     * Get global leaderboard across all ENABLED games
+     * @param {number} limit 
+     */
+    async getGlobalLeaderboard(limit = 10) {
+        try {
+            const leaderboard = await knex("user_game_stats")
+                .join("games", "user_game_stats.game_id", "games.id")
+                .join("users", "user_game_stats.user_id", "users.id")
+                .where("games.enabled", true) // Only count enabled games
+                .groupBy("users.id", "users.username")
+                .select(
+                    "users.id as userId",
+                    "users.username",
+                    knex.raw('SUM(user_game_stats.total_wins) as "totalWins"'),
+                    knex.raw('SUM(user_game_stats.total_score) as "totalScore"'),
+                    knex.raw('SUM(user_game_stats.total_plays) as "totalPlays"')
+                )
+                .orderBy("totalWins", "desc")
+                .orderBy("totalScore", "desc")
+                .limit(limit);
+
+            // Add rank
+            const rankedLeaderboard = leaderboard.map((entry, index) => ({
+                rank: index + 1,
+                ...entry
+            }));
+
+            return { data: rankedLeaderboard, error: null };
+        } catch (error) {
+            console.error("UserGameStatsModel.getGlobalLeaderboard error:", error);
             return { data: null, error };
         }
     }
