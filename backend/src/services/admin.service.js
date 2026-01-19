@@ -21,19 +21,20 @@ export const AdminService = {
             else startDate.setDate(endDate.getDate() - 30); // Default 30d
 
             // 1. Game Popularity (Pie Chart) - Play count % per game
-            const gamePopularity = await knex("game_sessions as gs")
-                .join("games as g", "gs.game_id", "g.id")
-                .where("gs.created_at", ">=", startDate)
+            // Using user_game_stats.total_plays as requested. 
+            // Note: This reflects "All Time" popularity or accumulated plays, date filter is removed for this specific specific metric to avoid misinterpretation of cumulative data.
+            const gamePopularity = await knex("user_game_stats as ugs")
+                .join("games as g", "ugs.game_id", "g.id")
                 .select("g.name")
-                .count("gs.id as value")
+                .sum("ugs.total_plays as value")
                 .groupBy("g.name");
 
             // Calculate percentages
-            const totalPlays = gamePopularity.reduce((sum, item) => sum + parseInt(item.value), 0);
+            const totalPlays = gamePopularity.reduce((sum, item) => sum + parseInt(item.value || 0), 0);
             const gamePopularityWithPercent = gamePopularity.map(item => ({
                 name: item.name,
-                value: parseInt(item.value),
-                percent: totalPlays > 0 ? ((parseInt(item.value) / totalPlays) * 100).toFixed(1) : 0
+                value: parseInt(item.value || 0),
+                percent: totalPlays > 0 ? ((parseInt(item.value || 0) / totalPlays) * 100).toFixed(1) : 0
             }));
 
             // 2. Play Count Trends (Line Chart)
