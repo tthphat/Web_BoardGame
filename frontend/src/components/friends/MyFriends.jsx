@@ -42,7 +42,7 @@ function MyFriends() {
 
     const handleRemoveFriend = (friendId) => {
         setFriends((prevFriends) =>
-            prevFriends.filter(friend => friend.id !== friendId)
+            prevFriends.filter(friend => friend.friend_id !== friendId)
         );
     }
 
@@ -131,7 +131,7 @@ function MyFriends() {
                                             {getFriendSince(friend.accepted_at)}
                                         </td>
                                         <td className="p-3 border-r border-dashed border-gray-300 group-hover:border-red-200 text-gray-600 text-center">
-                                            <RemoveFriend friendId={friend.id} onRemove={handleRemoveFriend} />
+                                            <RemoveFriend friendId={friend.friend_id} onRemove={handleRemoveFriend} />
                                         </td>
                                     </tr>
                                 ))

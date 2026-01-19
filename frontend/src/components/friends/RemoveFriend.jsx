@@ -1,10 +1,11 @@
 import { removeFriendApi } from "@/services/user.service";
+import { toast } from "sonner";
 
 function RemoveFriend({ friendId, onRemove }) {
 
-    const handleRemove = () => {
+    const handleRemove = async () => {
         try {
-            removeFriendApi(friendId);
+            await removeFriendApi(friendId);
             onRemove(friendId);
             toast.success("Remove friend successfully");
         } catch (error) {
@@ -14,7 +15,8 @@ function RemoveFriend({ friendId, onRemove }) {
     }
 
     return (
-        <button className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded cursor-pointer" onClick={handleRemove}>
+        <button className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded cursor-pointer"
+            onClick={handleRemove}>
             Remove
         </button>
     );
