@@ -330,7 +330,7 @@ export const UserController = {
             const message = await UserService.createNewConversation(id, content, req.user.id);
             res.json({
                 data: {
-                    message: message.data.message
+                    conversation_id: message.data.conversation_id
                 }
             });
         } catch (error) {

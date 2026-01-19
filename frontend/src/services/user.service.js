@@ -394,7 +394,7 @@ export async function fetchUserApi(userId) {
 export async function sendFirstMessageApi(userId, message) {
     console.log("Fontend-User-Service: Send first message API input: ", userId, message);
 
-    const response = await fetch(`/api/user/conversations/${userId}/messages`, {
+    const response = await fetch(`/api/user/conversations/${userId}/new`, {
         method: "POST",
         credentials: "include",
         headers: {

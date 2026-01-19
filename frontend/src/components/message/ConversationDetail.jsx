@@ -1,10 +1,12 @@
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { UserRound, Send, Phone, Video, MoreVertical } from "lucide-react";
 import { useState, useRef, useEffect, useLayoutEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { fetchUserApi, getMessagesApi, sendMessageApi, sendFirstMessageApi } from "@/services/user.service";
 
+
 function ConversationDetail() {
+    const navigate = useNavigate();
     const { id, userId } = useParams();
     const { user, loading } = useAuth();
     const [messages, setMessages] = useState([]);
