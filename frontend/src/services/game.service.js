@@ -4,6 +4,7 @@ export async function getEnabledGamesApi() {
         method: "GET",
         headers: {
             "Content-Type": "application/json",
+            "x-api-key": import.meta.env.VITE_API_KEY,
         },
     });
 
@@ -23,6 +24,7 @@ export async function getAllGamesApi() {
         credentials: "include",
         headers: {
             "Content-Type": "application/json",
+            "x-api-key": import.meta.env.VITE_API_KEY,
         },
     });
 
@@ -42,6 +44,7 @@ export async function toggleGameApi(gameId, enabled) {
         credentials: "include",
         headers: {
             "Content-Type": "application/json",
+            "x-api-key": import.meta.env.VITE_API_KEY,
         },
         body: JSON.stringify({ gameId, enabled }),
     });
@@ -62,6 +65,7 @@ export async function finishGameApi(gameSlug, result) {
         credentials: "include",
         headers: {
             "Content-Type": "application/json",
+            "x-api-key": import.meta.env.VITE_API_KEY,
         },
         body: JSON.stringify({ gameSlug, result }),
     });
