@@ -135,7 +135,7 @@ export const UserGameStatsModel = {
      * @param {number} limit 
      * @param {Array} allowedUserIds - Optional list of user IDs to filter by
      */
-    async getLeaderboard(gameId, slug, limit = 10, allowedUserIds = null) {
+    async getLeaderboard(gameId, slug, limit = 10, offset = 0, allowedUserIds = null) {
         try {
             // Determine sorting logic based on game slug
             let orderByClause = "user_game_stats.best_score DESC"; // Default
@@ -177,16 +177,30 @@ export const UserGameStatsModel = {
             // Sort by rank for consistency in output
             query = query.orderBy("globalRank", "asc");
 
-            const leaderboard = await query.limit(limit);
+            // Count total records matching filters
+            const totalQuery = query.clone().clear('order').count("* as total");
+            const totalResult = await totalQuery.first();
+            const total = totalResult ? parseInt(totalResult.total) : 0;
 
-            // Add relative rank (index based) for friends view compatibility
-            // But we specifically return globalRank for the frontend to use if needed
+            // Apply pagination to data query
+            query = query.offset(offset).limit(limit);
+
+            const leaderboard = await query;
+
+            // Add relative rank (index based on offset) for friends view compatibility
+            // We specifically return globalRank for the frontend to use if needed
             const finalLeaderboard = leaderboard.map((entry, index) => ({
                 ...entry,
-                rank: index + 1 // Keep relative rank as 'rank' for default view
+                rank: offset + index + 1 // Keep relative rank as 'rank' for default view
             }));
 
-            return { data: finalLeaderboard, error: null };
+            return {
+                data: {
+                    items: finalLeaderboard,
+                    total: total
+                },
+                error: null
+            };
         } catch (error) {
             console.error("UserGameStatsModel.getLeaderboard error:", error);
             return { data: null, error };
@@ -207,12 +221,14 @@ export const UserGameStatsModel = {
 
             // Fetch leaderboard for each game
             for (const game of games) {
-                const { data } = await this.getLeaderboard(game.id, game.slug, limit, allowedUserIds);
-                leaderboards[game.slug] = {
-                    gameName: game.name,
-                    slug: game.slug,
-                    players: data
-                };
+                const { data } = await this.getLeaderboard(game.id, game.slug, limit, 0, allowedUserIds); // offset 0 for summary
+                if (data) {
+                    leaderboards[game.slug] = {
+                        gameName: game.name,
+                        slug: game.slug,
+                        players: data.items // Access items from new structure
+                    };
+                }
             }
 
             return { data: leaderboards, error: null };

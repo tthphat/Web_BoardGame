@@ -117,12 +117,21 @@ export const GameController = {
                 });
             }
 
-            const { data, error } = await UserGameStatsModel.getLeaderboard(game.id, slug, limit, allowedUserIds);
+            const page = parseInt(req.query.page) || 1;
+            const offset = (page - 1) * limit;
+
+            const { data, error } = await UserGameStatsModel.getLeaderboard(game.id, slug, limit, offset, allowedUserIds);
             if (error) throw error;
 
             res.json({
                 success: true,
-                data
+                data: data.items,
+                pagination: {
+                    total: data.total,
+                    page,
+                    limit,
+                    totalPages: Math.ceil(data.total / limit)
+                }
             });
         } catch (error) {
             next(error);
