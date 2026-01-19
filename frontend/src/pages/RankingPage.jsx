@@ -1,31 +1,60 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { getLeaderboardApi, getAllLeaderboardsApi } from '@/services/game.service';
+import { getMyFriendsApi } from '@/services/user.service';
 import { useEnabledGames } from '@/hooks/useEnabledGames';
 import { GAME_REGISTRY } from '@/config/gameRegistry';
-import { Trophy, Medal, Clock, Gamepad2, ShieldAlert, RefreshCcw } from 'lucide-react';
+import { Trophy, Medal, Clock, Gamepad2, ShieldAlert, RefreshCcw, Users, User, Globe } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
 
 const RankingPage = () => {
     const [leaderboardData, setLeaderboardData] = useState(null); // Array or Object depending on view
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [selectedGame, setSelectedGame] = useState(null); // null = All Games
+    const { user } = useAuth();
+
+    // Filter State
+    const [friends, setFriends] = useState([]);
+    const [filterMode, setFilterMode] = useState('global'); // 'global', 'friends_only', 'specific_user'
+    const [targetUserId, setTargetUserId] = useState(null);
 
     // Hook to get enabled games
     const { enabledScreens } = useEnabledGames();
 
+    // Fetch friends list on mount
+    useEffect(() => {
+        const fetchFriends = async () => {
+            try {
+                const response = await getMyFriendsApi(1, 100); // Get first 100 friends
+                setFriends(response.data.myFriends || []);
+            } catch (err) {
+                console.warn("Failed to fetch friends for filter:", err);
+            }
+        };
+        fetchFriends();
+    }, []);
+
     const fetchLeaderboard = useCallback(async () => {
         setLoading(true);
         try {
+            // Construct options
+            const options = {};
+            if (filterMode === 'friends_only') {
+                options.filter = 'friends';
+            } else if (filterMode === 'specific_user' && targetUserId) {
+                options.userId = targetUserId;
+            }
+
             if (selectedGame) {
                 // Fetch specific game leaderboard
                 const slug = GAME_REGISTRY[selectedGame]?.slug;
                 if (!slug) throw new Error("Invalid game configuration");
 
-                const response = await getLeaderboardApi(slug, 20); // Get top 20
+                const response = await getLeaderboardApi(slug, 20, options); // Get top 20
                 setLeaderboardData(response.data);
             } else {
                 // Fetch all leaderboards (summary)
-                const response = await getAllLeaderboardsApi(5); // Get top 5 for summary
+                const response = await getAllLeaderboardsApi(5, options); // Get top 5 for summary
                 setLeaderboardData(response.data);
             }
             setError(null);
@@ -35,7 +64,7 @@ const RankingPage = () => {
         } finally {
             setLoading(false);
         }
-    }, [selectedGame]);
+    }, [selectedGame, filterMode, targetUserId]);
 
     useEffect(() => {
         fetchLeaderboard();
@@ -43,8 +72,15 @@ const RankingPage = () => {
 
     // Helper to render user row
     const renderUserRow = (user, index, type = 'full', slug = null) => {
-        const isTop3 = index < 3;
-        const rankColor = index === 0 ? 'text-yellow-600' : index === 1 ? 'text-gray-400' : index === 2 ? 'text-orange-600' : 'text-gray-600 dark:text-gray-400';
+        // Correct rank display: Use database-provided "globalRank" if in specific_user mode, otherwise index-based
+        const rankValue = (filterMode === 'specific_user' && user.globalRank) ? Number(user.globalRank) : index + 1;
+        const isTop3 = rankValue <= 3;
+
+        // Rank color logic based on the actual rank value
+        let rankColor = 'text-gray-600 dark:text-gray-400';
+        if (rankValue === 1) rankColor = 'text-yellow-600';
+        else if (rankValue === 2) rankColor = 'text-gray-400';
+        else if (rankValue === 3) rankColor = 'text-orange-600';
 
         // Dynamic column checks
         const showTotal = !['match-3', 'snake', 'memory-card'].includes(slug);
@@ -57,7 +93,7 @@ const RankingPage = () => {
             `}>
                 <td className="p-2 text-center border-r border-retro-shadow dark:border-[#555]">
                     <span className={`inline-block w-5 text-center ${rankColor}`}>
-                        {index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `#${index + 1}`}
+                        {rankValue === 1 ? '🥇' : rankValue === 2 ? '🥈' : rankValue === 3 ? '🥉' : `#${rankValue}`}
                     </span>
                 </td>
                 <td className="p-2 border-r border-retro-shadow dark:border-[#555]">
@@ -174,7 +210,50 @@ const RankingPage = () => {
             </div>
 
             {/* Toolbar */}
-            <div className="bg-retro-silver p-3 border-2 border-t-retro-highlight border-l-retro-highlight border-b-retro-shadow border-r-retro-shadow flex justify-end items-center dark:bg-[#2d2d2d] dark:border-t-[#555] dark:border-l-[#555] dark:border-b-[#000] dark:border-r-[#000]">
+            <div className="bg-retro-silver p-3 border-2 border-t-retro-highlight border-l-retro-highlight border-b-retro-shadow border-r-retro-shadow flex justify-between items-center dark:bg-[#2d2d2d] dark:border-t-[#555] dark:border-l-[#555] dark:border-b-[#000] dark:border-r-[#000]">
+                {/* Filter Dropdown */}
+                <div className="flex items-center gap-2">
+                    <span className="text-xs font-bold uppercase hidden sm:block">View Scope:</span>
+                    <div className="relative">
+                        <select
+                            value={
+                                filterMode === 'global' ? 'global' :
+                                    filterMode === 'friends_only' ? 'friends_only' :
+                                        (filterMode === 'specific_user' && user && targetUserId === user.id) ? 'me' :
+                                            targetUserId || ''
+                            }
+                            onChange={(e) => {
+                                const val = e.target.value;
+                                if (val === 'global') {
+                                    setFilterMode('global');
+                                    setTargetUserId(null);
+                                } else if (val === 'friends_only') {
+                                    setFilterMode('friends_only');
+                                    setTargetUserId(null);
+                                } else if (val === 'me') {
+                                    setFilterMode('specific_user');
+                                    setTargetUserId(user?.id);
+                                } else {
+                                    setFilterMode('specific_user');
+                                    setTargetUserId(val);
+                                }
+                            }}
+                            className="bg-white border-2 border-t-retro-shadow border-l-retro-shadow border-b-retro-highlight border-r-retro-highlight text-xs py-1 pl-2 pr-8 min-w-[150px] focus:outline-none dark:bg-[#3d3d3d] dark:border-t-[#000] dark:border-l-[#000] dark:border-b-[#555] dark:border-r-[#555]"
+                        >
+                            <option value="global">🌐 Global Ranking</option>
+                            <option value="friends_only">👥 Friends Only</option>
+                            <option value="me">👤 My Rank Only</option>
+                            {friends.length > 0 && (
+                                <optgroup label="Specific Friend">
+                                    {friends.map(f => (
+                                        <option key={f.friend_id} value={f.friend_id}>👤 {f.username}</option>
+                                    ))}
+                                </optgroup>
+                            )}
+                        </select>
+                    </div>
+                </div>
+
                 <button
                     onClick={fetchLeaderboard}
                     className="px-3 py-1 bg-retro-silver border-2 border-t-retro-highlight border-l-retro-highlight border-b-retro-shadow border-r-retro-shadow active:border-t-retro-shadow active:border-l-retro-shadow active:border-b-retro-highlight active:border-r-retro-highlight active:translate-y-0.5 text-xs font-bold uppercase transition-all flex items-center gap-1 dark:bg-[#3d3d3d] dark:border-t-[#555] dark:border-l-[#555] dark:border-b-[#000] dark:border-r-[#000]"
@@ -232,6 +311,7 @@ const RankingPage = () => {
             <div className="bg-retro-silver border-2 border-t-retro-shadow border-l-retro-shadow border-b-retro-highlight border-r-retro-highlight px-2 py-0.5 flex justify-between text-[10px] font-bold uppercase text-gray-700 dark:bg-[#2d2d2d] dark:border-t-[#555] dark:border-l-[#555] dark:border-b-black dark:border-r-black">
                 <div className="dark:text-gray-200">
                     {selectedGame ? `Viewing: ${GAME_REGISTRY[selectedGame].name}` : 'Viewing: All Games Summary'}
+                    <span className="ml-4">Filter: {filterMode === 'global' ? 'Global' : filterMode === 'friends_only' ? 'Friends' : 'Single User'}</span>
                 </div>
                 <div className="dark:text-gray-200">Online</div>
             </div>
