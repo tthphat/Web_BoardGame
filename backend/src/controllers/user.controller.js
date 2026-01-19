@@ -226,5 +226,44 @@ export const UserController = {
         }
     },
 
+    // =============
+    // Get All My Conversations
+    // =============
+    async getAllMyConversations(req, res, next) {
+        try {
+            const page = Number(req.query.page) || 1;
+            const limit = Number(req.query.limit) || 10;
+            const search = req.query.search || "";
+
+            const conversations = await UserService.getAllMyConversations(req.user.id, page, limit, search);
+            res.json({
+                data: {
+                    conversations: conversations.data.conversations,
+                    pagination: conversations.data.pagination
+                }
+            });
+        } catch (error) {
+            next(error);
+        }
+    },
+
+    // =============
+    // Get Messages
+    // =============
+    async getMessages(req, res, next) {
+        try {
+            const { id } = req.params;
+            const { offset, limit } = req.query;
+            const messages = await UserService.getMessages(id, offset, limit, req.user.id);
+            res.json({
+                data: {
+                    messages: messages.data.messages,
+                    pagination: messages.data.pagination
+                }
+            });
+        } catch (error) {
+            next(error);
+        }
+    },
 }
 

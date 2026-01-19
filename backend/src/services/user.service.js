@@ -330,4 +330,57 @@ export const UserService = {
             throw error;
         }
     },
+
+    // =============
+    // Get All My Conversations
+    // =============
+    async getAllMyConversations(current_id, page, limit, search) {
+        try {
+            const offset = (page - 1) * limit;
+
+            const { data: count, error: countError } = await UserModel.countConversations(current_id, search);
+            if (countError) {
+                throw new Error("Failed to count conversations");
+            }
+
+            const { data: conversations, error } = await UserModel.getAllMyConversations(current_id, offset, limit, search);
+            if (error) {
+                throw new Error("Failed to get all my conversations");
+            }
+
+            return {
+                data: {
+                    conversations,
+                    pagination: {
+                        page,
+                        limit,
+                        totalPages: Math.ceil(count / limit),
+                        total: count
+                    }
+                }
+            };
+        } catch (error) {
+            throw error;
+        }
+    },
+
+    // =============
+    // Get Messages
+    // =============
+    async getMessages(conversation_id, offset, limit, current_id) {
+        try {
+            const { data: messages, error } = await UserModel.getMessages(conversation_id, offset, limit, current_id);
+            console.log("Backend-user.service.js-getMessages: ", error);
+            if (error) {
+                throw new Error("Failed to get messages");
+            }
+            return {
+                data: {
+                    messages
+                }
+            };
+        } catch (error) {
+            throw error;
+        }
+    },
 };
