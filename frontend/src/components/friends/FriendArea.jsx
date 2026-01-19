@@ -1,4 +1,4 @@
-//import { getConversationsApi } from "@/api/conversations";
+import { getConversationsApi } from "@/api/conversations";
 import { useState, useEffect, useRef } from "react";
 import { PaginationSection } from "@/components/common/PaginationSection";
 
@@ -27,7 +27,7 @@ function FriendArea() {
     useEffect(() => {
         const fetchConversations = async () => {
             try {
-                // const data = await getConversationsApi(page, limit, search);
+                const data = await getConversationsApi(page, limit, search);
                 setConversations(data.data.conversations);
                 setTotalPages(data.data.pagination.totalPages);
             } catch (error) {

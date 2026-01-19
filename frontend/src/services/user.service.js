@@ -274,6 +274,29 @@ export async function removeFriendApi(friend_id) {
     console.log("Fontend-User-Service: Remove friend API output: ", data);
 }
 
+// get all my conversation
+export async function getAllMyConversationsApi(page, limit, search) {
+    console.log("Fontend-User-Service: Get all my conversations API input: ", page, limit, search);
+
+    const response = await fetch(`/api/user/all-my-conversations?page=${page}&limit=${limit}&search=${search}`, {
+        method: "GET",
+        credentials: "include",
+        headers: {
+            "Content-Type": "application/json",
+            "x-api-key": import.meta.env.VITE_API_KEY,
+        },
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+        throw new Error(data.message || data.error || "Get all my conversations failed");
+    }
+
+    console.log("Fontend-User-Service: Get all my conversations API output: ", data);
+    return data;
+}
+
 
 
 
