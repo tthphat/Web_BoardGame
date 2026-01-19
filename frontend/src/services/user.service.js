@@ -205,3 +205,57 @@ export async function addFriendApi(user_id) {
     console.log("Fontend-User-Service: Add friend API output: ", data);
     return data;
 }
+
+// Accept friend request
+export async function acceptFriendApi(sender_id) {
+    console.log("Fontend-User-Service: Accept friend API input: ", sender_id);
+
+    const response = await fetch(`/api/user/accept-friend`, {
+        method: "POST",
+        credentials: "include",
+        headers: {
+            "Content-Type": "application/json",
+            "x-api-key": import.meta.env.VITE_API_KEY,
+        },
+        body: JSON.stringify({ sender_id }),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+        throw new Error(data.message || data.error || "Accept friend failed");
+    }
+
+    console.log("Fontend-User-Service: Accept friend API output: ", data);
+    return data;
+}
+
+// Reject friend request
+export async function rejectFriendApi(sender_id) {
+    console.log("Fontend-User-Service: Reject friend API input: ", sender_id);
+
+    const response = await fetch(`/api/user/reject-friend`, {
+        method: "POST",
+        credentials: "include",
+        headers: {
+            "Content-Type": "application/json",
+            "x-api-key": import.meta.env.VITE_API_KEY,
+        },
+        body: JSON.stringify({ sender_id }),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+        throw new Error(data.message || data.error || "Reject friend failed");
+    }
+
+    console.log("Fontend-User-Service: Reject friend API output: ", data);
+    return data;
+}
+
+
+
+
+
+
