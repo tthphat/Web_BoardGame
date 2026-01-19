@@ -107,5 +107,15 @@ export const useDrawing = (isPlaying) => {
     toggleEraser,
     clearCanvas,
     getPixelColor,
+    getGameState: () => ({
+      canvas,
+      selectedColor,
+      isErasing,
+      config: {
+        type: 'drawing',
+        rows: config.rows,
+        cols: config.cols
+      }
+    }),
   };
 };

@@ -32,20 +32,20 @@ const getCellIndex = (r, c) => {
     // Cell boundaries (each cell is 3 units, grid lines at 5 and 9)
     // Rows: 2-4 → row 0, 6-8 → row 1, 10-12 → row 2
     // Cols: 2-4 → col 0, 6-8 → col 1, 10-12 → col 2
-    
+
     let cellRow = -1;
     let cellCol = -1;
-    
+
     if (r >= 2 && r <= 4) cellRow = 0;
     else if (r >= 6 && r <= 8) cellRow = 1;
     else if (r >= 10 && r <= 12) cellRow = 2;
-    
+
     if (c >= 2 && c <= 4) cellCol = 0;
     else if (c >= 6 && c <= 8) cellCol = 1;
     else if (c >= 10 && c <= 12) cellCol = 2;
-    
+
     if (cellRow === -1 || cellCol === -1) return -1;
-    
+
     return cellRow * 3 + cellCol;
 };
 
@@ -109,16 +109,16 @@ export const useTicTacToe = (isPlaying, botEnabled = false) => {
     const makeBotMove = useCallback((currentBoard) => {
         const emptyCells = getEmptyCells(currentBoard);
         if (emptyCells.length === 0) return;
-        
+
         // Chọn random một ô trống
         const randomIndex = Math.floor(Math.random() * emptyCells.length);
         const botMove = emptyCells[randomIndex];
-        
+
         // Đặt quân O
         const newBoard = [...currentBoard];
         newBoard[botMove] = 'O';
         setBoard(newBoard);
-        
+
         // Kiểm tra thắng
         const result = checkWinnerResult(newBoard);
         if (result) {
@@ -133,12 +133,12 @@ export const useTicTacToe = (isPlaying, botEnabled = false) => {
     useEffect(() => {
         if (!isPlaying || !botEnabled || winner) return;
         if (currentPlayer !== 'O') return;
-        
+
         // Delay 500ms để người chơi thấy rõ nước đi
         const timer = setTimeout(() => {
             makeBotMove(board);
         }, 500);
-        
+
         return () => clearTimeout(timer);
     }, [currentPlayer, isPlaying, botEnabled, winner, board, makeBotMove]);
 
@@ -192,7 +192,7 @@ export const useTicTacToe = (isPlaying, botEnabled = false) => {
 
             if (cellValue === 'X') {
                 // Check if this pixel is part of X shape
-                const isX = X_SHAPE.some(({ dr, dc }) => 
+                const isX = X_SHAPE.some(({ dr, dc }) =>
                     r === center.r + dr && c === center.c + dc
                 );
                 if (isX) {
@@ -200,7 +200,7 @@ export const useTicTacToe = (isPlaying, botEnabled = false) => {
                 }
             } else if (cellValue === 'O') {
                 // Check if this pixel is part of O shape
-                const isO = O_SHAPE.some(({ dr, dc }) => 
+                const isO = O_SHAPE.some(({ dr, dc }) =>
                     r === center.r + dr && c === center.c + dc
                 );
                 if (isO) {
@@ -221,6 +221,19 @@ export const useTicTacToe = (isPlaying, botEnabled = false) => {
         setWinningLine([]);
     };
 
+    // Get serialized game state for saving
+    const getGameState = () => {
+        return {
+            board: board,
+            currentPlayer: currentPlayer,
+            winner: winner,
+            score: score,
+            config: {
+                type: 'tic-tac-toe'
+            }
+        };
+    };
+
     return {
         board,
         currentPlayer,
@@ -231,5 +244,6 @@ export const useTicTacToe = (isPlaying, botEnabled = false) => {
         handlePixelClick,
         getPixelColor,
         resetGame,
+        getGameState,
     };
 };
