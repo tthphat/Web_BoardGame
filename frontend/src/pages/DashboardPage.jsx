@@ -5,6 +5,8 @@ import ColorPalette from '../components/games/ColorPalette';
 import { useMemoryGame } from '../hooks/useMemoryGame';
 import { useDrawing } from '../hooks/useDrawing';
 import { useEnabledGames } from '../hooks/useEnabledGames';
+import { useGameStats } from '../hooks/useGameStats';
+import { useAuth } from '../contexts/AuthContext';
 import { toast } from 'sonner';
 import { getGameConfig } from '../config/gameRegistry';
 import { useSettings } from '../contexts/SettingsContext';
@@ -12,6 +14,9 @@ import { useSettings } from '../contexts/SettingsContext';
 const DashboardPage = () => {
   // Fetch enabled games from backend
   const { enabledScreens, loading: gamesLoading } = useEnabledGames();
+  
+  // Auth context for checking login status
+  const { user } = useAuth();
 
   // Danh sách các màn hình từ backend (filtered)
   const screens = enabledScreens;
@@ -20,6 +25,7 @@ const DashboardPage = () => {
   const [currentScreenIndex, setCurrentScreenIndex] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
   const [score, setScore] = useState(0);
+  const [gameEndHandled, setGameEndHandled] = useState(false);
 
   // Game state chung cho tất cả games (thay vì nhiều state riêng lẻ)
   const [gameState, setGameState] = useState({});
@@ -29,9 +35,71 @@ const DashboardPage = () => {
 
   const currentScreenName = screens[currentScreenIndex] || 'HEART';
   const currentConfig = getGameConfig(currentScreenName);
+  
+  // Game stats hook
+  const { recordGameEnd } = useGameStats(currentConfig?.slug, !!user);
 
   // Drawing hook - cần screen name
   const drawingGame = useDrawing(isPlaying && currentScreenName === 'DRAWING');
+
+  // Effect to handle game end and record stats
+  useEffect(() => {
+    // Skip if not playing, already handled, or no config
+    if (!isPlaying || gameEndHandled || !currentConfig) return;
+
+    const handleGameEnd = async (result) => {
+      console.log(`[GameStats] 🎮 Game End Detected: ${currentScreenName}`, result);
+      setGameEndHandled(true);
+      
+      console.log(`[GameStats] 📤 Calling API to record stats...`);
+      const response = await recordGameEnd(result);
+      console.log(`[GameStats] 📥 API Response:`, response);
+      
+      if (response?.stats?.newBestScore) {
+        console.log(`[GameStats] 🏆 NEW HIGH SCORE! Best: ${response.stats.bestScore}`);
+        toast.success('🎉 New High Score!', {
+          description: `Best: ${response.stats.bestScore}`
+        });
+      } else if (response?.stats?.newBestTime) {
+        console.log(`[GameStats] ⏱️ NEW BEST TIME! Best: ${response.stats.bestTimeSeconds}s`);
+        toast.success('⏱️ New Best Time!', {
+          description: `Best: ${response.stats.bestTimeSeconds}s`
+        });
+      }
+    };
+
+    // Check for game end conditions
+    // Snake game over
+    if (currentScreenName === 'SNAKE' && gameState.isGameOver) {
+      console.log(`[GameStats] 🐍 Snake Game Over detected! Score: ${score}`);
+      handleGameEnd({ score, won: false });
+    }
+    
+    // Memory game - check if gameState is 'finished' (all cards matched) or 'timeout'
+    if (currentScreenName === 'MEMORY' && (memoryGame.gameState === 'finished' || memoryGame.gameState === 'timeout')) {
+      const won = memoryGame.gameState === 'finished';
+      const timeUsed = 30 - memoryGame.timeLeft; // TIME_LIMIT is 30 seconds
+      console.log(`[GameStats] 🃏 Memory Game ended! State: ${memoryGame.gameState}, Score: ${memoryGame.score}, Time: ${timeUsed}s`);
+      handleGameEnd({ 
+        score: memoryGame.score, 
+        won,
+        timeSeconds: timeUsed
+      });
+    }
+    
+    // TicTacToe/Caro - winner determined
+    if (['TICTACTOE', 'CARO4', 'CARO5'].includes(currentScreenName) && gameState.winner) {
+      const won = gameState.winner === 'BLUE' || gameState.winner === 'X';
+      console.log(`[GameStats] ⭕ ${currentScreenName} ended! Winner: ${gameState.winner}, Player won: ${won}`);
+      handleGameEnd({ 
+        score: won ? 1 : 0,
+        won
+      });
+    }
+    
+    // Note: Match3 is a continuous game without a defined "game over" state
+    // Stats would need to be recorded differently (e.g., on manual exit or time limit)
+  }, [isPlaying, gameState, memoryGame.gameState, memoryGame.score, memoryGame.timeLeft, currentScreenName, score, currentConfig, recordGameEnd, gameEndHandled]);
 
   // Sync memoryGame score với score state
   useEffect(() => {
@@ -46,6 +114,7 @@ const DashboardPage = () => {
     setGameState(config?.initialState || {});
     setIsPlaying(false);
     setScore(0);
+    setGameEndHandled(false);
   };
 
   // Hàm chuyển màn hình sang TRÁI
@@ -73,6 +142,7 @@ const DashboardPage = () => {
     if (gameState.winner && gameState.resetGame) {
       gameState.resetGame();
       setGameState({ ...config.initialState, resetGame: gameState.resetGame });
+      setGameEndHandled(false);
       return;
     }
 
@@ -83,12 +153,14 @@ const DashboardPage = () => {
         gameState.resetGame();
         setScore(0);
         setGameState(prev => ({ ...prev, isGameOver: false }));
+        setGameEndHandled(false);
         return;
       }
       // Chưa chơi -> bắt đầu chơi
       if (!isPlaying) {
         setIsPlaying(true);
         setScore(0);
+        setGameEndHandled(false);
         return;
       }
       return;
@@ -99,6 +171,7 @@ const DashboardPage = () => {
       setIsPlaying(true);
       setScore(0);
       setGameState(config.initialState);
+      setGameEndHandled(false);
 
       // Memory game cần init riêng
       if (currentScreenName === 'MEMORY') {

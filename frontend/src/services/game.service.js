@@ -4,6 +4,7 @@ export async function getEnabledGamesApi() {
         method: "GET",
         headers: {
             "Content-Type": "application/json",
+            "x-api-key": import.meta.env.VITE_API_KEY,
         },
     });
 
@@ -23,6 +24,7 @@ export async function getAllGamesApi() {
         credentials: "include",
         headers: {
             "Content-Type": "application/json",
+            "x-api-key": import.meta.env.VITE_API_KEY,
         },
     });
 
@@ -42,6 +44,7 @@ export async function toggleGameApi(gameId, enabled) {
         credentials: "include",
         headers: {
             "Content-Type": "application/json",
+            "x-api-key": import.meta.env.VITE_API_KEY,
         },
         body: JSON.stringify({ gameId, enabled }),
     });
@@ -62,6 +65,7 @@ export async function finishGameApi(gameSlug, result) {
         credentials: "include",
         headers: {
             "Content-Type": "application/json",
+            "x-api-key": import.meta.env.VITE_API_KEY,
         },
         body: JSON.stringify({ gameSlug, result }),
     });
@@ -74,3 +78,44 @@ export async function finishGameApi(gameSlug, result) {
 
     return data;
 }
+
+// Get leaderboard for a game (public)
+export async function getLeaderboardApi(gameSlug, limit = 10) {
+    const response = await fetch(`/api/games/${gameSlug}/leaderboard?limit=${limit}`, {
+        method: "GET",
+        headers: {
+            "Content-Type": "application/json",
+            "x-api-key": import.meta.env.VITE_API_KEY,
+        },
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+        throw new Error(data.message || data.error || "Failed to fetch leaderboard");
+    }
+
+    return data;
+}
+
+// Get current user's game stats (authenticated)
+export async function getUserStatsApi() {
+    const response = await fetch("/api/games/my-stats", {
+        method: "GET",
+        credentials: "include",
+        headers: {
+            "Content-Type": "application/json",
+            "x-api-key": import.meta.env.VITE_API_KEY,
+        },
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+        throw new Error(data.message || data.error || "Failed to fetch user stats");
+    }
+
+    return data;
+}
+
+
