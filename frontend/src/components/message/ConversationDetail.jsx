@@ -2,7 +2,7 @@ import { useParams } from "react-router-dom";
 import { UserRound, Send, Phone, Video, MoreVertical } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
-import { getMessagesApi } from "@/services/user.service";
+import { getMessagesApi, sendMessageApi } from "@/services/user.service";
 
 function ConversationDetail() {
     const { id } = useParams();
@@ -27,21 +27,43 @@ function ConversationDetail() {
         scrollToBottom();
     }, [messages]);
 
+
+    // Handle load more messages
+    const handleLoadMore = async () => {
+        if (!hasMore) return;
+
+        try {
+            const res = await getMessagesApi(id, offset, limit);
+            setMessages((prevMessages) => [...res.data.messages, ...prevMessages]);
+            setOffset((prevOffset) => prevOffset + res.data.messages.length);
+            setHasMore(res.data.messages.length === limit);
+        } catch (error) {
+            console.error("Error fetching more messages:", error);
+        }
+    };
+
+
     // Handle send message
-    const handleSendMessage = (e) => {
+    const handleSendMessage = async (e) => {
         e.preventDefault();
+
         if (!inputMessage.trim()) return;
 
-        const newMessage = {
-            id: messages.length + 1,
-            sender_id: currentUserId,
-            content: inputMessage,
-            created_at: new Date().toISOString()
-        };
+        try {
+            const res = await sendMessageApi({
+                conversation_id: id,
+                content: inputMessage
+            });
 
-        setMessages([...messages, newMessage]);
-        setInputMessage("");
+            // dùng message THẬT từ backend
+            setMessages((prev) => [...prev, res.data]);
+
+            setInputMessage("");
+        } catch (error) {
+            console.error("Error sending message:", error);
+        }
     };
+
 
     // fetch messages from API
     const fetchMessages = async () => {
@@ -59,20 +81,6 @@ function ConversationDetail() {
     useEffect(() => {
         fetchMessages();
     }, [id]);
-
-    // Handle load more messages
-    const handleLoadMore = async () => {
-        if (!hasMore) return;
-
-        try {
-            const res = await getMessagesApi(id, offset, limit);
-            setMessages((prevMessages) => [...res.data.messages, ...prevMessages]);
-            setOffset((prevOffset) => prevOffset + res.data.messages.length);
-            setHasMore(res.data.messages.length === limit);
-        } catch (error) {
-            console.error("Error fetching more messages:", error);
-        }
-    };
 
     if (loading) return <div className="h-full flex items-center justify-center">Loading...</div>; // Or use Loading component if imported
 
