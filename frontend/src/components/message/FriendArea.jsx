@@ -16,12 +16,12 @@ function FriendArea() {
     const [users, setUsers] = useState([]);
     const searchRef = useRef("");
     const navigate = useNavigate();
-    const location = useLocation();
+
 
     const handleStartNewChat = async (userId) => {
         const res = await checkExistConversationApi(userId);
         if (res.data.conversation) {
-            navigate(`/messages/${res.data.conversation.id}`);
+            navigate(`/messages/${res.data.conversation.conversation_id}`);
         } else {
             navigate(`/messages/new/${userId}`);
         }
