@@ -121,8 +121,12 @@ export const GAME_REGISTRY = {
     hideOutsideDots: true,
     hasWrapper: true,
     externalState: null,
-    initialState: { score: 0 },
-    getStatusText: (state, isPlaying) => isPlaying ? '(PLAYING)' : '',
+    initialState: { score: 0, timeLeft: 60, isGameOver: false },
+    getStatusText: (state, isPlaying) => {
+      if (!isPlaying) return '';
+      if (state.isGameOver) return '- TIME UP!';
+      return '- Playing';
+    },
   },
   MEMORY: {
     name: 'Memory Card',

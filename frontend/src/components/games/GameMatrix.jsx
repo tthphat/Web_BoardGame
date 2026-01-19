@@ -237,6 +237,7 @@ const GameMatrix = ({
           ref={gameRefs.match3}
           isPlaying={isPlaying && screen === 'MATCH3'}
           onScoreUpdate={screen === 'MATCH3' ? onScoreUpdate : undefined}
+          onGameStateUpdate={screen === 'MATCH3' ? onGameStateUpdate : undefined}
           onBoardUpdate={screen === 'MATCH3' ? handleBoardUpdate : undefined}
         />
       )}

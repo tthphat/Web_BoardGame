@@ -150,11 +150,13 @@ export const Caro5Wrapper = forwardRef(({ isPlaying, botEnabled, onGameStateUpda
 Caro5Wrapper.displayName = 'Caro5Wrapper';
 
 // ===== MATCH3 WRAPPER =====
-export const Match3Wrapper = forwardRef(({ isPlaying, onScoreUpdate, onBoardUpdate }, ref) => {
+export const Match3Wrapper = forwardRef(({ isPlaying, onScoreUpdate, onGameStateUpdate, onBoardUpdate }, ref) => {
   const game = useMatch3(isPlaying);
   const callbackRef = useRef(onScoreUpdate);
+  const stateCallbackRef = useRef(onGameStateUpdate);
   const boardUpdateRef = useRef(onBoardUpdate);
   const prevScoreRef = useRef(null);
+  const prevStateRef = useRef({ timeLeft: null, isGameOver: null });
   
   // Lưu game vào ref để luôn lấy được giá trị mới nhất
   const gameRef = useRef(game);
@@ -163,6 +165,10 @@ export const Match3Wrapper = forwardRef(({ isPlaying, onScoreUpdate, onBoardUpda
   useEffect(() => {
     callbackRef.current = onScoreUpdate;
   }, [onScoreUpdate]);
+
+  useEffect(() => {
+    stateCallbackRef.current = onGameStateUpdate;
+  }, [onGameStateUpdate]);
   
   useEffect(() => {
     boardUpdateRef.current = onBoardUpdate;
@@ -200,6 +206,23 @@ export const Match3Wrapper = forwardRef(({ isPlaying, onScoreUpdate, onBoardUpda
       callbackRef.current(game.score);
     }
   }, [game.score, isPlaying]);
+
+  // Gọi onGameStateUpdate khi timeLeft hoặc isGameOver thay đổi
+  useEffect(() => {
+    if (!isPlaying || !stateCallbackRef.current) return;
+    
+    const prevState = prevStateRef.current;
+    const hasChanged = prevState.timeLeft !== game.timeLeft || 
+                       prevState.isGameOver !== game.isGameOver;
+    
+    if (hasChanged) {
+      prevStateRef.current = { timeLeft: game.timeLeft, isGameOver: game.isGameOver };
+      stateCallbackRef.current({
+        timeLeft: game.timeLeft,
+        isGameOver: game.isGameOver,
+      });
+    }
+  }, [game.timeLeft, game.isGameOver, isPlaying]);
 
   return null;
 });

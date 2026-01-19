@@ -260,7 +260,7 @@ export const useMatch3 = (isPlaying) => {
     };
 
     const handlePixelClick = (r, c) => {
-        if (!isPlaying || isAnimating) return;
+        if (!isPlaying || isAnimating || isGameOver) return;
 
         if (!selected) {
             setSelected({ r, c });
