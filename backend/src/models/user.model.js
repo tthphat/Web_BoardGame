@@ -493,7 +493,7 @@ export const UserModel = {
                     "m.content",
                     "m.created_at"
                 )
-                .orderBy("m.created_at", "asc")
+                .orderBy("m.created_at", "desc")
                 .offset(offset)
                 .limit(limit);
 

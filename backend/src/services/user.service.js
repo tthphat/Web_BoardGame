@@ -381,7 +381,7 @@ export const UserService = {
 
             return {
                 data: {
-                    messages,
+                    messages: messages.reverse(),
                     partner
                 }
             };
