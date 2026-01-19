@@ -84,6 +84,7 @@ export async function getLeaderboardApi(gameSlug, limit = 10, options = {}) {
     let url = `/api/games/${gameSlug}/leaderboard?limit=${limit}`;
     if (options.filter) url += `&filter=${options.filter}`;
     if (options.userId) url += `&userId=${options.userId}`;
+    if (options.page) url += `&page=${options.page}`;
 
     const response = await fetch(url, {
         method: "GET",

@@ -17,6 +17,8 @@ const RankingPage = () => {
     const [friends, setFriends] = useState([]);
     const [filterMode, setFilterMode] = useState('global'); // 'global', 'friends_only', 'specific_user'
     const [targetUserId, setTargetUserId] = useState(null);
+    const [page, setPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(1);
 
     // Hook to get enabled games
     const { enabledScreens } = useEnabledGames();
@@ -50,8 +52,11 @@ const RankingPage = () => {
                 const slug = GAME_REGISTRY[selectedGame]?.slug;
                 if (!slug) throw new Error("Invalid game configuration");
 
-                const response = await getLeaderboardApi(slug, 20, options); // Get top 20
+                const response = await getLeaderboardApi(slug, 20, { ...options, page }); // Get top 20
                 setLeaderboardData(response.data);
+                if (response.pagination) {
+                    setTotalPages(response.pagination.totalPages);
+                }
             } else {
                 // Fetch all leaderboards (summary)
                 const response = await getAllLeaderboardsApi(5, options); // Get top 5 for summary
@@ -64,7 +69,7 @@ const RankingPage = () => {
         } finally {
             setLoading(false);
         }
-    }, [selectedGame, filterMode, targetUserId]);
+    }, [selectedGame, filterMode, targetUserId, page]);
 
     useEffect(() => {
         fetchLeaderboard();
@@ -187,7 +192,10 @@ const RankingPage = () => {
             {/* Game Tabs */}
             <div className="flex flex-wrap gap-0 px-1">
                 <button
-                    onClick={() => setSelectedGame(null)}
+                    onClick={() => {
+                        setSelectedGame(null);
+                        setPage(1);
+                    }}
                     className={`px-3 py-1 text-[10px] font-bold uppercase transition-all relative ${!selectedGame
                         ? 'bg-retro-silver border-2 border-t-retro-shadow border-l-retro-shadow border-b-transparent border-r-retro-shadow z-10 -mb-[2px] pt-1.5 dark:bg-[#2d2d2d] dark:border-t-[#000] dark:border-l-[#000] dark:border-r-[#555]'
                         : 'bg-[#b0b0b0] border-2 border-t-retro-highlight border-l-retro-highlight border-b-retro-shadow border-r-retro-shadow hover:bg-retro-silver dark:bg-[#1a1a1a] dark:border-t-[#555] dark:border-l-[#555] dark:border-b-[#000] dark:border-r-[#000] dark:hover:bg-[#2d2d2d]'
@@ -198,7 +206,10 @@ const RankingPage = () => {
                 {enabledScreens.filter(key => key !== 'HEART' && key !== 'DRAWING').map((gameKey) => (
                     <button
                         key={gameKey}
-                        onClick={() => setSelectedGame(gameKey)}
+                        onClick={() => {
+                            setSelectedGame(gameKey);
+                            setPage(1);
+                        }}
                         className={`px-3 py-1 text-[10px] font-bold uppercase transition-all relative ${selectedGame === gameKey
                             ? 'bg-retro-silver border-2 border-t-retro-shadow border-l-retro-shadow border-b-transparent border-r-retro-shadow z-10 -mb-[2px] pt-1.5 dark:bg-[#2d2d2d] dark:border-t-[#000] dark:border-l-[#000] dark:border-r-[#555]'
                             : 'bg-[#b0b0b0] border-2 border-t-retro-highlight border-l-retro-highlight border-b-retro-shadow border-r-retro-shadow hover:bg-retro-silver dark:bg-[#1a1a1a] dark:border-t-[#555] dark:border-l-[#555] dark:border-b-[#000] dark:border-r-[#000] dark:hover:bg-[#2d2d2d]'
@@ -237,6 +248,7 @@ const RankingPage = () => {
                                     setFilterMode('specific_user');
                                     setTargetUserId(val);
                                 }
+                                setPage(1);
                             }}
                             className="bg-white border-2 border-t-retro-shadow border-l-retro-shadow border-b-retro-highlight border-r-retro-highlight text-xs py-1 pl-2 pr-8 min-w-[150px] focus:outline-none dark:bg-[#3d3d3d] dark:border-t-[#000] dark:border-l-[#000] dark:border-b-[#555] dark:border-r-[#555]"
                         >
@@ -306,6 +318,29 @@ const RankingPage = () => {
                     </>
                 )}
             </div>
+
+            {/* Pagination Controls - Only for Single Game View */}
+            {selectedGame && !loading && !error && (
+                <div className="flex justify-center items-center gap-4 py-2">
+                    <button
+                        disabled={page === 1}
+                        onClick={() => setPage(p => Math.max(1, p - 1))}
+                        className="px-3 py-1 bg-retro-silver border-2 border-t-retro-highlight border-l-retro-highlight border-b-retro-shadow border-r-retro-shadow active:border-t-retro-shadow active:border-l-retro-shadow active:border-b-retro-highlight active:border-r-retro-highlight disabled:opacity-50 disabled:grayscale text-xs font-bold uppercase dark:bg-[#3d3d3d] dark:border-t-[#555] dark:border-l-[#555] dark:border-b-[#000] dark:border-r-[#000]"
+                    >
+                        ◀ Prev
+                    </button>
+                    <span className="text-xs font-bold uppercase dark:text-gray-300">
+                        Page {page} of {totalPages}
+                    </span>
+                    <button
+                        disabled={page >= totalPages}
+                        onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+                        className="px-3 py-1 bg-retro-silver border-2 border-t-retro-highlight border-l-retro-highlight border-b-retro-shadow border-r-retro-shadow active:border-t-retro-shadow active:border-l-retro-shadow active:border-b-retro-highlight active:border-r-retro-highlight disabled:opacity-50 disabled:grayscale text-xs font-bold uppercase dark:bg-[#3d3d3d] dark:border-t-[#555] dark:border-l-[#555] dark:border-b-[#000] dark:border-r-[#000]"
+                    >
+                        Next ▶
+                    </button>
+                </div>
+            )}
 
             {/* Status Bar */}
             <div className="bg-retro-silver border-2 border-t-retro-shadow border-l-retro-shadow border-b-retro-highlight border-r-retro-highlight px-2 py-0.5 flex justify-between text-[10px] font-bold uppercase text-gray-700 dark:bg-[#2d2d2d] dark:border-t-[#555] dark:border-l-[#555] dark:border-b-black dark:border-r-black">
