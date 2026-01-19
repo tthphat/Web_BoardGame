@@ -2,7 +2,7 @@ import { useParams } from "react-router-dom";
 import { UserRound, Send, Phone, Video, MoreVertical } from "lucide-react";
 import { useState, useRef, useEffect, useLayoutEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
-import { fetchUserApi, getMessagesApi, sendMessageApi } from "@/services/user.service";
+import { fetchUserApi, getMessagesApi, sendMessageApi, sendFirstMessageApi } from "@/services/user.service";
 
 function ConversationDetail() {
     const { id, userId } = useParams();

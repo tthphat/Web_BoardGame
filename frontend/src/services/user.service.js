@@ -390,3 +390,27 @@ export async function fetchUserApi(userId) {
     return data;
 }
 
+// send first message
+export async function sendFirstMessageApi(userId, message) {
+    console.log("Fontend-User-Service: Send first message API input: ", userId, message);
+
+    const response = await fetch(`/api/user/conversations/${userId}/messages`, {
+        method: "POST",
+        credentials: "include",
+        headers: {
+            "Content-Type": "application/json",
+            "x-api-key": import.meta.env.VITE_API_KEY,
+        },
+        body: JSON.stringify({ content: message }),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+        throw new Error(data.message || data.error || "Send first message failed");
+    }
+
+    console.log("Fontend-User-Service: Send first message API output: ", data);
+    return data;
+}
+
