@@ -4,7 +4,8 @@ import {
     getAllGamesApi,
     updateGameStateApi,
     getAllBoardConfigsApi,
-    updateBoardConfigApi
+    updateBoardConfigApi,
+    activateBoardConfigApi
 } from '../../../services/admin.service';
 import { toast } from 'sonner';
 
@@ -67,6 +68,23 @@ const GameConfig = () => {
             toast.success(`Config for ${config.code} saved successfully`);
         } catch (error) {
             toast.error("Failed to save configuration");
+        } finally {
+            setSaving(null);
+        }
+    };
+
+    // Handle Config Apply (Notify Games)
+    const handleApplyConfig = async (config) => {
+        setSaving(config.id);
+        try {
+            await activateBoardConfigApi(config.id);
+            setConfigs(prev => prev.map(c => ({
+                ...c,
+                is_active: c.id === config.id
+            })));
+            toast.success(`Configuration '${config.code}' applied successfully!`);
+        } catch (error) {
+            toast.error("Failed to apply configuration");
         } finally {
             setSaving(null);
         }
@@ -160,7 +178,7 @@ const GameConfig = () => {
                                             onChange={(e) => handleConfigChange(config.id, 'gap', e.target.value)}
                                         />
                                     </td>
-                                    <td className="p-3 text-center">
+                                    <td className="p-3 text-center flex gap-2 justify-center">
                                         <button
                                             onClick={() => handleSaveConfig(config)}
                                             disabled={saving === config.id}
@@ -168,6 +186,14 @@ const GameConfig = () => {
                                         >
                                             {saving === config.id ? <RefreshCw size={14} className="animate-spin" /> : <Save size={14} />}
                                             SAVE
+                                        </button>
+                                        <button
+                                            onClick={() => handleApplyConfig(config)}
+                                            disabled={saving === config.id}
+                                            className="flex items-center justify-center gap-1 px-3 py-1 bg-[#c0c0c0] hover:bg-[#dcdcdc] text-black border-2 border-b-black border-r-black border-t-white border-l-white active:border-t-black active:border-l-black active:border-b-white active:border-r-white disabled:opacity-50"
+                                        >
+                                            {saving === config.id ? <RefreshCw size={14} className="animate-spin" /> : <Settings size={14} />}
+                                            APPLY
                                         </button>
                                     </td>
                                 </tr>

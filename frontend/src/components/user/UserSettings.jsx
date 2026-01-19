@@ -8,25 +8,20 @@ const UserSettings = () => {
     const {
         controls,
         setControls,
-        boardConfigId,
-        setBoardConfigId,
-        availableConfigs
     } = useSettings();
 
     // Local state for deferred saving
     const [localControls, setLocalControls] = useState(controls);
-    const [localBoardId, setLocalBoardId] = useState(boardConfigId);
 
     // Sync local state when global state changes (e.g. initial load)
     useEffect(() => {
         setLocalControls(controls);
-        setLocalBoardId(boardConfigId);
-    }, [controls, boardConfigId]);
+    }, [controls]);
 
     // Check for unsaved changes
     const isDirty = useMemo(() => {
-        return localControls !== controls || localBoardId !== boardConfigId;
-    }, [localControls, localBoardId, controls, boardConfigId]);
+        return localControls !== controls;
+    }, [localControls, controls]);
 
     // Block navigation if dirty
     const blocker = useBlocker(
@@ -35,17 +30,14 @@ const UserSettings = () => {
 
     const handleSave = () => {
         setControls(localControls);
-        setBoardConfigId(localBoardId);
         toast.success("Settings saved successfully!");
     };
 
     const handleReset = () => {
         // Reset to defaults
         const defaultControls = 'ARROWS';
-        const defaultBoardId = null;
 
         setLocalControls(defaultControls);
-        setLocalBoardId(defaultBoardId);
 
         toast.info("Settings reset to default. Click Save to apply.");
     };
@@ -105,37 +97,7 @@ const UserSettings = () => {
                     </div>
                 </div>
 
-                {/* 2. Board Settings */}
-                <div className="bg-[#c0c0c0] p-1 border-2 border-t-white border-l-white border-b-black border-r-black">
-                    <div className="bg-[#e0e0e0] p-4 border-2 border-t-[#808080] border-l-[#808080] border-b-white border-r-white h-full">
-                        <div className="flex items-center gap-2 mb-4 text-[#000080] dark:text-[#000080] font-bold border-b border-gray-400 pb-2">
-                            <Grid size={20} />
-                            <h3>BOARD DISPLAY CONFIG</h3>
-                        </div>
 
-                        <div className="space-y-2">
-                            <p className="text-sm mb-2 text-black dark:text-black">Select your preferred board size for supported games (Snake, etc.):</p>
-
-                            <select
-                                value={localBoardId || ''}
-                                onChange={(e) => setLocalBoardId(e.target.value ? parseInt(e.target.value) : null)}
-                                className="w-full p-2 bg-white border-2 border-t-[#808080] border-l-[#808080] border-b-white border-r-white outline-none font-mono text-black"
-                            >
-                                {availableConfigs.map(config => (
-                                    <option key={config.id} value={config.id}>
-                                        {config.code} ({config.cols}x{config.rows}, Dot: {config.dot_size}px)
-                                    </option>
-                                ))}
-                            </select>
-
-                            {localBoardId && (
-                                <div className="mt-4 p-2 bg-yellow-100 border border-yellow-300 text-yellow-800 text-xs">
-                                    <p>Note: Some competitive games may enforce standard board sizes regardless of this setting.</p>
-                                </div>
-                            )}
-                        </div>
-                    </div>
-                </div>
             </div>
 
             <div className="flex justify-end pt-4 gap-4">

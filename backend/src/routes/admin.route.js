@@ -13,5 +13,6 @@ router.patch("/games/:id/state", AdminController.updateGameState);
 // Board Config Management
 router.get("/board-configs", AdminController.getAllBoardConfigs);
 router.put("/board-configs/:id", AdminController.updateBoardConfig);
+router.put("/board-configs/:id/activate", AdminController.activateBoardConfig);
 
 export default router;

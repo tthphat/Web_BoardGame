@@ -200,19 +200,16 @@ const DashboardPage = () => {
         <div className="flex-1 flex flex-row border-2 border-t-[#808080] border-l-[#808080] border-b-white border-r-white dark:border-t-black dark:border-l-black dark:border-b-[#555] dark:border-r-[#555] p-1 overflow-hidden">
 
           <div className="flex-1 bg-black border-2 border-t-black border-l-black border-b-white border-r-white relative flex flex-col items-center justify-center overflow-hidden p-4">
-
-            <div className="scale-75 md:scale-100 lg:scale-110 transition-transform">
-              <GameMatrix
-                screen={currentScreenName}
-                isPlaying={isPlaying}
-                onScoreUpdate={handleScoreUpdate}
-                onCardClick={memoryGame.handleCardClick}
-                activeGameState={memoryGame}
-                botEnabled={true}
-                onGameStateUpdate={handleGameStateUpdate}
-                drawingState={drawingGame}
-              />
-            </div>
+            <GameMatrix
+              screen={currentScreenName}
+              isPlaying={isPlaying}
+              onScoreUpdate={handleScoreUpdate}
+              onCardClick={memoryGame.handleCardClick}
+              activeGameState={memoryGame}
+              botEnabled={true}
+              onGameStateUpdate={handleGameStateUpdate}
+              drawingState={drawingGame}
+            />
           </div >
 
           {/* CỘT PHẢI: ĐIỀU KHIỂN */}

@@ -30,5 +30,26 @@ export const BoardConfigModel = {
             console.error("BoardConfigModel.update error:", error);
             return { data: null, error };
         }
+    },
+
+    // Activate a board config
+    async activate(id) {
+        try {
+            await knex.transaction(async (trx) => {
+                // Deactivate all
+                await trx("board_configs")
+                    .update({ is_active: false, updated_at: new Date() });
+
+                // Activate target
+                await trx("board_configs")
+                    .where({ id })
+                    .update({ is_active: true, updated_at: new Date() });
+            });
+
+            return { data: { success: true }, error: null };
+        } catch (error) {
+            console.error("BoardConfigModel.activate error:", error);
+            return { data: null, error };
+        }
     }
 };
