@@ -480,4 +480,21 @@ export const UserService = {
             throw error;
         }
     },
+
+    // check exist conversation
+    async checkExistConversation(friend_id, current_id) {
+        try {
+            const { data: conversation, error } = await UserModel.checkExistConversation(friend_id, current_id);
+            if (error) {
+                throw new Error("Failed to check exist conversation");
+            }
+            return {
+                data: {
+                    conversation
+                }
+            };
+        } catch (error) {
+            throw error;
+        }
+    },
 };

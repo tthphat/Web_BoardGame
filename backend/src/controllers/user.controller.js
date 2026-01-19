@@ -338,5 +338,21 @@ export const UserController = {
         }
     },
 
+    // =============
+    // Check Exist Conversation
+    // =============
+    async checkExistConversation(req, res, next) {
+        try {
+            const { id } = req.params;
+            const conversation = await UserService.checkExistConversation(id, req.user.id);
+            res.json({
+                data: {
+                    conversation: conversation.data.conversation
+                }
+            });
+        } catch (error) {
+            next(error);
+        }
+    },
 }
 
