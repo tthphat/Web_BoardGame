@@ -249,14 +249,33 @@ export const UserService = {
     // =============
     async addFriend(id, user_id) {
         try {
-            const { data: friend, error } = await UserModel.addFriend(id, user_id);
-            if (error || !friend) {
+            const { error } = await UserModel.addFriend(id, user_id);
+            if (error) {
                 throw new Error("Failed to add friend");
             }
-            console.log("Backend-user.service.js-addFriend: ", friend);
+
             return {
                 data: {
-                    friend
+                    message: "Add friend successfully"
+                }
+            };
+        } catch (error) {
+            throw error;
+        }
+    },
+
+    // =============
+    // Accept Friend
+    // =============
+    async acceptFriend(receiver_id, sender_id) {
+        try {
+            const { error } = await UserModel.acceptFriend(receiver_id, sender_id);
+            if (error) {
+                throw new Error("Failed to accept friend");
+            }
+            return {
+                data: {
+                    message: "Accept friend successfully"
                 }
             };
         } catch (error) {

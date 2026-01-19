@@ -55,7 +55,7 @@ function FriendRequests() {
     };
 
     // xử lí xóa khi reject
-    const handleRemoveRequest = (idToRemove) => {
+    const handleRequest = (idToRemove) => {
         setRequests((prevRequests) =>
             prevRequests.filter(req => req.sender_id !== idToRemove)
         );
@@ -148,7 +148,7 @@ function FriendRequests() {
                                         <td className="p-3 text-center">
                                             <AcceptRejectFriend
                                                 sender_id={request.sender_id}
-                                                onReject={handleRemoveRequest}
+                                                handleRequest={handleRequest}
                                             />
                                         </td>
                                     </tr>

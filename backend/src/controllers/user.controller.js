@@ -167,12 +167,30 @@ export const UserController = {
             const friend = await UserService.addFriend(req.user.id, user_id);
             res.json({
                 data: {
-                    friend: friend.data.friend
+                    message: friend.data.message
                 }
             });
         } catch (error) {
             next(error);
         }
     },
+
+    // =============
+    // Accept Friend
+    // =============
+    async acceptFriend(req, res, next) {
+        try {
+            const { sender_id } = req.body;
+            const friend = await UserService.acceptFriend(req.user.id, sender_id);
+            res.json({
+                data: {
+                    message: friend.data.message
+                }
+            });
+        } catch (error) {
+            next(error);
+        }
+    },
+
 }
 

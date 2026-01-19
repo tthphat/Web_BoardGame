@@ -203,7 +203,6 @@ export async function addFriendApi(user_id) {
     }
 
     console.log("Fontend-User-Service: Add friend API output: ", data);
-    return data;
 }
 
 // Accept friend request
@@ -227,7 +226,6 @@ export async function acceptFriendApi(sender_id) {
     }
 
     console.log("Fontend-User-Service: Accept friend API output: ", data);
-    return data;
 }
 
 // Reject friend request
@@ -251,7 +249,6 @@ export async function rejectFriendApi(sender_id) {
     }
 
     console.log("Fontend-User-Service: Reject friend API output: ", data);
-    return data;
 }
 
 

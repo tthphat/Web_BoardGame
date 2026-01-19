@@ -320,19 +320,30 @@ export const UserModel = {
     // Add friend
     async addFriend(senderId, receiverId) {
         try {
-            const [friend] = await knex("friends")
+            await knex("friends")
                 .insert({
                     sender_id: senderId,
                     receiver_id: receiverId,
                     status: "pending"
                 })
-                .returning(["sender_id", "receiver_id", "status"]);
 
-            return { data: friend, error: null };
+            return { error: null };
         } catch (error) {
-            return { data: null, error };
+            return { error };
         }
     },
 
+    // Accept friend
+    async acceptFriend(receiverId, senderId) {
+        try {
+            await knex("friends")
+                .where({ receiver_id: receiverId, sender_id: senderId })
+                .update({ status: "accepted", accepted_at: new Date() })
+
+            return { error: null };
+        } catch (error) {
+            return { error };
+        }
+    },
 }
 

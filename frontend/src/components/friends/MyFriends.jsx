@@ -126,7 +126,7 @@ function MyFriends() {
                                             {getFriendSince(friend.accepted_at)}
                                         </td>
                                         <td className="p-3 border-r border-dashed border-gray-300 group-hover:border-red-200 text-gray-600 text-center">
-                                            <button className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded">
+                                            <button className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded cursor-pointer">
                                                 Remove
                                             </button>
                                         </td>
