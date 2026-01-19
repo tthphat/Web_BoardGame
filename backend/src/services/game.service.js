@@ -1,5 +1,6 @@
 import { AchievementService } from "./achievement.service.js";
 import { BoardConfigModel } from "../models/boardConfig.model.js";
+import { GameModel } from "../models/game.model.js";
 
 const GAME_ACHIEVEMENT_MAPPING = {
     "tic-tac-toe": "FIRST_PLAY_TIC_TAC_TOE",
@@ -36,7 +37,27 @@ export class GameService {
             gameSlug,
             earnedAchievement
         };
-        // ... (previous content)
+    }
+
+    // Get enabled games (public)
+    static async getEnabledGames() {
+        const { data, error } = await GameModel.getEnabledGames();
+        if (error) throw error;
+        return data;
+    }
+
+    // Get all games (for admin)
+    static async getAllGames() {
+        const { data, error } = await GameModel.findAll();
+        if (error) throw error;
+        return data;
+    }
+
+    // Toggle game enabled status (for admin)
+    static async toggleGameEnabled(gameId, enabled) {
+        const { data, error } = await GameModel.updateState(gameId, enabled);
+        if (error) throw error;
+        return data;
     }
 
     static async getBoardConfigs() {
@@ -49,3 +70,4 @@ export class GameService {
         }
     }
 }
+

@@ -14,6 +14,20 @@ export const GameModel = {
         }
     },
 
+    // Get enabled games only (public)
+    async getEnabledGames() {
+        try {
+            const games = await knex("games")
+                .select("id", "name", "slug", "board_size", "enabled")
+                .where({ enabled: true })
+                .orderBy("id", "asc");
+            return { data: games, error: null };
+        } catch (error) {
+            console.error("GameModel.getEnabledGames error:", error);
+            return { data: null, error };
+        }
+    },
+
     // Update game state (enable/disable)
     async updateState(id, enabled) {
         try {
@@ -32,3 +46,4 @@ export const GameModel = {
         }
     }
 };
+

@@ -16,6 +16,7 @@ import adminRoute from "./routes/admin.route.js"; // Import route
 
 import { checkApiKey } from "./middlewares/apiKey.middleware.js";
 import { verifyToken } from "./middlewares/auth.middleware.js";
+import { GameController } from "./controllers/game.controller.js";
 
 const app = express();
 
@@ -23,7 +24,9 @@ app.use(cors());
 app.use(express.json());
 app.use(cookieParser());
 
-app.use("/api/auth", authRoute); // login, register không cần check api key
+// Public routes (no auth or api key required)
+app.use("/api/auth", authRoute); // login, register
+app.get("/api/games/enabled", GameController.getEnabledGames); // enabled games list
 
 app.use(checkApiKey); // middleware kiểm tra api key
 
