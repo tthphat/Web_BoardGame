@@ -14,6 +14,7 @@ import MyFriends from "../components/friends/MyFriends";
 import FriendReuqests from "../components/friends/FriendReuqests";
 import UserList from "../components/friends/UserList";
 import SettingsPage from "../pages/SettingsPage";
+import ConversationLayout from "../layouts/ConversationLayout";
 
 export const router = createBrowserRouter([
     { path: "/login", element: <LoginPage /> },
@@ -70,7 +71,7 @@ export const router = createBrowserRouter([
             },
             {
                 path: "/messages",
-                element: <DemoPage title="Messages" description="Hộp thư đến 0 tin nhắn mới." />
+                element: <ConversationLayout />
             },
             {
                 path: "/trophy",
