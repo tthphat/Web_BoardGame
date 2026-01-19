@@ -76,13 +76,20 @@ const DashboardPage = () => {
       return;
     }
 
-    // Snake game - restart logic
-    if (currentScreenName === 'SNAKE') {
-      if (gameState.isGameOver && gameState.resetGame) {
+    // Snake/Match3 game - restart logic
+    if (currentScreenName === 'SNAKE' || currentScreenName === 'MATCH3') {
+      if (gameState.isGameOver) {
         // Đã game over -> reset trực tiếp, không toggle isPlaying
-        gameState.resetGame();
-        setScore(0);
-        setGameState(prev => ({ ...prev, isGameOver: false }));
+        // Match3 tự reset state khi isPlaying off -> on? No, need explicit reset if state persisted
+        // But hook resets on isPlaying change? Yes.
+        // So just toggling might work if we set isPlaying false then true? 
+        // Better: reset local state and let hook re-init.
+        setIsPlaying(false);
+        setTimeout(() => {
+          setIsPlaying(true);
+          setScore(0);
+          setGameState(prev => ({ ...prev, isGameOver: false, timeLeft: 60 }));
+        }, 0);
         return;
       }
       // Chưa chơi -> bắt đầu chơi
@@ -241,12 +248,17 @@ const DashboardPage = () => {
                     <span>SCORE</span>
                     <span className="text-cyan-400">{score.toString().padStart(4, '0')}</span>
                   </div>
-                  {/* Timer for Memory game */}
-                  {currentScreenName === 'MEMORY' && isPlaying && (
+                  {/* Timer for Memory and Match3 game */}
+                  {(currentScreenName === 'MEMORY' || currentScreenName === 'MATCH3') && isPlaying && (
                     <div className="flex justify-between mt-1">
                       <span>TIME</span>
-                      <span className={`font-bold ${memoryGame.timeLeft <= 10 ? 'text-red-500 animate-pulse' : memoryGame.timeLeft <= 30 ? 'text-yellow-400' : 'text-cyan-400'}`}>
-                        {memoryGame.timeLeft}s
+                      <span className={`font-bold ${(currentScreenName === 'MEMORY' ? memoryGame.timeLeft : (gameState.timeLeft || 0)) <= 10
+                        ? 'text-red-500 animate-pulse'
+                        : (currentScreenName === 'MEMORY' ? memoryGame.timeLeft : (gameState.timeLeft || 0)) <= 30
+                          ? 'text-yellow-400'
+                          : 'text-cyan-400'
+                        }`}>
+                        {currentScreenName === 'MEMORY' ? memoryGame.timeLeft : (gameState.timeLeft || 60)}s
                       </span>
                     </div>
                   )}

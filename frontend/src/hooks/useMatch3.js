@@ -50,23 +50,51 @@ const MATCH3_SIZE = 13;
 export const useMatch3 = (isPlaying) => {
     const rows = MATCH3_SIZE;
     const cols = MATCH3_SIZE;
-    
+
     const [board, setBoard] = useState([]);
     const [selected, setSelected] = useState(null); // {r, c}
     const [isAnimating, setIsAnimating] = useState(false);
     const [score, setScore] = useState(0);
 
+    // Timer states
+    const [timeLeft, setTimeLeft] = useState(60);
+    const [isGameOver, setIsGameOver] = useState(false);
+
     // Initialize board when game starts - logic moved inside useEffect to avoid warning
     useEffect(() => {
         if (!isPlaying) {
             setBoard([]);
+            setTimeLeft(60); // Reset timer
+            setIsGameOver(false);
             return;
         }
 
         const initialBoard = generateBoard(rows, cols);
         setBoard(initialBoard);
         setScore(0);
+        setTimeLeft(60);
+        setIsGameOver(false);
     }, [isPlaying, rows, cols]);
+
+    // Timer Logic
+    useEffect(() => {
+        let interval;
+        if (isPlaying && timeLeft > 0 && !isGameOver) {
+            interval = setInterval(() => {
+                setTimeLeft((prev) => {
+                    if (prev <= 1) {
+                        setIsGameOver(true);
+                        return 0;
+                    }
+                    return prev - 1;
+                });
+            }, 1000);
+        } else if (timeLeft === 0) {
+            setIsGameOver(true);
+        }
+
+        return () => clearInterval(interval);
+    }, [isPlaying, timeLeft, isGameOver]);
 
     // Tìm tất cả các match (ngang và dọc)
     const findMatches = (currentBoard) => {
@@ -237,7 +265,7 @@ export const useMatch3 = (isPlaying) => {
     };
 
     const handlePixelClick = (r, c) => {
-        if (!isPlaying || isAnimating) return;
+        if (!isPlaying || isAnimating || isGameOver) return;
 
         if (!selected) {
             setSelected({ r, c });
@@ -258,6 +286,8 @@ export const useMatch3 = (isPlaying) => {
         selected,
         handlePixelClick,
         isAnimating,
-        score
+        score,
+        timeLeft,
+        isGameOver
     };
 };

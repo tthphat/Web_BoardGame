@@ -32,12 +32,12 @@ export const TicTacToeWrapper = forwardRef(({ isPlaying, botEnabled, onGameState
   const game = useTicTacToe(isPlaying, botEnabled);
   const callbackRef = useRef(onGameStateUpdate);
   const prevStateRef = useRef({ currentPlayer: null, winner: null });
-  
+
   // Cập nhật callback ref
   useEffect(() => {
     callbackRef.current = onGameStateUpdate;
   }, [onGameStateUpdate]);
-  
+
   useImperativeHandle(ref, () => ({
     getPixelColor: game.getPixelColor,
     handlePixelClick: game.handlePixelClick,
@@ -47,12 +47,12 @@ export const TicTacToeWrapper = forwardRef(({ isPlaying, botEnabled, onGameState
   // Chỉ gọi callback khi có thay đổi thực sự
   useEffect(() => {
     if (!isPlaying || !callbackRef.current) return;
-    
+
     const prevState = prevStateRef.current;
-    const hasChanged = prevState.currentPlayer !== game.currentPlayer || 
-                       prevState.winner !== game.winner ||
-                       prevState.score !== game.score;
-    
+    const hasChanged = prevState.currentPlayer !== game.currentPlayer ||
+      prevState.winner !== game.winner ||
+      prevState.score !== game.score;
+
     if (hasChanged) {
       prevStateRef.current = { currentPlayer: game.currentPlayer, winner: game.winner, score: game.score };
       callbackRef.current({
@@ -73,11 +73,11 @@ export const Caro4Wrapper = forwardRef(({ isPlaying, botEnabled, onGameStateUpda
   const game = useCaro(isPlaying, botEnabled);
   const callbackRef = useRef(onGameStateUpdate);
   const prevStateRef = useRef({ currentPlayer: null, winner: null });
-  
+
   useEffect(() => {
     callbackRef.current = onGameStateUpdate;
   }, [onGameStateUpdate]);
-  
+
   useImperativeHandle(ref, () => ({
     getPixelColor: game.getPixelColor,
     handlePixelClick: game.handlePixelClick,
@@ -86,12 +86,12 @@ export const Caro4Wrapper = forwardRef(({ isPlaying, botEnabled, onGameStateUpda
 
   useEffect(() => {
     if (!isPlaying || !callbackRef.current) return;
-    
+
     const prevState = prevStateRef.current;
-    const hasChanged = prevState.currentPlayer !== game.currentPlayer || 
-                       prevState.winner !== game.winner ||
-                       prevState.score !== game.score;
-    
+    const hasChanged = prevState.currentPlayer !== game.currentPlayer ||
+      prevState.winner !== game.winner ||
+      prevState.score !== game.score;
+
     if (hasChanged) {
       prevStateRef.current = { currentPlayer: game.currentPlayer, winner: game.winner, score: game.score };
       callbackRef.current({
@@ -112,11 +112,11 @@ export const Caro5Wrapper = forwardRef(({ isPlaying, botEnabled, onGameStateUpda
   const game = useCaro5(isPlaying, botEnabled);
   const callbackRef = useRef(onGameStateUpdate);
   const prevStateRef = useRef({ currentPlayer: null, winner: null });
-  
+
   useEffect(() => {
     callbackRef.current = onGameStateUpdate;
   }, [onGameStateUpdate]);
-  
+
   useImperativeHandle(ref, () => ({
     getPixelColor: game.getPixelColor,
     handlePixelClick: game.handlePixelClick,
@@ -125,12 +125,12 @@ export const Caro5Wrapper = forwardRef(({ isPlaying, botEnabled, onGameStateUpda
 
   useEffect(() => {
     if (!isPlaying || !callbackRef.current) return;
-    
+
     const prevState = prevStateRef.current;
-    const hasChanged = prevState.currentPlayer !== game.currentPlayer || 
-                       prevState.winner !== game.winner ||
-                       prevState.score !== game.score;
-    
+    const hasChanged = prevState.currentPlayer !== game.currentPlayer ||
+      prevState.winner !== game.winner ||
+      prevState.score !== game.score;
+
     if (hasChanged) {
       prevStateRef.current = { currentPlayer: game.currentPlayer, winner: game.winner, score: game.score };
       callbackRef.current({
@@ -147,24 +147,30 @@ export const Caro5Wrapper = forwardRef(({ isPlaying, botEnabled, onGameStateUpda
 Caro5Wrapper.displayName = 'Caro5Wrapper';
 
 // ===== MATCH3 WRAPPER =====
-export const Match3Wrapper = forwardRef(({ isPlaying, onScoreUpdate, onBoardUpdate }, ref) => {
+export const Match3Wrapper = forwardRef(({ isPlaying, onScoreUpdate, onBoardUpdate, onGameStateUpdate }, ref) => {
   const game = useMatch3(isPlaying);
   const callbackRef = useRef(onScoreUpdate);
   const boardUpdateRef = useRef(onBoardUpdate);
+  const stateCallbackRef = useRef(onGameStateUpdate);
   const prevScoreRef = useRef(null);
-  
+  const prevGameOverRef = useRef(null);
+
   // Lưu game vào ref để luôn lấy được giá trị mới nhất
   const gameRef = useRef(game);
   gameRef.current = game;
-  
+
   useEffect(() => {
     callbackRef.current = onScoreUpdate;
   }, [onScoreUpdate]);
-  
+
   useEffect(() => {
     boardUpdateRef.current = onBoardUpdate;
   }, [onBoardUpdate]);
-  
+
+  useEffect(() => {
+    stateCallbackRef.current = onGameStateUpdate;
+  }, [onGameStateUpdate]);
+
   // Dùng getter functions để luôn lấy state mới nhất
   useImperativeHandle(ref, () => ({
     getPixelColor: (r, c) => {
@@ -180,6 +186,8 @@ export const Match3Wrapper = forwardRef(({ isPlaying, onScoreUpdate, onBoardUpda
     // Expose trực tiếp để GameMatrix có thể đọc
     get selected() { return gameRef.current.selected; },
     get board() { return gameRef.current.board; },
+    get isGameOver() { return gameRef.current.isGameOver; },
+    get timeLeft() { return gameRef.current.timeLeft; },
   }), []); // Không cần dependencies vì dùng gameRef
 
   // Gọi onBoardUpdate khi board hoặc selected thay đổi để force parent re-render
@@ -191,12 +199,25 @@ export const Match3Wrapper = forwardRef(({ isPlaying, onScoreUpdate, onBoardUpda
 
   useEffect(() => {
     if (!isPlaying || !callbackRef.current) return;
-    
+
     if (prevScoreRef.current !== game.score) {
       prevScoreRef.current = game.score;
       callbackRef.current(game.score);
     }
   }, [game.score, isPlaying]);
+
+  // Sync Timer & Game Over state
+  useEffect(() => {
+    if (!isPlaying || !stateCallbackRef.current) return;
+
+    // Call callback on every tick or state change
+    stateCallbackRef.current({
+      isGameOver: game.isGameOver,
+      timeLeft: game.timeLeft,
+      resetGame: () => { /* Reset logic might be handled by parent re-mounting or custom func */ }
+    });
+
+  }, [game.isGameOver, game.timeLeft, isPlaying]);
 
   return null;
 });
@@ -210,23 +231,23 @@ export const SnakeWrapper = forwardRef(({ isPlaying, rows, cols, onScoreUpdate, 
   const boardUpdateRef = useRef(onBoardUpdate);
   const prevScoreRef = useRef(null);
   const prevGameOverRef = useRef(null);
-  
+
   // Lưu game vào ref để luôn lấy được giá trị mới nhất
   const gameRef = useRef(game);
   gameRef.current = game;
-  
+
   useEffect(() => {
     scoreCallbackRef.current = onScoreUpdate;
   }, [onScoreUpdate]);
-  
+
   useEffect(() => {
     stateCallbackRef.current = onGameStateUpdate;
   }, [onGameStateUpdate]);
-  
+
   useEffect(() => {
     boardUpdateRef.current = onBoardUpdate;
   }, [onBoardUpdate]);
-  
+
   useImperativeHandle(ref, () => ({
     getPixelColor: (r, c) => gameRef.current.getPixelColor(r, c),
     changeDirection: (dir) => gameRef.current.changeDirection(dir),
@@ -245,7 +266,7 @@ export const SnakeWrapper = forwardRef(({ isPlaying, rows, cols, onScoreUpdate, 
   // Gọi onScoreUpdate khi score thay đổi
   useEffect(() => {
     if (!isPlaying || !scoreCallbackRef.current) return;
-    
+
     if (prevScoreRef.current !== game.score) {
       prevScoreRef.current = game.score;
       scoreCallbackRef.current(game.score);
@@ -255,7 +276,7 @@ export const SnakeWrapper = forwardRef(({ isPlaying, rows, cols, onScoreUpdate, 
   // Gọi onGameStateUpdate khi game state thay đổi
   useEffect(() => {
     if (!isPlaying || !stateCallbackRef.current) return;
-    
+
     if (prevGameOverRef.current !== game.isGameOver) {
       prevGameOverRef.current = game.isGameOver;
       stateCallbackRef.current({

@@ -238,6 +238,7 @@ const GameMatrix = ({
           isPlaying={isPlaying && screen === 'MATCH3'}
           onScoreUpdate={screen === 'MATCH3' ? onScoreUpdate : undefined}
           onBoardUpdate={screen === 'MATCH3' ? handleBoardUpdate : undefined}
+          onGameStateUpdate={screen === 'MATCH3' ? onGameStateUpdate : undefined}
         />
       )}
       {GAME_REGISTRY.SNAKE.hasWrapper && (
