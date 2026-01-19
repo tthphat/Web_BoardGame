@@ -15,6 +15,10 @@ import FriendReuqests from "../components/friends/FriendReuqests";
 import UserList from "../components/friends/UserList";
 import SettingsPage from "../pages/SettingsPage";
 import RankingPage from "../pages/RankingPage";
+import ConversationLayout from "../layouts/ConversationLayout";
+import ConversationDetail from "../components/message/ConversationDetail";
+import ConversationPlaceholder from "../components/message/ConversationPlaceholder";
+
 
 export const router = createBrowserRouter([
     { path: "/login", element: <LoginPage /> },
@@ -71,7 +75,17 @@ export const router = createBrowserRouter([
             },
             {
                 path: "/messages",
-                element: <DemoPage title="Messages" description="Hộp thư đến 0 tin nhắn mới." />
+                element: <ConversationLayout />,
+                children: [
+                    {
+                        index: true,
+                        element: <ConversationPlaceholder />
+                    },
+                    {
+                        path: ":id",
+                        element: <ConversationDetail />
+                    }
+                ]
             },
             {
                 path: "/trophy",

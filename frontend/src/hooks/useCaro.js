@@ -24,8 +24,13 @@ const getEmptyCells = (board, rows, cols) => {
   return emptyCells;
 };
 
-export const useCaro = (isPlaying, botEnabled = false) => {
-  const config = getBoardConfig(); // { cols, rows, dotSize, gap }
+export const useCaro = (isPlaying, botEnabled = false, boardRows, boardCols) => {
+  const defaultConfig = getBoardConfig();
+  const config = { 
+    ...defaultConfig, 
+    rows: boardRows || defaultConfig.rows, 
+    cols: boardCols || defaultConfig.cols 
+  };
   
   // Khởi tạo board rỗng
   const createEmptyBoard = useCallback(() => {
@@ -106,6 +111,7 @@ export const useCaro = (isPlaying, botEnabled = false) => {
     // Chọn random một ô trống
     const randomIndex = Math.floor(Math.random() * emptyCells.length);
     const { r: botR, c: botC } = emptyCells[randomIndex];
+    console.log(`[CaroBot] Move: ${botR},${botC} in ${config.rows}x${config.cols}`);
     
     // Đặt quân RED
     const newBoard = currentBoard.map(row => [...row]);

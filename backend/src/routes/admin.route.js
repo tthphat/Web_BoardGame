@@ -4,6 +4,7 @@ import { AdminController } from "../controllers/admin.controller.js";
 const router = express.Router();
 
 router.get("/dashboard-stats", AdminController.getDashboardStats);
+router.get("/statistics", AdminController.getStatistics);
 router.get("/recent-activities", AdminController.getRecentActivities);
 
 // Game Management

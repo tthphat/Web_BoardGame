@@ -221,6 +221,8 @@ const GameMatrix = ({
           ref={gameRefs.caro4}
           isPlaying={isPlaying && screen === 'CARO4'}
           botEnabled={true}
+          rows={rows}
+          cols={cols}
           onGameStateUpdate={screen === 'CARO4' ? onGameStateUpdate : undefined}
         />
       )}
@@ -229,6 +231,8 @@ const GameMatrix = ({
           ref={gameRefs.caro5}
           isPlaying={isPlaying && screen === 'CARO5'}
           botEnabled={true}
+          rows={rows}
+          cols={cols}
           onGameStateUpdate={screen === 'CARO5' ? onGameStateUpdate : undefined}
         />
       )}
