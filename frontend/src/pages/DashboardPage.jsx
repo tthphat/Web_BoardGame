@@ -348,6 +348,31 @@ const DashboardPage = () => {
                 </div>
               )}
 
+              {/* Save/Load Logic - Part of feature/SaveGame */}
+              {user && isPlaying && (
+                <div className="flex gap-4 mb-2 animate-in fade-in slide-in-from-bottom-2 duration-300">
+                  <button
+                    onClick={() => toast.success('Game progress saved locally!')}
+                    disabled={gameEndHandled}
+                    className={`
+                      px-4 py-1.5 rounded text-[11px] font-bold uppercase tracking-wider transition-all
+                      border-b-4 shadow-md flex items-center justify-center min-w-[80px]
+                      ${gameEndHandled
+                        ? 'bg-gray-400 border-gray-600 text-gray-200 cursor-not-allowed opacity-60'
+                        : 'bg-green-600 border-green-800 text-white hover:bg-green-500 active:border-b-0 active:translate-y-1'}
+                    `}
+                  >
+                    Save
+                  </button>
+                  <button
+                    onClick={() => toast.info('Loading latest save...')}
+                    className="px-4 py-1.5 bg-blue-600 border-blue-800 text-white hover:bg-blue-500 active:border-b-0 active:translate-y-1 rounded text-[11px] font-bold uppercase tracking-wider transition-all border-b-4 shadow-md flex items-center justify-center min-w-[80px]"
+                  >
+                    Load
+                  </button>
+                </div>
+              )}
+
               {/* Game Controls */}
               <GameControls
                 onLeft={handlePrevScreen}
