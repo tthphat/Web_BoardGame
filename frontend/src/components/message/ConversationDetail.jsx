@@ -113,6 +113,14 @@ function ConversationDetail() {
 
             {/* Messages Area */}
             <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50">
+                {hasMore && (
+                    <div className="flex justify-center mb-8 ">
+                        <button onClick={handleLoadMore} className="p-2 bg-gray-200 cursor-pointer rounded-full text-xs text-blue-600">
+                            Load older messages
+                        </button>
+                    </div>
+                )}
+
                 {messages.map((msg) => {
                     const isMe = msg.sender_id === currentUserId;
                     return (
