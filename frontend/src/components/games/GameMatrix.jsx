@@ -114,6 +114,8 @@ const GameMatrix = forwardRef(({
         console.log('[GameMatrix] loadGameState - screen:', screen, 'refKey:', refKey);
         if (gameRef?.current?.loadGameState) {
           gameRef.current.loadGameState(savedState);
+          // Force re-render to update UI immediately
+          setForceRenderKey(prev => prev + 1);
           return true;
         }
       }
@@ -121,12 +123,14 @@ const GameMatrix = forwardRef(({
       // 2. Drawing Game
       if (screen === 'DRAWING' && drawingState?.loadGameState) {
         drawingState.loadGameState(savedState);
+        setForceRenderKey(prev => prev + 1);
         return true;
       }
 
       // 3. Memory Game
       if (screen === 'MEMORY' && activeGameState?.loadGameState) {
         activeGameState.loadGameState(savedState);
+        setForceRenderKey(prev => prev + 1);
         return true;
       }
 
