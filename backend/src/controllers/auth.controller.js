@@ -30,7 +30,9 @@ export const AuthController = {
 
             return res.status(200).json({
                 message: "Login successful",
-                user,
+                data: {
+                    user: user.data.user
+                }
             });
 
         } catch (error) {
@@ -53,7 +55,8 @@ export const AuthController = {
 
             console.log("Backend-Auth-Controller: Register API output: ", user);
 
-            res.json({
+            return res.status(200).json({
+                message: "Verify your email to login",
                 data: {
                     user: user.data.user
                 }
@@ -89,7 +92,9 @@ export const AuthController = {
 
             return res.status(200).json({
                 message: "Register successful",
-                user,
+                data: {
+                    user: user.data.user
+                }
             });
 
         } catch (error) {
