@@ -1,39 +1,40 @@
-import { LayoutDashboard, Users, Settings, BarChart3, Moon, LogOut } from 'lucide-react';
+import { LayoutDashboard, Users, Settings, BarChart3, Moon, LogOut, User } from 'lucide-react';
 import React from 'react';
 
 import MenuItem from '../common/MenuItem';
 const AdminSidebar = ({ activeItem, setActiveItem }) => {
 
     const adminMenuItems = [
-        {id: 'Dashboard', icon: <LayoutDashboard size={20}/>, label: 'Dashboard'},
-        {id: 'UserMgmt', icon: <Users size={20}/>, label: 'User Manager'},
-        {id: 'GameConfig', icon: <Settings size={20}/>, label: 'Game Config'},
-        {id: 'Statistics', icon: <BarChart3 size={20}/>, label: 'Statistics'},
+        { id: 'Dashboard', icon: <LayoutDashboard size={20} />, label: 'Dashboard' },
+        { id: 'UserMgmt', icon: <Users size={20} />, label: 'User Manager' },
+        { id: 'GameConfig', icon: <Settings size={20} />, label: 'Game Config' },
+        { id: 'Statistics', icon: <BarChart3 size={20} />, label: 'Statistics' },
+        { id: 'Profile', icon: <User size={20} />, label: 'Profile' },
     ];
 
     return (
         <aside className="w-64 h-full bg-[#c0c0c0] dark:bg-[#2d2d2d] border-r-2 border-r-[#808080] dark:border-r-[#000] flex flex-col transition-colors duration-300 font-mono">
-            
-            
+
+
 
             {/* Menu List */}
             <nav className="flex-1 py-4 space-y-2 px-3">
                 {adminMenuItems.map((item) => (
-                <MenuItem 
-                    key={item.id}
-                    icon={item.icon}
-                    label={item.label}
-                    active={activeItem === item.id}
-                    onClick={() => setActiveItem(item.id)} 
-                />
+                    <MenuItem
+                        key={item.id}
+                        icon={item.icon}
+                        label={item.label}
+                        active={activeItem === item.id}
+                        onClick={() => setActiveItem(item.id)}
+                    />
                 ))}
             </nav>
 
             {/* Footer Area: Dark Mode & Logout */}
             <div className="p-4 border-t-2 border-t-white dark:border-t-[#555] space-y-2">
-                
+
                 {/* Dark Mode Button */}
-                <button 
+                <button
                     onClick={() => document.documentElement.classList.toggle('dark')}
                     className="flex items-center justify-center gap-3 w-full px-4 py-2 
                     bg-[#e0e0e0] dark:bg-[#404040] 
@@ -49,7 +50,7 @@ const AdminSidebar = ({ activeItem, setActiveItem }) => {
                     <span className="font-bold uppercase text-sm">Dark Mode</span>
                 </button>
 
-                
+
             </div>
 
         </aside>

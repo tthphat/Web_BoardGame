@@ -9,6 +9,7 @@ import { toast } from 'sonner';
 import UserManagement from '../components/admin/page/UserManagement';
 import GameConfig from '../components/admin/page/GameConfig';
 import Statistics from '../components/admin/page/Statistics';
+import Profile from '../components/user/Profile';
 
 // Import các trang placeholder cho các mục chưa làm
 const PlaceholderPage = ({ title }) => (
@@ -47,6 +48,8 @@ const AdminMainLayout = () => {
                 return <GameConfig />;
             case 'Statistics':
                 return <Statistics />;
+            case 'Profile':
+                return <Profile />;
             default:
                 return <AdminDashboardMock />;
         }
