@@ -36,7 +36,7 @@ function Profile() {
                             {/* Username */}
                             <div className="flex items-center gap-4">
                                 <label className="w-24 font-mono font-bold text-sm">Username:</label>
-                                <div className="flex-1 bg-white border-2 border-inset border-gray-600 p-1 px-2 font-mono flex justify-between items-center shadow-inner">
+                                <div className="flex-1 bg-white border-2 border-inset border-gray-600 p-1 px-2 font-mono flex justify-between items-center shadow-inner dark:bg-[#333] dark:text-white">
                                     <span>{profile?.username || "LOADING..."}</span>
                                     <EditProfile data={profile?.username} field="username" onSuccess={fetchProfile} />
                                 </div>
@@ -45,7 +45,7 @@ function Profile() {
                             {/* Email */}
                             <div className="flex items-center gap-4">
                                 <label className="w-24 font-mono font-bold text-sm">Email:</label>
-                                <div className="flex-1 bg-white border-2 border-inset border-gray-600 p-1 px-2 font-mono flex justify-between items-center shadow-inner">
+                                <div className="flex-1 bg-white border-2 border-inset border-gray-600 p-1 px-2 font-mono flex justify-between items-center shadow-inner dark:bg-[#333] dark:text-white">
                                     <span>{profile?.email || "LOADING..."}</span>
                                     <EditProfile data={profile?.email} field="email" onSuccess={fetchProfile} />
                                 </div>
@@ -54,7 +54,7 @@ function Profile() {
                             {/* Password */}
                             <div className="flex items-center gap-4">
                                 <label className="w-24 font-mono font-bold text-sm">Password:</label>
-                                <div className="flex-1 bg-white border-2 border-inset border-gray-600 p-1 px-2 font-mono flex justify-between items-center shadow-inner">
+                                <div className="flex-1 bg-white border-2 border-inset border-gray-600 p-1 px-2 font-mono flex justify-between items-center shadow-inner dark:bg-[#333] dark:text-white">
                                     <span>**********</span>
                                     <EditProfile data="" field="password" onSuccess={fetchProfile} />
                                 </div>
