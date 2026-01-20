@@ -43,7 +43,7 @@ export const useCaro = (isPlaying, botEnabled = false, boardRows, boardCols) => 
   const [winningLine, setWinningLine] = useState([]); // [{r, c}, ...]
   const [score, setScore] = useState(0); // Count player wins
 
-  // Reset game khi bắt đầu chơi (keep score)
+  // Reset game khi bắt đầu chơi hoặc khi back ra (keep score)
   useEffect(() => {
     if (isPlaying) {
       setBoard(createEmptyBoard());
@@ -51,6 +51,12 @@ export const useCaro = (isPlaying, botEnabled = false, boardRows, boardCols) => 
       setWinner(null);
       setWinningLine([]);
       // Don't reset score - keep counting wins
+    } else {
+      // Clear state khi back ra (isPlaying = false)
+      setBoard(createEmptyBoard());
+      setCurrentPlayer('BLUE');
+      setWinner(null);
+      setWinningLine([]);
     }
   }, [isPlaying, createEmptyBoard]);
 
