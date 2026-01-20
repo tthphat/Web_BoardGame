@@ -26,9 +26,22 @@ const app = express();
 // Parse urlencoded (form data) for login docs
 app.use(express.urlencoded({ extended: true }));
 
-// app.use(cors());
+// CORS configuration - allow multiple origins
+const allowedOrigins = [
+    "https://web-board-game-phi.vercel.app",
+    "http://localhost:5173",
+    "http://localhost:3000"
+];
+
 app.use(cors({
-    origin: "https://web-board-game-phi.vercel.app",
+    origin: function (origin, callback) {
+        // Allow requests with no origin (like mobile apps or curl)
+        if (!origin) return callback(null, true);
+        if (allowedOrigins.includes(origin)) {
+            return callback(null, true);
+        }
+        return callback(new Error('Not allowed by CORS'));
+    },
     credentials: true
 }));
 
