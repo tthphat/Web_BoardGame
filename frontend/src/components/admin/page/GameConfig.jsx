@@ -21,11 +21,15 @@ const GameConfig = () => {
         try {
             const [gamesData, configsData] = await Promise.all([
                 getAllGamesApi(),
-                getAllBoardConfigsApi()
+                getAllBoardConfigsApi().catch(err => {
+                    console.error("Failed to fetch board configs", err);
+                    return { data: [] }; // Return empty array if fails
+                })
             ]);
             setGames(gamesData.data);
             setConfigs(configsData.data);
         } catch (error) {
+            console.error("Failed to load configuration data", error);
             toast.error("Failed to load configuration data");
         } finally {
             setLoading(false);
