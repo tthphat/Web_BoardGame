@@ -145,6 +145,11 @@ const DashboardPage = () => {
   const handleEnter = () => {
     const config = currentConfig;
 
+    // HEART is just a display screen, not a playable game
+    if (currentScreenName === 'HEART') {
+      return;
+    }
+
     if (!config) {
       toast.error("Game chưa được implement!");
       return;
@@ -190,13 +195,8 @@ const DashboardPage = () => {
   };
 
   // Xử lý nút Back (dừng game)
-  const handleBack = async () => {
+  const handleBack = () => {
     if (isPlaying) {
-      // Drawing game: call finishGame on back to record First Play achievement
-      if (currentScreenName === 'DRAWING') {
-        await recordGameEnd({ score: 0, won: false });
-      }
-      
       setIsPlaying(false);
       setScore(0);
       setGameState(currentConfig?.initialState || {});
