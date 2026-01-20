@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 
 const COLORS = [
     'bg-red-500 shadow-[0_0_5px_red]',
@@ -291,6 +291,17 @@ export const useMatch3 = (isPlaying) => {
         };
     };
 
+    // Load game state from saved data
+    const loadGameState = useCallback((savedState) => {
+        if (savedState?.board) {
+            setBoard(savedState.board);
+            setScore(savedState.score || 0);
+            setTimeLeft(savedState.timeLeft || 60);
+            setIsGameOver(false);
+            setSelected(null);
+        }
+    }, []);
+
     return {
         board,
         selected,
@@ -299,6 +310,7 @@ export const useMatch3 = (isPlaying) => {
         score,
         timeLeft,
         isGameOver,
-        getGameState
+        getGameState,
+        loadGameState
     };
 };

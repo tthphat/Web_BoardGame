@@ -175,11 +175,28 @@ export const useSnake = (enabled, rows, cols) => {
         };
     };
 
+    // Load game state from saved data
+    const loadGameState = useCallback((savedState) => {
+        if (savedState?.snake && savedState?.food) {
+            setGameState({
+                snake: savedState.snake,
+                food: savedState.food,
+                direction: 'LEFT',
+                isGameOver: false,
+                score: savedState.score || 0
+            });
+            lastSnakeRef.current = savedState.snake;
+            lastDirRef.current = 'LEFT';
+            nextDirectionRef.current = 'LEFT';
+        }
+    }, []);
+
     return {
         ...gameState,
         resetGame,
         changeDirection,
         getPixelColor,
-        getGameState
+        getGameState,
+        loadGameState
     };
 };
