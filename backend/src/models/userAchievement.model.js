@@ -16,6 +16,7 @@ export function addUserAchievement(knex, {
 export function getUserAchievements(knex, userId, gameSlug = null, searchName = null) {
     let query = knex("user_achievements")
         .join("achievements", "user_achievements.achievement_id", "achievements.id")
+        .join("games", "achievements.game_id", "games.id")
         .select(
             "achievements.id",
             "achievements.code",
@@ -26,11 +27,11 @@ export function getUserAchievements(knex, userId, gameSlug = null, searchName = 
             "user_achievements.meta"
         )
         .where("user_achievements.user_id", userId)
+        .where("games.enabled", true)
         .orderBy("user_achievements.earned_at", "desc");
 
     if (gameSlug) {
-        // Assuming 'icon' column in achievements table holds the game slug/type identifier
-        query = query.where("achievements.icon", gameSlug);
+        query = query.where("games.slug", gameSlug);
     }
 
     if (searchName) {
@@ -59,6 +60,7 @@ export function getUserAchievementProgress(knex, userId, gameSlug = null, search
             "user_achievements.meta"
         )
         .where("achievements.enabled", true)
+        .where("games.enabled", true)
         .orderByRaw("user_achievements.earned_at DESC NULLS LAST, achievements.name ASC");
 
     if (gameSlug) {
