@@ -18,8 +18,6 @@ import RankingPage from "../pages/RankingPage";
 import ConversationLayout from "../layouts/ConversationLayout";
 import ConversationDetail from "../components/message/ConversationDetail";
 import ConversationPlaceholder from "../components/message/ConversationPlaceholder";
-import ApiDocs from "../pages/ApiDocs";
-
 
 export const router = createBrowserRouter([
     { path: "/login", element: <LoginPage /> },
@@ -27,8 +25,6 @@ export const router = createBrowserRouter([
     { path: "/register", element: <RegisterPage /> },
 
     { path: "/verify-email", element: <VerifyEmail /> },
-
-    { path: "/api-docs", element: <ApiDocs /> },
 
     {
         path: "/admin",

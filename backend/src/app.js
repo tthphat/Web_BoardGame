@@ -19,7 +19,12 @@ import { verifyToken } from "./middlewares/auth.middleware.js";
 import { GameController } from "./controllers/game.controller.js";
 import { authorize } from "./middlewares/authorize.middleware.js";
 
+import { swaggerLoginView, swaggerLoginAction, swaggerProtect } from "./middlewares/swaggerAuth.middleware.js";
+
 const app = express();
+
+// Parse urlencoded (form data) for login docs
+app.use(express.urlencoded({ extended: true }));
 
 // app.use(cors());
 app.use(cors({
@@ -29,6 +34,10 @@ app.use(cors({
 
 app.use(express.json());
 app.use(cookieParser());
+
+// ===== Swagger Login (Public) =====
+app.get('/docs-login', swaggerLoginView);
+app.post('/docs-login', swaggerLoginAction);
 
 // Public routes (no auth or api key required)
 app.use("/api/auth", authRoute); // login, register
@@ -47,10 +56,10 @@ app.use("/api/achievements", verifyToken, achievementRoute);
 app.use("/api/games", verifyToken, gameRoute);
 app.use("/api/user", verifyToken, userRoute);
 
-app.use(errorHandler);
+// ===== Swagger Documentation (Protected - requires Cookie Auth) =====
+app.use("/api-docs", swaggerProtect, swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
-// Swagger Documentation
-app.use("/api-docs", verifyToken, swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+app.use(errorHandler);
 
 /**
  * @swagger
