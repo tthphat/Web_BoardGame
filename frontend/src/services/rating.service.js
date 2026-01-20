@@ -2,9 +2,9 @@ import { API_BASE } from "@/lib/api";
 import { getAuthHeaders } from "@/lib/auth-headers";
 
 export async function addRatingApi(gameSlug, rating, comment) {
-    const response = await fetch(`${API_BASE}/games/ratings`, {
+    const response = await fetch(`${API_BASE}/api/games/ratings`, {
         method: "POST",
-        credentials: "include",
+        // credentials: "include",
         headers: getAuthHeaders(),
         body: JSON.stringify({ gameSlug, rating, comment }),
     });
@@ -20,9 +20,9 @@ export async function addRatingApi(gameSlug, rating, comment) {
 }
 
 export async function getGameRatingsApi(gameSlug, page = 1, limit = 10) {
-    const response = await fetch(`${API_BASE}/games/${gameSlug}/ratings?page=${page}&limit=${limit}`, {
+    const response = await fetch(`${API_BASE}/api/games/${gameSlug}/ratings?page=${page}&limit=${limit}`, {
         method: "GET",
-        credentials: "include",
+        // credentials: "include",
         headers: getAuthHeaders(),
     });
 
