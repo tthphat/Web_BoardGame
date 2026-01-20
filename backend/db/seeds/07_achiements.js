@@ -6,10 +6,7 @@ export async function seed(knex) {
     return acc;
   }, {});
 
-  // 2. Clear existing achievements
-  await knex("achievements").del();
-
-  // 3. Define achievements with their corresponding game slug
+  // 2. Define achievements with their corresponding game slug
   const achievements = [
     {
       gameSlug: "tic-tac-toe",
@@ -154,10 +151,10 @@ export async function seed(knex) {
       description: "Play Memory Card 5 times",
       icon: "memory-card",
       enabled: true
-    },
+    }
   ];
 
-  // 4. Map gameSlug to game_id and insert
+  // 3. Map gameSlug to game_id and insert (using upsert to prevent data loss)
   const achievementsToInsert = achievements
     .filter(a => gameMap[a.gameSlug]) // Ensure game exists
     .map(a => ({
@@ -170,6 +167,9 @@ export async function seed(knex) {
     }));
 
   if (achievementsToInsert.length > 0) {
-    await knex("achievements").insert(achievementsToInsert);
+    await knex("achievements")
+      .insert(achievementsToInsert)
+      .onConflict(["game_id", "code"])
+      .merge();
   }
 }
