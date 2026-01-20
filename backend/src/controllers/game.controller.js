@@ -87,7 +87,7 @@ export const GameController = {
     async getLeaderboard(req, res, next) {
         try {
             const { slug } = req.params;
-            const limit = parseInt(req.query.limit) || 10;
+            const limit = parseInt(req.query.limit) || 3;
             const filter = req.query.filter; // 'friends'
             const targetUserId = req.query.userId; // Specific user ID
 
@@ -141,7 +141,7 @@ export const GameController = {
     // Get leaderboards for all enabled games (public)
     async getAllLeaderboards(req, res, next) {
         try {
-            const limit = parseInt(req.query.limit) || 10;
+            const limit = parseInt(req.query.limit) || 3;
             const filter = req.query.filter; // 'friends'
             const targetUserId = req.query.userId; // Specific user ID
 

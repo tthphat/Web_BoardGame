@@ -68,7 +68,7 @@ export async function finishGameApi(gameSlug, result) {
 }
 
 // Get leaderboard for a game (protected)
-export async function getLeaderboardApi(gameSlug, limit = 10, options = {}) {
+export async function getLeaderboardApi(gameSlug, limit = 3, options = {}) {
     let url = `${API_BASE}/api/games/${gameSlug}/leaderboard?limit=${limit}`;
     if (options.filter) url += `&filter=${options.filter}`;
     if (options.userId) url += `&userId=${options.userId}`;
@@ -89,7 +89,7 @@ export async function getLeaderboardApi(gameSlug, limit = 10, options = {}) {
 }
 
 // Get all leaderboards (protected)
-export async function getAllLeaderboardsApi(limit = 5, options = {}) {
+export async function getAllLeaderboardsApi(limit = 3, options = {}) {
     let url = `${API_BASE}/api/games/leaderboard?limit=${limit}`;
     if (options.filter) url += `&filter=${options.filter}`;
     if (options.userId) url += `&userId=${options.userId}`;

@@ -135,7 +135,7 @@ export const UserGameStatsModel = {
      * @param {number} limit 
      * @param {Array} allowedUserIds - Optional list of user IDs to filter by
      */
-    async getLeaderboard(gameId, slug, limit = 10, offset = 0, allowedUserIds = null) {
+    async getLeaderboard(gameId, slug, limit = 3, offset = 0, allowedUserIds = null) {
         try {
             // Determine sorting logic based on game slug
             let orderByClause = "user_game_stats.best_score DESC"; // Default
@@ -211,7 +211,7 @@ export const UserGameStatsModel = {
      * @param {number} limit 
      * @param {Array} allowedUserIds - Optional list of user IDs to filter by
      */
-    async getAllLeaderboards(limit = 10, allowedUserIds = null) {
+    async getAllLeaderboards(limit = 3, allowedUserIds = null) {
         try {
             // Get all enabled games except free-draw
             const games = await knex("games")
@@ -241,7 +241,7 @@ export const UserGameStatsModel = {
      * Get recent updates (recently played games)
      * @param {number} limit
      */
-    async getRecentUpdates(limit = 10) {
+    async getRecentUpdates(limit = 3) {
         try {
             const recentUpdates = await knex("user_game_stats as ugs")
                 .join("users as u", "ugs.user_id", "u.id")

@@ -47,13 +47,13 @@ const RankingPage = () => {
                 const slug = GAME_REGISTRY[selectedGame]?.slug;
                 if (!slug) throw new Error("Invalid game configuration");
 
-                const response = await getLeaderboardApi(slug, 20, { ...options, page });
+                const response = await getLeaderboardApi(slug, 3, { ...options, page });
                 setLeaderboardData(response.data);
                 if (response.pagination) {
                     setTotalPages(response.pagination.totalPages);
                 }
             } else {
-                const response = await getAllLeaderboardsApi(5, options);
+                const response = await getAllLeaderboardsApi(3, options);
                 setLeaderboardData(response.data);
             }
             setError(null);
