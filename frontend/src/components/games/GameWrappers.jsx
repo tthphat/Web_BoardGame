@@ -43,7 +43,8 @@ export const TicTacToeWrapper = forwardRef(({ isPlaying, botEnabled, onGameState
     handlePixelClick: game.handlePixelClick,
     resetGame: game.resetGame,
     getGameState: game.getGameState,
-  }), [game.getPixelColor, game.handlePixelClick, game.resetGame, game.getGameState]);
+    loadGameState: game.loadGameState,
+  }), [game.getPixelColor, game.handlePixelClick, game.resetGame, game.getGameState, game.loadGameState]);
 
   // Chỉ gọi callback khi có thay đổi thực sự
   useEffect(() => {
@@ -85,7 +86,8 @@ export const Caro4Wrapper = forwardRef(({ isPlaying, botEnabled, onGameStateUpda
     handlePixelClick: game.handlePixelClick,
     resetGame: game.resetGame,
     getGameState: game.getGameState,
-  }), [game.getPixelColor, game.handlePixelClick, game.resetGame, game.getGameState]);
+    loadGameState: game.loadGameState,
+  }), [game.getPixelColor, game.handlePixelClick, game.resetGame, game.getGameState, game.loadGameState]);
 
   useEffect(() => {
     if (!isPlaying || !callbackRef.current) return;
@@ -126,7 +128,8 @@ export const Caro5Wrapper = forwardRef(({ isPlaying, botEnabled, onGameStateUpda
     handlePixelClick: game.handlePixelClick,
     resetGame: game.resetGame,
     getGameState: game.getGameState,
-  }), [game.getPixelColor, game.handlePixelClick, game.resetGame, game.getGameState]);
+    loadGameState: game.loadGameState,
+  }), [game.getPixelColor, game.handlePixelClick, game.resetGame, game.getGameState, game.loadGameState]);
 
   useEffect(() => {
     if (!isPlaying || !callbackRef.current) return;
@@ -190,6 +193,7 @@ export const Match3Wrapper = forwardRef(({ isPlaying, onScoreUpdate, onGameState
     getSelected: () => gameRef.current.selected,
     getBoard: () => gameRef.current.board,
     getGameState: () => gameRef.current.getGameState(),
+    loadGameState: (savedState) => gameRef.current.loadGameState?.(savedState),
     // Expose trực tiếp để GameMatrix có thể đọc
     get selected() { return gameRef.current.selected; },
     get board() { return gameRef.current.board; },
@@ -262,6 +266,7 @@ export const SnakeWrapper = forwardRef(({ isPlaying, rows, cols, onScoreUpdate, 
     changeDirection: (dir) => gameRef.current.changeDirection(dir),
     resetGame: () => gameRef.current.resetGame(),
     getGameState: () => gameRef.current.getGameState ? gameRef.current.getGameState() : { snake: gameRef.current.snake, food: gameRef.current.food, score: gameRef.current.score, isGameOver: gameRef.current.isGameOver },
+    loadGameState: (savedState) => gameRef.current.loadGameState?.(savedState),
     get isGameOver() { return gameRef.current.isGameOver; },
     get score() { return gameRef.current.score; },
   }), []);
