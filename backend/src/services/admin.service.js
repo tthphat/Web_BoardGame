@@ -188,20 +188,8 @@ export const AdminService = {
     // =============
     async getRecentActivities() {
         try {
-            // 1. Recent Game Sessions (Last 10)
-            const recentSessions = await knex("game_sessions as gs")
-                .join("users as u", "gs.user_id", "u.id")
-                .join("games as g", "gs.game_id", "g.id")
-                .select(
-                    "gs.id",
-                    "gs.created_at",
-                    "gs.score",
-                    "gs.status",
-                    "u.username",
-                    "g.name as game_name"
-                )
-                .orderBy("gs.created_at", "desc")
-                .limit(10);
+            // 1. Recent Game Sessions (Last 10) - Now using User Game Stats
+            const { data: recentSessions } = await UserGameStatsModel.getRecentUpdates(10);
 
             // 2. New Registrations (Last 5)
             const newRegistrations = await knex("users")
