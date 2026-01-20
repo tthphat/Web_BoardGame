@@ -20,7 +20,7 @@ export const AuthController = {
 
             res.cookie("access_token", user.data.token, {
                 httpOnly: true,
-                secure: process.env.NODE_ENV === "production",
+                secure: true,
                 sameSite: "none",
                 maxAge: 24 * 60 * 60 * 1000
             });
@@ -79,7 +79,7 @@ export const AuthController = {
 
             res.cookie("access_token", user.data.token, {
                 httpOnly: true,
-                secure: process.env.NODE_ENV === "production",
+                secure: true,
                 sameSite: "none",
                 maxAge: 24 * 60 * 60 * 1000
             });
