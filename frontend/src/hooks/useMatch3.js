@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 
 const COLORS = [
     'bg-red-500 shadow-[0_0_5px_red]',
@@ -57,6 +57,10 @@ export const useMatch3 = (isPlaying) => {
     const [score, setScore] = useState(0);
     const [timeLeft, setTimeLeft] = useState(60);
     const [isGameOver, setIsGameOver] = useState(false);
+    const [isPaused, setIsPaused] = useState(false); // Paused state for loaded games
+    
+    // Ref for race-condition-safe pause check
+    const isPausedRef = useRef(false);
 
     // Initialize board when game starts - logic moved inside useEffect to avoid warning
     useEffect(() => {
@@ -79,6 +83,9 @@ export const useMatch3 = (isPlaying) => {
         if (!isPlaying || isGameOver || timeLeft <= 0) return;
 
         const timer = setInterval(() => {
+            // Check isPausedRef to prevent race condition
+            if (isPausedRef.current) return;
+            
             setTimeLeft((prev) => {
                 if (prev <= 1) {
                     setIsGameOver(true);
@@ -262,6 +269,12 @@ export const useMatch3 = (isPlaying) => {
     const handlePixelClick = (r, c) => {
         if (!isPlaying || isAnimating || isGameOver) return;
 
+        // If paused (just loaded), unpause on first click
+        if (isPaused) {
+            isPausedRef.current = false;
+            setIsPaused(false);
+        }
+
         if (!selected) {
             setSelected({ r, c });
         } else {
@@ -291,6 +304,21 @@ export const useMatch3 = (isPlaying) => {
         };
     };
 
+    // Load game state from saved data
+    const loadGameState = useCallback((savedState) => {
+        if (savedState?.board) {
+            // CRITICAL: Set isPausedRef BEFORE state update to prevent race condition
+            isPausedRef.current = true;
+            
+            setBoard(savedState.board);
+            setScore(savedState.score || 0);
+            setTimeLeft(savedState.timeLeft || 60);
+            setIsGameOver(false);
+            setSelected(null);
+            setIsPaused(true);
+        }
+    }, []);
+
     return {
         board,
         selected,
@@ -299,6 +327,8 @@ export const useMatch3 = (isPlaying) => {
         score,
         timeLeft,
         isGameOver,
-        getGameState
+        isPaused,
+        getGameState,
+        loadGameState
     };
 };

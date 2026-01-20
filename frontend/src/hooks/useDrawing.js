@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { getBoardConfig } from '../utils/boardConfig';
 
 // Danh sách màu sắc cho Drawing
@@ -35,93 +35,140 @@ export const useDrawing = (isPlaying) => {
   const [canvas, setCanvas] = useState(createEmptyCanvas);
   const [selectedColor, setSelectedColor] = useState('RED');
   const [isErasing, setIsErasing] = useState(false);
+  
+  // Use ref for isDrawing to avoid stale closure issues
+  const isDrawingRef = useRef(false);
+  const selectedColorRef = useRef('RED');
+  const isErasingRef = useRef(false);
+
+  // Keep refs in sync with state
+  useEffect(() => {
+    selectedColorRef.current = selectedColor;
+  }, [selectedColor]);
+
+  useEffect(() => {
+    isErasingRef.current = isErasing;
+  }, [isErasing]);
 
   // Reset canvas when isPlaying changes (like other games)
   useEffect(() => {
     if (isPlaying) {
-      // Start with empty canvas
       setCanvas(createEmptyCanvas());
       setSelectedColor('RED');
       setIsErasing(false);
+      isDrawingRef.current = false;
     } else {
-      // Clear state when back (isPlaying = false)
       setCanvas(createEmptyCanvas());
       setSelectedColor('RED');
       setIsErasing(false);
+      isDrawingRef.current = false;
     }
   }, [isPlaying, createEmptyCanvas]);
 
-  // Xử lý click vào pixel
-  const handlePixelClick = (r, c) => {
-    if (!isPlaying) return;
+  // Global mouseup listener to stop drawing
+  useEffect(() => {
+    const handleGlobalMouseUp = () => {
+      isDrawingRef.current = false;
+    };
 
-    // Chuyển từ 1-indexed sang 0-indexed
+    window.addEventListener('mouseup', handleGlobalMouseUp);
+    return () => window.removeEventListener('mouseup', handleGlobalMouseUp);
+  }, []);
+
+  // Vẽ pixel (dùng functional update để tránh stale state)
+  const drawPixel = useCallback((r, c) => {
     const canvasR = r - 1;
     const canvasC = c - 1;
 
-    // Kiểm tra ngoài phạm vi
     if (canvasR < 0 || canvasR >= config.rows || canvasC < 0 || canvasC >= config.cols) return;
 
-    // Cập nhật canvas
-    const newCanvas = canvas.map(row => [...row]);
+    setCanvas(prevCanvas => {
+      const newValue = isErasingRef.current ? null : selectedColorRef.current;
+      // Skip if same value (avoid unnecessary re-render)
+      if (prevCanvas[canvasR][canvasC] === newValue) return prevCanvas;
+      
+      const newCanvas = prevCanvas.map(row => [...row]);
+      newCanvas[canvasR][canvasC] = newValue;
+      return newCanvas;
+    });
+  }, [config.rows, config.cols]);
 
-    if (isErasing) {
-      // Xóa pixel
-      newCanvas[canvasR][canvasC] = null;
-    } else {
-      // Tô màu pixel
-      newCanvas[canvasR][canvasC] = selectedColor;
-    }
+  // Xử lý click vào pixel
+  const handlePixelClick = useCallback((r, c) => {
+    if (!isPlaying) return;
+    drawPixel(r, c);
+  }, [isPlaying, drawPixel]);
 
-    setCanvas(newCanvas);
-  };
+  // Xử lý mouse down - bắt đầu vẽ
+  const startDrawing = useCallback((r, c) => {
+    if (!isPlaying) return;
+    isDrawingRef.current = true;
+    drawPixel(r, c);
+  }, [isPlaying, drawPixel]);
+
+  // Xử lý mouse enter khi đang kéo (dùng ref nên không bị stale)
+  const continueDrawing = useCallback((r, c) => {
+    if (!isPlaying || !isDrawingRef.current) return;
+    drawPixel(r, c);
+  }, [isPlaying, drawPixel]);
+
+  // Xử lý mouse up - dừng vẽ
+  const stopDrawing = useCallback(() => {
+    isDrawingRef.current = false;
+  }, []);
 
   // Đổi màu bút
-  const setColor = (colorName) => {
+  const setColor = useCallback((colorName) => {
     setSelectedColor(colorName);
-    setIsErasing(false); // Tắt eraser khi chọn màu
-  };
+    setIsErasing(false);
+  }, []);
 
   // Bật/tắt tẩy
-  const toggleEraser = () => {
-    setIsErasing(!isErasing);
-  };
+  const toggleEraser = useCallback(() => {
+    setIsErasing(prev => !prev);
+  }, []);
 
   // Xóa toàn bộ canvas
-  const clearCanvas = () => {
+  const clearCanvas = useCallback(() => {
     setCanvas(createEmptyCanvas());
-  };
+  }, [createEmptyCanvas]);
 
   // Lấy màu pixel dựa trên canvas state
-  const getPixelColor = (r, c) => {
-    // Chuyển từ 1-indexed sang 0-indexed
+  const getPixelColor = useCallback((r, c) => {
     const canvasR = r - 1;
     const canvasC = c - 1;
 
-    // Kiểm tra ngoài phạm vi
     if (canvasR < 0 || canvasR >= config.rows || canvasC < 0 || canvasC >= config.cols) {
       return 'bg-[#333] shadow-none opacity-40';
     }
 
     const cellColor = canvas[canvasR][canvasC];
+    return cellColor ? getColorClass(cellColor) : 'bg-[#333] shadow-none opacity-40';
+  }, [canvas, config.rows, config.cols]);
 
-    if (cellColor) {
-      return getColorClass(cellColor);
+  // Load game state from saved data
+  const loadGameState = useCallback((savedState) => {
+    if (savedState?.canvas) {
+      setCanvas(savedState.canvas);
+      setSelectedColor(savedState.selectedColor || 'RED');
+      setIsErasing(savedState.isErasing || false);
     }
-
-    // Ô trống
-    return 'bg-[#333] shadow-none opacity-40';
-  };
+  }, []);
 
   return {
     canvas,
     selectedColor,
     isErasing,
+    isDrawing: isDrawingRef.current,
     handlePixelClick,
+    startDrawing,
+    continueDrawing,
+    stopDrawing,
     setColor,
     toggleEraser,
     clearCanvas,
     getPixelColor,
+    loadGameState,
     getGameState: () => ({
       canvas,
       selectedColor,

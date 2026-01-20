@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback, useRef } from 'react';
 import GameMatrix from '../components/games/GameMatrix';
 import GameControls from '../components/games/GameControls';
 import ColorPalette from '../components/games/ColorPalette';
+import HelpModal from '../components/games/HelpModal';
 import { useMemoryGame } from '../hooks/useMemoryGame';
 import { useDrawing } from '../hooks/useDrawing';
 import { useEnabledGames } from '../hooks/useEnabledGames';
@@ -30,6 +31,7 @@ const DashboardPage = () => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [score, setScore] = useState(0);
   const [gameEndHandled, setGameEndHandled] = useState(false);
+  const [showHelp, setShowHelp] = useState(false);
 
   // Game state chung cho tất cả games (thay vì nhiều state riêng lẻ)
   const [gameState, setGameState] = useState({});
@@ -285,7 +287,15 @@ const DashboardPage = () => {
   }, [isPlaying, currentScreenName, gameState.changeDirection, handleEnter, controls]);
 
   return (
-    <div className="h-full w-full flex items-center justify-center p-4 overflow-hidden">
+    <>
+      {/* Help Modal */}
+      <HelpModal
+        isOpen={showHelp}
+        onClose={() => setShowHelp(false)}
+        gameConfig={currentConfig}
+      />
+
+      <div className="h-full w-full flex items-center justify-center p-4 overflow-hidden">
       <div className="bg-[#c0c0c0] dark:bg-[#2d2d2d] p-1 border-2 border-t-white border-l-white border-b-black border-r-black shadow-xl w-full max-w-6xl h-full max-h-[90vh] flex flex-col">
 
         <div className="flex-1 flex flex-row border-2 border-t-[#808080] border-l-[#808080] border-b-white border-r-white dark:border-t-black dark:border-l-black dark:border-b-[#555] dark:border-r-[#555] p-1 overflow-hidden">
@@ -302,6 +312,33 @@ const DashboardPage = () => {
               drawingState={drawingGame}
               ref={gameMatrixRef}
             />
+            
+            {/* Pause overlay for Snake when loading game */}
+            {currentScreenName === 'SNAKE' && isPlaying && gameState.isPaused && (
+              <div className="absolute inset-0 bg-black/70 flex items-center justify-center z-50 animate-in fade-in duration-200 pointer-events-none">
+                 <div className="text-xl font-bold text-white bg-black/80 px-4 py-2 rounded border border-white/20 animate-pulse text-center">
+                    PRESS ARROW KEYS<br/>TO START
+                  </div>
+              </div>
+            )}
+            
+            {/* Pause overlay for Match3 when loading game */}
+            {currentScreenName === 'MATCH3' && isPlaying && gameState.isPaused && (
+              <div className="absolute inset-0 bg-black/70 flex items-center justify-center z-50 animate-in fade-in duration-200 pointer-events-none">
+                 <div className="text-xl font-bold text-white bg-black/80 px-4 py-2 rounded border border-white/20 animate-pulse text-center">
+                    CLICK TO START
+                  </div>
+              </div>
+            )}
+            
+            {/* Pause overlay for Memory when loading game */}
+            {currentScreenName === 'MEMORY' && isPlaying && memoryGame.isPaused && (
+              <div className="absolute inset-0 bg-black/70 flex items-center justify-center z-50 animate-in fade-in duration-200 pointer-events-none">
+                 <div className="text-xl font-bold text-white bg-black/80 px-4 py-2 rounded border border-white/20 animate-pulse text-center">
+                    CLICK A CARD<br/>TO START
+                  </div>
+              </div>
+            )}
           </div >
 
           {/* CỘT PHẢI: ĐIỀU KHIỂN */}
@@ -367,6 +404,7 @@ const DashboardPage = () => {
                   screens={screens}
                   currentScreenIndex={currentScreenIndex}
                   gameEndHandled={gameEndHandled}
+                  onLoad={() => setGameEndHandled(false)}
                 />
               )}
 
@@ -376,12 +414,14 @@ const DashboardPage = () => {
                 onRight={handleNextScreen}
                 onBack={handleBack}
                 onEnter={handleEnter}
+                onHelp={() => setShowHelp(true)}
               />
             </div>
           </div >
         </div >
       </div >
-    </div >
+      </div>
+    </>
   );
 };
 
