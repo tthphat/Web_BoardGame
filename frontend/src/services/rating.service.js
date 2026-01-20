@@ -1,11 +1,11 @@
+import { API_BASE } from "@/lib/api";
+import { getAuthHeaders } from "@/lib/auth-headers";
+
 export async function addRatingApi(gameSlug, rating, comment) {
-    const response = await fetch("/api/games/ratings", {
+    const response = await fetch(`${API_BASE}/games/ratings`, {
         method: "POST",
         credentials: "include",
-        headers: {
-            "Content-Type": "application/json",
-            "x-api-key": import.meta.env.VITE_API_KEY,
-        },
+        headers: getAuthHeaders(),
         body: JSON.stringify({ gameSlug, rating, comment }),
     });
 
@@ -20,13 +20,10 @@ export async function addRatingApi(gameSlug, rating, comment) {
 }
 
 export async function getGameRatingsApi(gameSlug, page = 1, limit = 10) {
-    const response = await fetch(`/api/games/${gameSlug}/ratings?page=${page}&limit=${limit}`, {
+    const response = await fetch(`${API_BASE}/games/${gameSlug}/ratings?page=${page}&limit=${limit}`, {
         method: "GET",
         credentials: "include",
-        headers: {
-            "Content-Type": "application/json",
-            "x-api-key": import.meta.env.VITE_API_KEY,
-        },
+        headers: getAuthHeaders(),
     });
 
     const data = await response.json();
