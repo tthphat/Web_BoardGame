@@ -375,6 +375,18 @@ const GameMatrix = forwardRef(({
           transform: `scale(${scale})`
         }}
         key={forceRenderKey}
+        onMouseLeave={() => {
+          // Stop drawing when mouse leaves the board
+          if (screen === 'DRAWING' && drawingState?.stopDrawing) {
+            drawingState.stopDrawing();
+          }
+        }}
+        onMouseUp={() => {
+          // Stop drawing when mouse is released
+          if (screen === 'DRAWING' && drawingState?.stopDrawing) {
+            drawingState.stopDrawing();
+          }
+        }}
       >
         {Array.from({ length: rows * cols }).map((_, index) => {
           const r = Math.floor(index / cols) + 1;
@@ -387,6 +399,18 @@ const GameMatrix = forwardRef(({
               className={`rounded-full cursor-pointer transition-all duration-200 ${colorClass}`}
               style={{ width: dotSize, height: dotSize }}
               onClick={() => handlePixelClick(r, c)}
+              onMouseDown={() => {
+                // Start drawing when mouse is pressed (Drawing game only)
+                if (screen === 'DRAWING' && drawingState?.startDrawing) {
+                  drawingState.startDrawing(r, c);
+                }
+              }}
+              onMouseEnter={() => {
+                // Continue drawing when dragging (Drawing game only)
+                if (screen === 'DRAWING' && drawingState?.continueDrawing) {
+                  drawingState.continueDrawing(r, c);
+                }
+              }}
             />
           );
         })}

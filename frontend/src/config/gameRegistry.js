@@ -71,10 +71,10 @@ export const GAME_REGISTRY = {
     initialState: { currentPlayer: 'BLUE', winner: null },
     getStatusText: (state, isPlaying) => {
       if (!isPlaying) return '';
-      if (state.winner === 'DRAW') return '- HÒA!';
-      if (state.winner === 'BLUE') return '- XANH THẮNG!';
-      if (state.winner === 'RED') return '- ĐỎ THẮNG!';
-      return `- Lượt ${state.currentPlayer === 'BLUE' ? 'XANH' : 'ĐỎ'}`;
+      if (state.winner === 'DRAW') return '- DRAW!';
+      if (state.winner === 'BLUE') return '- BLUE WINS!';
+      if (state.winner === 'RED') return '- RED WINS!';
+      return `- ${state.currentPlayer === 'BLUE' ? 'BLUE' : 'RED'}'s turn`;
     },
   },
   CARO4: {
@@ -89,10 +89,10 @@ export const GAME_REGISTRY = {
     initialState: { currentPlayer: 'BLUE', winner: null },
     getStatusText: (state, isPlaying) => {
       if (!isPlaying) return '';
-      if (state.winner === 'DRAW') return '- HÒA!';
-      if (state.winner === 'BLUE') return '- XANH THẮNG!';
-      if (state.winner === 'RED') return '- ĐỎ THẮNG!';
-      return `- Lượt ${state.currentPlayer === 'BLUE' ? 'XANH' : 'ĐỎ'}`;
+      if (state.winner === 'DRAW') return '- DRAW!';
+      if (state.winner === 'BLUE') return '- BLUE WINS!';
+      if (state.winner === 'RED') return '- RED WINS!';
+      return `- ${state.currentPlayer === 'BLUE' ? 'BLUE' : 'RED'}'s turn`;
     },
   },
   TICTACTOE: {
