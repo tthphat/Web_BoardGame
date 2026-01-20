@@ -46,7 +46,6 @@ const AdminMainLayout = () => {
             case 'GameConfig':
                 return <GameConfig />;
             case 'Statistics':
-            case 'Statistics':
                 return <Statistics />;
             default:
                 return <AdminDashboardMock />;
