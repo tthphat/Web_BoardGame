@@ -31,11 +31,11 @@ export const GAME_REGISTRY = {
       title: 'Welcome',
       objective: 'Navigate through the game menu',
       controls: [
-        '← → or A/D: Browse games',
-        'Enter: Select and start game',
-        'Back: Return to menu',
+        'Click ← → : Browse games',
+        'Click Enter: Select and start game',
+        'Click Back: Return to menu',
       ],
-      tips: 'Use the control buttons below to navigate!',
+      tips: 'Enjoy playing the game!',
     },
   },
   SNAKE: {
@@ -81,12 +81,12 @@ export const GAME_REGISTRY = {
       title: 'Free Draw',
       objective: 'Express your creativity on the canvas',
       controls: [
-        'Click/Drag: Draw pixels',
+        'Click: Draw pixels',
         'Color palette: Select colors',
         'Eraser: Remove pixels',
         'Clear: Reset canvas',
       ],
-      tips: 'Hold and drag to draw continuously!',
+      tips: 'Draw your imagination!',
     },
   },
   CARO5: {

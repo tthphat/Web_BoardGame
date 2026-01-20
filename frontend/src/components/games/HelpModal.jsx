@@ -27,7 +27,7 @@ const HelpModal = ({ isOpen, onClose, gameConfig }) => {
         {/* Title Bar - Navy Blue Win95 Style */}
         <div className="bg-gradient-to-r from-[#000080] to-[#1084d0] px-2 py-1 flex justify-between items-center">
           <span className="text-white font-bold font-mono text-sm tracking-wide flex items-center gap-2">
-            📖 {title.toUpperCase()}.HLP
+            {title.toUpperCase()}.HLP
           </span>
           <button 
             onClick={onClose}
@@ -47,17 +47,17 @@ const HelpModal = ({ isOpen, onClose, gameConfig }) => {
             
             {/* Objective Section */}
             <div className="mb-4">
-              <span className="font-mono font-bold text-green-600 dark:text-green-400">🎯 OBJECTIVE: </span>
+              <span className="font-mono font-bold text-green-600 dark:text-green-400">OBJECTIVE: </span>
               <span className="font-mono text-gray-800 dark:text-gray-200">{objective}</span>
             </div>
 
             {/* Controls Section */}
             <div className="mb-4">
-              <div className="font-mono font-bold text-purple-600 dark:text-purple-400 mb-2">🎮 CONTROLS:</div>
+              <div className="font-mono font-bold text-purple-600 dark:text-purple-400 mb-2">CONTROLS:</div>
               <ul className="font-mono text-gray-800 dark:text-gray-200 text-sm space-y-1 ml-4">
                 {controls.map((ctrl, i) => (
                   <li key={i} className="flex items-start gap-2">
-                    <span className="text-cyan-600 dark:text-cyan-400">►</span>
+                    <span className="text-cyan-600 dark:text-cyan-400">-</span>
                     <span>{ctrl}</span>
                   </li>
                 ))}
@@ -69,7 +69,7 @@ const HelpModal = ({ isOpen, onClose, gameConfig }) => {
               <div className="bg-[#ffffcc] dark:bg-yellow-900/40 p-3 
                               border border-[#808080] dark:border-yellow-700
                               font-mono text-sm text-gray-800 dark:text-yellow-200">
-                <span className="font-bold">💡 TIP:</span> {tips}
+                <span className="font-bold">TIP:</span> {tips}
               </div>
             )}
           </div>
