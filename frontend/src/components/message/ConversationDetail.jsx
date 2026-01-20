@@ -126,15 +126,15 @@ function ConversationDetail() {
     if (loading) return <div className="h-full flex items-center justify-center">Loading...</div>; // Or use Loading component if imported
 
     return (
-        <div className="h-full flex flex-col bg-white">
+        <div className="h-full flex flex-col bg-white dark:bg-[#333]">
             {/* Chat Header */}
-            <div className="p-3 border-b border-gray-200 flex items-center justify-between bg-white shadow-sm z-10">
+            <div className="p-3 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between bg-white dark:bg-[#2d2d2d] shadow-sm z-10">
                 <div className="flex items-center gap-3">
                     <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-500">
                         <UserRound className="w-6 h-6" />
                     </div>
                     <div>
-                        <h3 className="font-bold text-gray-800">{partner.username}</h3>
+                        <h3 className="font-bold text-gray-800 dark:text-white">{partner.username}</h3>
                         <div className="flex items-center gap-1.5">
                             <span className="w-2 h-2 rounded-full bg-green-500"></span>
                             <p className="text-xs text-green-600 font-medium">Online</p>
@@ -142,14 +142,14 @@ function ConversationDetail() {
                     </div>
                 </div>
 
-                <div className="flex items-center gap-2 text-gray-500">
-                    <button className="p-2 hover:bg-gray-100 rounded-full transition-colors">
+                <div className="flex items-center gap-2 text-gray-500 dark:text-gray-400">
+                    <button className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full transition-colors">
                         <Phone className="w-5 h-5" />
                     </button>
-                    <button className="p-2 hover:bg-gray-100 rounded-full transition-colors">
+                    <button className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full transition-colors">
                         <Video className="w-5 h-5" />
                     </button>
-                    <button className="p-2 hover:bg-gray-100 rounded-full transition-colors">
+                    <button className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full transition-colors">
                         <MoreVertical className="w-5 h-5" />
                     </button>
                 </div>
@@ -158,7 +158,7 @@ function ConversationDetail() {
             {/* Messages Area */}
             <div
                 ref={scrollContainerRef}
-                className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50"
+                className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50 dark:bg-[#333]"
             >
                 {hasMore && messages.length > 0 && (
                     <div className="flex justify-center mb-8 ">
@@ -179,7 +179,7 @@ function ConversationDetail() {
                             )}
                             <div className={`max-w-[70%] rounded-2xl px-4 py-2 shadow-sm ${isMe
                                 ? "bg-blue-600 text-white rounded-br-none"
-                                : "bg-white text-gray-800 border border-gray-200 rounded-bl-none"
+                                : "bg-white dark:bg-[#2d2d2d] text-gray-800 dark:text-gray-200 border border-gray-200 dark:border-gray-700 rounded-bl-none"
                                 }`}>
                                 <p className="text-sm">{msg.content}</p>
                                 <p className={`text-[10px] mt-1 text-right ${isMe ? "text-blue-200" : "text-gray-400"}`}>
@@ -193,12 +193,12 @@ function ConversationDetail() {
             </div>
 
             {/* Input Area */}
-            <div className="p-3 border-t border-gray-200 bg-white">
+            <div className="p-3 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-[#2d2d2d]">
                 <form onSubmit={handleSendMessage} className="flex items-center gap-2">
                     <input
                         type="text"
                         placeholder="Type a message..."
-                        className="flex-1 py-2 px-4 bg-gray-100 border-none rounded-full focus:ring-2 focus:ring-blue-500 focus:outline-none transition-all"
+                        className="flex-1 py-2 px-4 bg-gray-100 dark:bg-[#404040] dark:text-white border-none rounded-full focus:ring-2 focus:ring-blue-500 focus:outline-none transition-all"
                         value={inputMessage}
                         onChange={(e) => setInputMessage(e.target.value)}
                     />
@@ -208,7 +208,7 @@ function ConversationDetail() {
                         className={`p-2 rounded-full transition-colors 
                             ${inputMessage.trim()
                                 ? "bg-blue-600 text-white hover:bg-blue-700 shadow-md"
-                                : "bg-gray-200 text-gray-400 cursor-not-allowed"
+                                : "bg-gray-200 dark:bg-gray-700 text-gray-400 dark:text-gray-500 cursor-not-allowed"
                             }`}
                     >
                         <Send className="w-5 h-5" />

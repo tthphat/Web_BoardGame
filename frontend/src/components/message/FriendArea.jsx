@@ -82,14 +82,14 @@ function FriendArea() {
 
 
     return (
-        <div className="w-full h-full bg-white flex flex-col">
+        <div className="w-full h-full bg-white dark:bg-[#333] flex flex-col">
             {/* Search Header */}
             <div className="search-bar flex justify-end">
                 <div className="relative flex w-full items-center gap-2 font-mono">
                     <input
                         type="text"
                         placeholder="Search..."
-                        className="flex-1 p-2 pr-8 border border-gray-600"
+                        className="flex-1 p-2 pr-8 border border-gray-600 dark:bg-[#2d2d2d] dark:text-white"
                         ref={searchRef}
                         onChange={(e) => {
                             if (e.target.value === "" && search !== "") {
@@ -117,7 +117,7 @@ function FriendArea() {
 
                     <button
                         onClick={handleSearch}
-                        className="p-2 border border-gray-600 transition-all hover:bg-blue-800 hover:text-white"
+                        className="p-2 border border-gray-600 transition-all hover:bg-blue-800 hover:text-white dark:text-white"
                     >
                         Search
                     </button>
@@ -132,13 +132,12 @@ function FriendArea() {
                     <>
                         {/* Chưa có conversation */}
                         {conversations.length === 0 && search && (
-                            <div className="divide-y divide-gray-100">
+                            <div>
                                 {users.map(user => (
                                     <div
                                         key={user.id}
                                         onClick={() => handleStartNewChat(user.id)}
-                                        className={`flex items-center gap-3 p-3 hover:bg-blue-50 cursor-pointer ${location.pathname === `/messages/new/${user.id}` ? "bg-blue-50" : ""
-                                            }`}
+                                        className={`flex items-center gap-3 p-3 hover:bg-blue-50 cursor-pointer dark:hover:bg-gray-700`}
                                     >
                                         <div className="relative flex-shrink-0">
                                             <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-500">
@@ -146,7 +145,7 @@ function FriendArea() {
                                             </div>
                                         </div>
                                         <div className="flex flex-col justify-between">
-                                            <span>{user.username}</span>
+                                            <span className="dark:text-white">{user.username}</span>
                                             <span className="text-xs text-gray-400">Start new chat</span>
                                         </div>
                                     </div>
@@ -156,10 +155,10 @@ function FriendArea() {
 
                         {/* Đã tồn tại conversation */}
                         {conversations.length > 0 && (
-                            <div className="divide-y divide-gray-100">
+                            <div>
                                 {conversations.map((conversation) => (
                                     <Link to={`/messages/${conversation.conversation_id}`} key={conversation.conversation_id}
-                                        className="flex items-center gap-3 p-3 hover:bg-blue-50 cursor-pointer transition-colors group"
+                                        className="flex items-center gap-3 p-3 hover:bg-blue-50 dark:hover:bg-gray-700 cursor-pointer transition-colors group"
                                     >
                                         {/* Avatar */}
                                         <div className="relative flex-shrink-0">
@@ -171,14 +170,14 @@ function FriendArea() {
                                         {/* Content */}
                                         <div className="flex-1 min-w-0">
                                             <div className="flex justify-between items-baseline mb-0.5">
-                                                <h3 className="font-semibold text-gray-900 truncate text-sm">
+                                                <h3 className="font-semibold text-gray-900 dark:text-gray-100 truncate text-sm">
                                                     {conversation.partner_name}
                                                 </h3>
                                             </div>
                                             <div className="flex justify-between items-center gap-2">
                                                 <p className={`text-xs truncate ${conversation.last_message_sender_id !== conversation.partner_id
-                                                    ? "text-gray-500"
-                                                    : "text-gray-900 font-medium"
+                                                    ? "text-gray-500 dark:text-gray-400"
+                                                    : "text-gray-900 dark:text-gray-200 font-medium"
                                                     }`}>
                                                     {conversation.last_message_sender_id !== conversation.partner_id && "You: "}
                                                     {conversation.last_message}
@@ -202,7 +201,7 @@ function FriendArea() {
             </div>
 
             {/* Pagination */}
-            <div className="p-2 border-t border-gray-200">
+            <div className="p-2 border-t border-gray-200 dark:border-gray-700">
                 <PaginationSection dataLength={conversations.length} totalPages={totalPages} currentPage={page} onPageChange={setPage} />
             </div>
         </div >
