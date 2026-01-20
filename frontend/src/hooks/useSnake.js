@@ -5,13 +5,13 @@ export const useSnake = (enabled, rows, cols) => {
     const calcInitialState = useCallback(() => {
         const midR = Math.floor(rows / 2) || 7;
         const midC = Math.floor(cols / 2) || 7;
-        
+
         const initialSnake = [
             { r: midR, c: midC },
             { r: midR, c: midC + 1 },
             { r: midR, c: midC + 2 }
         ];
-        
+
         return {
             snake: initialSnake,
             food: { r: Math.max(1, midR - 3), c: midC },
@@ -20,7 +20,7 @@ export const useSnake = (enabled, rows, cols) => {
             score: 0
         };
     }, [rows, cols]);
-   
+
     const [gameState, setGameState] = useState(() => calcInitialState());
 
     const intervalRef = useRef(null);
@@ -160,10 +160,26 @@ export const useSnake = (enabled, rows, cols) => {
         return 'bg-[#333] opacity-40';
     };
 
+    // Get serialized game state for saving
+    const getGameState = () => {
+        return {
+            snake: gameState.snake,
+            food: gameState.food,
+            score: gameState.score,
+            isGameOver: gameState.isGameOver,
+            config: {
+                type: 'snake',
+                rows: rows,
+                cols: cols
+            }
+        };
+    };
+
     return {
         ...gameState,
         resetGame,
         changeDirection,
-        getPixelColor
+        getPixelColor,
+        getGameState
     };
 };

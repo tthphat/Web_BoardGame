@@ -1,4 +1,4 @@
-import React, { useRef, useState, useCallback, useEffect } from 'react';
+import React, { useRef, useState, useCallback, useEffect, forwardRef, useImperativeHandle } from 'react';
 import { getBoardConfig } from '../../utils/boardConfig';
 import {
   GAME_REGISTRY,
@@ -25,7 +25,7 @@ import { useSettings } from '../../contexts/SettingsContext';
 
 // ... (imports)
 
-const GameMatrix = ({
+const GameMatrix = forwardRef(({
   screen = 'HEART',
   isPlaying = false,
   onScoreUpdate,
@@ -34,7 +34,7 @@ const GameMatrix = ({
   onCardClick,
   botEnabled = false,
   drawingState
-}) => {
+}, ref) => {
   const { activeConfig } = useSettings();
   const defaultConfig = getBoardConfig();
 
@@ -58,19 +58,55 @@ const GameMatrix = ({
   // ===== REFS OBJECT - Map refKey -> ref =====
   // Do React hooks không thể tạo động, ta phải khai báo sẵn
   // nhưng dùng object để lookup theo refKey từ registry
+  // IMPORTANT: These refs are stable across renders
+  const ticTacToeRef = useRef(null);
+  const caro4Ref = useRef(null);
+  const caro5Ref = useRef(null);
+  const match3Ref = useRef(null);
+  const snakeRef = useRef(null);
+
   const gameRefs = {
-    ticTacToe: useRef(null),
-    caro4: useRef(null),
-    caro5: useRef(null),
-    match3: useRef(null),
-    snake: useRef(null),
+    ticTacToe: ticTacToeRef,
+    caro4: caro4Ref,
+    caro5: caro5Ref,
+    match3: match3Ref,
+    snake: snakeRef,
   };
 
   // Helper: Lấy ref của game hiện tại dựa trên registry
-  const getActiveGameRef = () => {
+  const getActiveGameRef = useCallback(() => {
     const refKey = gameConfig?.refKey;
     return refKey ? gameRefs[refKey] : null;
-  };
+  }, [gameConfig?.refKey]);
+
+  // Expose getGameState via ref
+  useImperativeHandle(ref, () => ({
+    getGameState: () => {
+      // 1. Games with Wrappers (TicTacToe, Caro, Snake, Match3)
+      if (gameConfig?.hasWrapper) {
+        const refKey = gameConfig?.refKey;
+        const gameRef = refKey ? gameRefs[refKey] : null;
+        console.log('[GameMatrix] getGameState - screen:', screen, 'refKey:', refKey, 'gameRef:', gameRef?.current);
+        if (gameRef?.current?.getGameState) {
+          return gameRef.current.getGameState();
+        }
+      }
+
+      // 2. Drawing Game
+      if (screen === 'DRAWING' && drawingState?.getGameState) {
+        return drawingState.getGameState();
+      }
+
+      // 3. Memory Game
+      if (screen === 'MEMORY' && activeGameState?.getGameState) {
+        return activeGameState.getGameState();
+      }
+
+      console.warn('GameMatrix: No getGameState method found for current screen:', screen);
+      return null;
+    }
+  }), [screen, activeGameState, gameConfig, drawingState]);
+
 
   // Fullboard: dùng toàn bộ board thay vì 13x13
   const useFullboard = isPlaying && gameConfig?.fullboard;
@@ -322,6 +358,6 @@ const GameMatrix = ({
       </div>
     </div>
   );
-};
+});
 
 export default GameMatrix;

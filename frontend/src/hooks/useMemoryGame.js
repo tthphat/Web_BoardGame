@@ -9,21 +9,21 @@ const TIME_LIMIT = 30;
 
 // Danh sách các cặp màu/icon (8 cặp)
 const CARD_TYPES = [
-  'RED', 'BLUE', 'GREEN', 'YELLOW', 
+  'RED', 'BLUE', 'GREEN', 'YELLOW',
   'PURPLE', 'CYAN', 'ORANGE', 'WHITE'
 ];
 
-export const useMemoryGame = () => {
+export const useMemoryGame = (isPlaying) => {
   // --- STATE ---
   // board: Mảng 16 phần tử, mỗi phần tử lưu { id, type, isFlipped, isMatched }
-  const [board, setBoard] = useState([]); 
+  const [board, setBoard] = useState([]);
   const [cursor, setCursor] = useState(0); // Vị trí con trỏ (0-15)
   const [flippedIndices, setFlippedIndices] = useState([]); // Các thẻ đang lật tạm thời
   const [isProcessing, setIsProcessing] = useState(false); // Chặn input khi đang check match
   const [score, setScore] = useState(0);
   const [gameState, setGameState] = useState('idle'); // 'idle', 'playing', 'finished', 'timeout'
   const [timeLeft, setTimeLeft] = useState(TIME_LIMIT); // Countdown timer
-  
+
   const timerRef = useRef(null);
 
   // Timer countdown logic
@@ -40,7 +40,7 @@ export const useMemoryGame = () => {
         });
       }, 1000);
     }
-    
+
     return () => {
       if (timerRef.current) {
         clearInterval(timerRef.current);
@@ -48,16 +48,63 @@ export const useMemoryGame = () => {
     };
   }, [gameState]);
 
-  // --- INIT GAME ---
+  // --- AUTO INIT/RESET based on isPlaying (like other games) ---
+  useEffect(() => {
+    if (isPlaying) {
+      // Init game when starting
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+      }
+
+      // 1. Tạo 8 cặp thẻ
+      let cards = [...CARD_TYPES, ...CARD_TYPES];
+
+      // 2. Xáo trộn (Shuffle)
+      for (let i = cards.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [cards[i], cards[j]] = [cards[j], cards[i]];
+      }
+
+      // 3. Map vào state object
+      const newBoard = cards.map((type, index) => ({
+        id: index,
+        type,
+        isFlipped: false,
+        isMatched: false,
+      }));
+
+      setBoard(newBoard);
+      setCursor(0);
+      setFlippedIndices([]);
+      setScore(0);
+      setTimeLeft(TIME_LIMIT);
+      setGameState('playing');
+      setIsProcessing(false);
+    } else {
+      // Clear state when back (isPlaying = false)
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+      }
+      setBoard([]);
+      setCursor(0);
+      setFlippedIndices([]);
+      setScore(0);
+      setTimeLeft(TIME_LIMIT);
+      setGameState('idle');
+      setIsProcessing(false);
+    }
+  }, [isPlaying]);
+
+  // --- INIT GAME (manual call, kept for compatibility) ---
   const initGame = useCallback(() => {
     // Clear timer if exists
     if (timerRef.current) {
       clearInterval(timerRef.current);
     }
-    
+
     // 1. Tạo 8 cặp thẻ
     let cards = [...CARD_TYPES, ...CARD_TYPES];
-    
+
     // 2. Xáo trộn (Shuffle)
     for (let i = cards.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
@@ -86,7 +133,7 @@ export const useMemoryGame = () => {
   // Di chuyển con trỏ (Trái/Phải)
   const moveCursor = (direction) => {
     if (gameState !== 'playing') return;
-    
+
     setCursor((prev) => {
       if (direction === 'right') return (prev + 1) % (ROWS * COLS);
       if (direction === 'left') return (prev - 1 + (ROWS * COLS)) % (ROWS * COLS);
@@ -96,7 +143,7 @@ export const useMemoryGame = () => {
 
   const performFlip = (index) => {
     if (gameState !== 'playing' || isProcessing) return;
-    
+
     const currentCard = board[index];
     // Nếu thẻ đã lật hoặc đã match thì bỏ qua
     if (currentCard.isFlipped || currentCard.isMatched) return;
@@ -105,7 +152,7 @@ export const useMemoryGame = () => {
     const newBoard = [...board];
     newBoard[index].isFlipped = true;
     setBoard(newBoard);
-    
+
     const newFlipped = [...flippedIndices, index];
     setFlippedIndices(newFlipped);
 
@@ -145,7 +192,7 @@ export const useMemoryGame = () => {
 
         // Check Win Condition
         if (matchedBoard.every(c => c.isMatched)) {
-            setGameState('finished');
+          setGameState('finished');
         }
       }, 500);
     } else {
@@ -161,6 +208,20 @@ export const useMemoryGame = () => {
     }
   };
 
+  // Reset game (clear state when back)
+  const resetGame = useCallback(() => {
+    if (timerRef.current) {
+      clearInterval(timerRef.current);
+    }
+    setBoard([]);
+    setCursor(0);
+    setFlippedIndices([]);
+    setScore(0);
+    setTimeLeft(TIME_LIMIT);
+    setGameState('idle');
+    setIsProcessing(false);
+  }, []);
+
   return {
     board,
     cursor,
@@ -168,8 +229,21 @@ export const useMemoryGame = () => {
     gameState,
     timeLeft,
     initGame,
+    resetGame,
     moveCursor,
     flipCard,
     handleCardClick,
+    getGameState: () => ({
+      board,
+      cursor,
+      score,
+      gameState,
+      timeLeft,
+      config: {
+        type: 'memory',
+        rows: ROWS,
+        cols: COLS
+      }
+    }),
   };
 };
