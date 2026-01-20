@@ -57,7 +57,10 @@ const SaveLoadButtons = ({
             toast.dismiss(loadingToast);
 
             if (data && data.state) {
-                const savedState = JSON.parse(data.state);
+                // Handle both string and already-parsed object
+                const savedState = typeof data.state === 'string' 
+                    ? JSON.parse(data.state) 
+                    : data.state;
                 console.log("Loaded Game State:", savedState);
 
                 // Call loadGameState via gameMatrixRef
