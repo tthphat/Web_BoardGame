@@ -25,32 +25,32 @@ export async function seed(knex) {
   await knex("friends").insert([
     // Phát ↔ Quân (đã là bạn)
     {
-      user_id: phat.id,
-      friend_id: quan.id,
+      sender_id: phat.id,
+      receiver_id: quan.id,
       status: "accepted"
     },
     {
-      user_id: quan.id,
-      friend_id: phat.id,
+      sender_id: quan.id,
+      receiver_id: phat.id,
       status: "accepted"
     },
 
     // Phát → Phúc (đang chờ)
     {
-      user_id: phat.id,
-      friend_id: phuc.id,
+      sender_id: phat.id,
+      receiver_id: phuc.id,
       status: "pending"
     },
 
     // Phú ↔ Quân (đã là bạn)
     {
-      user_id: phu.id,
-      friend_id: quan.id,
+      sender_id: phu.id,
+      receiver_id: quan.id,
       status: "accepted"
     },
     {
-      user_id: quan.id,
-      friend_id: phu.id,
+      sender_id: quan.id,
+      receiver_id: phu.id,
       status: "accepted"
     }
   ]);
