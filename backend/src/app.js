@@ -46,6 +46,8 @@ app.use("/api-docs", swaggerProtect, swaggerUi.serve, swaggerUi.setup(swaggerSpe
 app.use("/api/auth", authRoute); // login, register
 app.get("/api/games/enabled", GameController.getEnabledGames); // enabled games list
 
+app.get("api/games/board-configs", GameController.getBoardConfigs);
+
 // Apply API key check for all routes below
 app.use(checkApiKey);
 
