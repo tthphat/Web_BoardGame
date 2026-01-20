@@ -147,16 +147,17 @@ const AdminDashboardMock = () => {
                 </thead>
                 <tbody className="font-mono">
                   {activities.recentSessions.length > 0 ? (
-                    activities.recentSessions.map((session) => (
-                      <tr key={session.id} className="border-b border-dashed border-gray-200 dark:border-gray-800 hover:bg-blue-50 dark:hover:bg-blue-900/20">
-                        <td className="p-2 text-gray-500">{formatTime(session.created_at)}</td>
+                    activities.recentSessions.map((session, index) => (
+                      <tr key={index} className="border-b border-dashed border-gray-200 dark:border-gray-800 hover:bg-blue-50 dark:hover:bg-blue-900/20">
+                        <td className="p-2 text-gray-500">{formatTime(session.updated_at)}</td>
                         <td className="p-2 font-bold text-blue-700 dark:text-blue-400">{session.game_name}</td>
                         <td className="p-2">{session.username}</td>
-                        <td className="p-2">Score: {session.score}</td>
                         <td className="p-2">
-                          <span className={`px-1 rounded ${session.status === 'finished' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}`}>
-                            {session.status.toUpperCase()}
-                          </span>
+                          <span className="block text-[10px] text-gray-500">Best: {session.best_score}</span>
+                          <span className="block text-[10px] text-gray-500">Plays: {session.total_plays}</span>
+                        </td>
+                        <td className="p-2">
+                          <span className="px-1 bg-green-100 text-green-800 rounded">ACTIVE</span>
                         </td>
                       </tr>
                     ))
