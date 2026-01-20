@@ -31,8 +31,8 @@ const GameRating = ({ gameSlug, gameName }) => {
                 <DialogHeader className="space-y-0 text-left">
                     
                     {/* 3. Dùng DialogTitle làm thanh tiêu đề xanh (Retro Window Bar) */}
-                    <DialogTitle className="bg-[#000080] text-white px-3 py-1.5 font-bold text-sm uppercase tracking-wider flex items-center gap-2 select-none border-b-2 border-black">
-                        <Star className="h-3 w-3 fill-white text-white" />
+                    <DialogTitle className="bg-[#000080] text-white dark:text-black px-3 py-1.5 font-bold text-sm uppercase tracking-wider flex items-center gap-2 select-none border-b-2 border-black">
+                        <Star className="h-3 w-3 fill-white dark:fill-black text-white dark:text-black" />
                         RATE_GAME.EXE
                     </DialogTitle>
 
