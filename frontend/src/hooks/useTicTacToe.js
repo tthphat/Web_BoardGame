@@ -240,16 +240,27 @@ export const useTicTacToe = (isPlaying, botEnabled = false) => {
         };
     };
 
+    // Load game state from saved data
+    const loadGameState = useCallback((savedState) => {
+        if (savedState?.board) {
+            setBoard(savedState.board);
+            setCurrentPlayer('X');
+            setWinner(null);
+            setWinningLine([]);
+        }
+    }, []);
+
     return {
         board,
         currentPlayer,
         winner,
         winningLine,
         score,
-        totalWins: score, // Alias for score to display wins in UI
+        totalWins: score,
         handlePixelClick,
         getPixelColor,
         resetGame,
         getGameState,
+        loadGameState,
     };
 };

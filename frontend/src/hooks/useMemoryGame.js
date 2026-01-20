@@ -23,13 +23,18 @@ export const useMemoryGame = (isPlaying) => {
   const [score, setScore] = useState(0);
   const [gameState, setGameState] = useState('idle'); // 'idle', 'playing', 'finished', 'timeout'
   const [timeLeft, setTimeLeft] = useState(TIME_LIMIT); // Countdown timer
+  const [isPaused, setIsPaused] = useState(false); // Paused state for loaded games
 
   const timerRef = useRef(null);
+  const isPausedRef = useRef(false); // Ref for race-condition-safe pause check
 
   // Timer countdown logic
   useEffect(() => {
     if (gameState === 'playing' && timeLeft > 0) {
       timerRef.current = setInterval(() => {
+        // Check isPausedRef to prevent race condition
+        if (isPausedRef.current) return;
+        
         setTimeLeft(prev => {
           if (prev <= 1) {
             clearInterval(timerRef.current);
@@ -167,6 +172,12 @@ export const useMemoryGame = (isPlaying) => {
     performFlip(cursor);
   };
   const handleCardClick = (index) => {
+    // If paused (just loaded), unpause on first click
+    if (isPaused && gameState === 'playing') {
+      isPausedRef.current = false;
+      setIsPaused(false);
+    }
+    
     // Cập nhật cursor đến vị trí vừa click (để đồng bộ giao diện)
     setCursor(index);
     // Thực hiện lật
@@ -222,14 +233,33 @@ export const useMemoryGame = (isPlaying) => {
     setIsProcessing(false);
   }, []);
 
+  // Load game state from saved data
+  const loadGameState = useCallback((savedState) => {
+    if (savedState?.board) {
+      // CRITICAL: Set isPausedRef BEFORE state update to prevent race condition
+      isPausedRef.current = true;
+      
+      setBoard(savedState.board);
+      setCursor(savedState.cursor || 0);
+      setScore(savedState.score || 0);
+      setTimeLeft(savedState.timeLeft || TIME_LIMIT);
+      setGameState('playing');
+      setFlippedIndices([]);
+      setIsProcessing(false);
+      setIsPaused(true);
+    }
+  }, []);
+
   return {
     board,
     cursor,
     score,
     gameState,
     timeLeft,
+    isPaused,
     initGame,
     resetGame,
+    loadGameState,
     moveCursor,
     flipCard,
     handleCardClick,

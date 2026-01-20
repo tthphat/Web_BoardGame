@@ -1,4 +1,5 @@
 import React, { useRef, useState, useCallback, useEffect, forwardRef, useImperativeHandle } from 'react';
+import { flushSync } from 'react-dom';
 import { getBoardConfig } from '../../utils/boardConfig';
 import {
   GAME_REGISTRY,
@@ -79,7 +80,7 @@ const GameMatrix = forwardRef(({
     return refKey ? gameRefs[refKey] : null;
   }, [gameConfig?.refKey]);
 
-  // Expose getGameState via ref
+  // Expose getGameState and loadGameState via ref
   useImperativeHandle(ref, () => ({
     getGameState: () => {
       // 1. Games with Wrappers (TicTacToe, Caro, Snake, Match3)
@@ -104,6 +105,40 @@ const GameMatrix = forwardRef(({
 
       console.warn('GameMatrix: No getGameState method found for current screen:', screen);
       return null;
+    },
+
+    loadGameState: (savedState) => {
+      // 1. Games with Wrappers (TicTacToe, Caro, Snake, Match3)
+      if (gameConfig?.hasWrapper) {
+        const refKey = gameConfig?.refKey;
+        const gameRef = refKey ? gameRefs[refKey] : null;
+        console.log('[GameMatrix] loadGameState - screen:', screen, 'refKey:', refKey);
+        if (gameRef?.current?.loadGameState) {
+          gameRef.current.loadGameState(savedState);
+          // Force synchronous re-render to update UI immediately
+          flushSync(() => setForceRenderKey(prev => prev + 1));
+          // Trigger another re-render after hook state has propagated
+          setTimeout(() => setForceRenderKey(prev => prev + 1), 10);
+          return true;
+        }
+      }
+
+      // 2. Drawing Game
+      if (screen === 'DRAWING' && drawingState?.loadGameState) {
+        drawingState.loadGameState(savedState);
+        flushSync(() => setForceRenderKey(prev => prev + 1));
+        return true;
+      }
+
+      // 3. Memory Game
+      if (screen === 'MEMORY' && activeGameState?.loadGameState) {
+        activeGameState.loadGameState(savedState);
+        flushSync(() => setForceRenderKey(prev => prev + 1));
+        return true;
+      }
+
+      console.warn('GameMatrix: No loadGameState method found for current screen:', screen);
+      return false;
     }
   }), [screen, activeGameState, gameConfig, drawingState]);
 

@@ -7,7 +7,8 @@ const SaveLoadButtons = ({
     gameMatrixRef,
     screens,
     currentScreenIndex,
-    gameEndHandled
+    gameEndHandled,
+    onLoad
 }) => {
     const handleSave = async () => {
         if (!gameMatrixRef.current?.getGameState) {
@@ -57,8 +58,25 @@ const SaveLoadButtons = ({
             toast.dismiss(loadingToast);
 
             if (data && data.state) {
-                console.log("Loaded Game State:", JSON.parse(data.state));
-                toast.success("Game loaded (check console for data)!");
+                // Handle both string and already-parsed object
+                const savedState = typeof data.state === 'string' 
+                    ? JSON.parse(data.state) 
+                    : data.state;
+                console.log("Loaded Game State:", savedState);
+
+                // Call loadGameState via gameMatrixRef
+                if (gameMatrixRef.current?.loadGameState) {
+                    const success = gameMatrixRef.current.loadGameState(savedState);
+                    if (success) {
+                        toast.success("Game loaded successfully!");
+                        // Reset gameEndHandled to enable Save button
+                        onLoad?.();
+                    } else {
+                        toast.error("Failed to restore game state.");
+                    }
+                } else {
+                    toast.error("Unable to restore game state.");
+                }
             } else {
                 toast.warning("No saved game found.");
             }
