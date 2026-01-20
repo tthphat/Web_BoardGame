@@ -22,7 +22,7 @@ import { authorize } from "./middlewares/authorize.middleware.js";
 const app = express();
 
 // ===== Swagger (PUBLIC) =====
-app.use("/api-docs", verifyToken, swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 
 // app.use(cors());
