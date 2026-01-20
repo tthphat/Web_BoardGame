@@ -14,7 +14,7 @@ export const RatingModel = {
             if (error.code === '23505') {
                 return { data: null, error: "You have already rated this game." };
             }
-            return { data: null, error };
+            return { data: null, error: error.message };
         }
     },
 
@@ -37,7 +37,7 @@ export const RatingModel = {
             return { data: ratings, error: null };
         } catch (error) {
             console.error("RatingModel.findByGameId error:", error);
-            return { data: null, error };
+            return { data: null, error: error.message };
         }
     },
 
@@ -59,7 +59,7 @@ export const RatingModel = {
             };
         } catch (error) {
             console.error("RatingModel.getStatsByGameId error:", error);
-            return { data: null, error };
+            return { data: null, error: error.message };
         }
     },
 
@@ -72,7 +72,7 @@ export const RatingModel = {
             return { data: rating, error: null };
         } catch (error) {
             console.error("RatingModel.findByUserAndGame error:", error);
-            return { data: null, error };
+            return { data: null, error: error.message };
         }
     }
 };

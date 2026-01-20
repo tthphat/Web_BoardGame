@@ -12,7 +12,8 @@ export async function addRatingApi(gameSlug, rating, comment) {
     const data = await response.json();
 
     if (!response.ok) {
-        throw new Error(data.message || data.error || "Failed to submit rating");
+        const errorMsg = data.message || data.error || "Failed to submit rating";
+        throw new Error(typeof errorMsg === 'object' ? JSON.stringify(errorMsg) : errorMsg);
     }
 
     return data;
@@ -31,7 +32,8 @@ export async function getGameRatingsApi(gameSlug, page = 1, limit = 10) {
     const data = await response.json();
 
     if (!response.ok) {
-        throw new Error(data.message || data.error || "Failed to to fetch ratings");
+        const errorMsg = data.message || data.error || "Failed to fetch ratings";
+        throw new Error(typeof errorMsg === 'object' ? JSON.stringify(errorMsg) : errorMsg);
     }
 
     return data;
