@@ -25,11 +25,20 @@ const options = {
                     scheme: 'bearer',
                     bearerFormat: 'JWT',
                 },
+                apiKeyAuth: {
+                    type: 'apiKey',
+                    in: 'header',
+                    name: 'x-api-key',
+                    description: 'Enter this API key (web-client-key)',
+                },
             },
         },
         security: [
             {
                 bearerAuth: [],
+            },
+            {
+                apiKeyAuth: [],
             },
         ],
     },
