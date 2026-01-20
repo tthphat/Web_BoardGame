@@ -506,4 +506,22 @@ export const UserService = {
             throw error;
         }
     },
+
+    // delete conversation
+    async deleteConversation(id) {
+        try {
+            const { data, error } = await UserModel.deleteConversation(id);
+            if (error) {
+                throw new Error("Failed to delete conversation");
+            }
+            return {
+                data: {
+                    message: "Delete conversation successfully",
+                    data
+                }
+            };
+        } catch (error) {
+            throw error;
+        }
+    },
 };

@@ -58,7 +58,8 @@ function FriendArea() {
 
     const handleRemoveConversation = async (conversationId) => {
         const res = await removeConversationApi(conversationId);
-        if (res.data) {
+        if (res.data.data) {
+
             navigate(`/messages`);
         }
     }

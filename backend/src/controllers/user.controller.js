@@ -354,5 +354,23 @@ export const UserController = {
             next(error);
         }
     },
+
+    // =============
+    // Delete Conversation
+    // =============
+    async deleteConversation(req, res, next) {
+        try {
+            const { id } = req.params;
+            const conversation = await UserService.deleteConversation(id);
+            res.json({
+                data: {
+                    message: conversation.data.message,
+                    data: conversation.data.data
+                }
+            });
+        } catch (error) {
+            next(error);
+        }
+    },
 }
 
