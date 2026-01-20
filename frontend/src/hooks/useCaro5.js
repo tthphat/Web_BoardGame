@@ -247,7 +247,9 @@ export const useCaro5 = (isPlaying, botEnabled = false, boardRows, boardCols) =>
 
   // Load game state from saved data
   const loadGameState = useCallback((savedState) => {
+    console.log('[useCaro5] loadGameState called with:', savedState);
     if (savedState?.board) {
+      console.log('[useCaro5] Setting board:', savedState.board);
       setBoard(savedState.board);
       setCurrentPlayer('BLUE');
       setWinner(null);

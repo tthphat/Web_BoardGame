@@ -302,6 +302,33 @@ const DashboardPage = () => {
               drawingState={drawingGame}
               ref={gameMatrixRef}
             />
+            
+            {/* Pause overlay for Snake when loading game */}
+            {currentScreenName === 'SNAKE' && isPlaying && gameState.isPaused && (
+              <div className="absolute inset-0 bg-black/70 flex items-center justify-center z-50 animate-in fade-in duration-200 pointer-events-none">
+                 <div className="text-xl font-bold text-white bg-black/80 px-4 py-2 rounded border border-white/20 animate-pulse text-center">
+                    PRESS ARROW KEYS<br/>TO START
+                  </div>
+              </div>
+            )}
+            
+            {/* Pause overlay for Match3 when loading game */}
+            {currentScreenName === 'MATCH3' && isPlaying && gameState.isPaused && (
+              <div className="absolute inset-0 bg-black/70 flex items-center justify-center z-50 animate-in fade-in duration-200 pointer-events-none">
+                 <div className="text-xl font-bold text-white bg-black/80 px-4 py-2 rounded border border-white/20 animate-pulse text-center">
+                    CLICK TO START
+                  </div>
+              </div>
+            )}
+            
+            {/* Pause overlay for Memory when loading game */}
+            {currentScreenName === 'MEMORY' && isPlaying && memoryGame.isPaused && (
+              <div className="absolute inset-0 bg-black/70 flex items-center justify-center z-50 animate-in fade-in duration-200 pointer-events-none">
+                 <div className="text-xl font-bold text-white bg-black/80 px-4 py-2 rounded border border-white/20 animate-pulse text-center">
+                    CLICK A CARD<br/>TO START
+                  </div>
+              </div>
+            )}
           </div >
 
           {/* CỘT PHẢI: ĐIỀU KHIỂN */}
@@ -367,6 +394,7 @@ const DashboardPage = () => {
                   screens={screens}
                   currentScreenIndex={currentScreenIndex}
                   gameEndHandled={gameEndHandled}
+                  onLoad={() => setGameEndHandled(false)}
                 />
               )}
 

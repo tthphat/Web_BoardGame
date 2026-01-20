@@ -22,11 +22,13 @@ export const useSnake = (enabled, rows, cols) => {
     }, [rows, cols]);
 
     const [gameState, setGameState] = useState(() => calcInitialState());
+    const [isPaused, setIsPaused] = useState(false); // Paused state for loaded games
 
     const intervalRef = useRef(null);
     const nextDirectionRef = useRef('LEFT');
     const lastSnakeRef = useRef(gameState.snake);
     const lastDirRef = useRef('LEFT');
+    const isPausedRef = useRef(false); // Ref for race-condition-safe pause check
 
     const generateFood = useCallback((currentSnake) => {
         let newFood;
@@ -55,6 +57,7 @@ export const useSnake = (enabled, rows, cols) => {
         lastSnakeRef.current = initialSnake;
         lastDirRef.current = 'LEFT';
         nextDirectionRef.current = 'LEFT';
+        isPausedRef.current = false; // Sync ref
 
         const initialFood = generateFood(initialSnake);
 
@@ -65,6 +68,7 @@ export const useSnake = (enabled, rows, cols) => {
             isGameOver: false,
             score: 0
         });
+        setIsPaused(false);
     }, [generateFood, rows, cols]);
 
     // Auto reset when enabled
@@ -76,7 +80,8 @@ export const useSnake = (enabled, rows, cols) => {
 
     const moveSnake = useCallback(() => {
         setGameState(prev => {
-            if (prev.isGameOver) return prev;
+            // Use ref instead of closure to avoid race condition after loading
+            if (prev.isGameOver || isPausedRef.current) return prev;
 
             const currentSnake = [...prev.snake];
             const head = currentSnake[0];
@@ -120,7 +125,7 @@ export const useSnake = (enabled, rows, cols) => {
                 score: newScore
             };
         });
-    }, [rows, cols, generateFood]);
+    }, [rows, cols, generateFood]); // No isPaused dependency - use ref instead
 
     useEffect(() => {
         if (!enabled || gameState.isGameOver) {
@@ -135,11 +140,19 @@ export const useSnake = (enabled, rows, cols) => {
     }, [enabled, gameState.isGameOver, moveSnake]);
 
     const changeDirection = useCallback((newDir) => {
+        // If paused (just loaded), unpause on first move
+        if (isPaused) {
+            isPausedRef.current = false; // Sync ref immediately
+            setIsPaused(false);
+            nextDirectionRef.current = newDir;
+            return;
+        }
+
         const opposites = { 'UP': 'DOWN', 'DOWN': 'UP', 'LEFT': 'RIGHT', 'RIGHT': 'LEFT' };
         if (newDir !== opposites[lastDirRef.current]) {
             nextDirectionRef.current = newDir;
         }
-    }, []);
+    }, [isPaused]);
 
     const getPixelColor = (r, c) => {
         const { snake, food, isGameOver } = gameState;
@@ -178,6 +191,9 @@ export const useSnake = (enabled, rows, cols) => {
     // Load game state from saved data
     const loadGameState = useCallback((savedState) => {
         if (savedState?.snake && savedState?.food) {
+            // CRITICAL: Set isPausedRef BEFORE state update to prevent race condition
+            isPausedRef.current = true;
+            
             setGameState({
                 snake: savedState.snake,
                 food: savedState.food,
@@ -188,11 +204,15 @@ export const useSnake = (enabled, rows, cols) => {
             lastSnakeRef.current = savedState.snake;
             lastDirRef.current = 'LEFT';
             nextDirectionRef.current = 'LEFT';
+            
+            // Set paused state waiting for user input
+            setIsPaused(true);
         }
     }, []);
 
     return {
         ...gameState,
+        isPaused,
         resetGame,
         changeDirection,
         getPixelColor,

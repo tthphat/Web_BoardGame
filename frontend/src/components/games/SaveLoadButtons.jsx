@@ -7,7 +7,8 @@ const SaveLoadButtons = ({
     gameMatrixRef,
     screens,
     currentScreenIndex,
-    gameEndHandled
+    gameEndHandled,
+    onLoad
 }) => {
     const handleSave = async () => {
         if (!gameMatrixRef.current?.getGameState) {
@@ -68,6 +69,8 @@ const SaveLoadButtons = ({
                     const success = gameMatrixRef.current.loadGameState(savedState);
                     if (success) {
                         toast.success("Game loaded successfully!");
+                        // Reset gameEndHandled to enable Save button
+                        onLoad?.();
                     } else {
                         toast.error("Failed to restore game state.");
                     }

@@ -162,7 +162,7 @@ export const Match3Wrapper = forwardRef(({ isPlaying, onScoreUpdate, onGameState
   const stateCallbackRef = useRef(onGameStateUpdate);
   const boardUpdateRef = useRef(onBoardUpdate);
   const prevScoreRef = useRef(null);
-  const prevStateRef = useRef({ timeLeft: null, isGameOver: null });
+  const prevStateRef = useRef({ timeLeft: null, isGameOver: null, isPaused: null });
 
   // Lưu game vào ref để luôn lấy được giá trị mới nhất
   const gameRef = useRef(game);
@@ -215,22 +215,24 @@ export const Match3Wrapper = forwardRef(({ isPlaying, onScoreUpdate, onGameState
     }
   }, [game.score, isPlaying]);
 
-  // Gọi onGameStateUpdate khi timeLeft hoặc isGameOver thay đổi
+  // Gọi onGameStateUpdate khi timeLeft, isGameOver, hoặc isPaused thay đổi
   useEffect(() => {
     if (!isPlaying || !stateCallbackRef.current) return;
 
     const prevState = prevStateRef.current;
     const hasChanged = prevState.timeLeft !== game.timeLeft ||
-      prevState.isGameOver !== game.isGameOver;
+      prevState.isGameOver !== game.isGameOver ||
+      prevState.isPaused !== game.isPaused;
 
     if (hasChanged) {
-      prevStateRef.current = { timeLeft: game.timeLeft, isGameOver: game.isGameOver };
+      prevStateRef.current = { timeLeft: game.timeLeft, isGameOver: game.isGameOver, isPaused: game.isPaused };
       stateCallbackRef.current({
         timeLeft: game.timeLeft,
         isGameOver: game.isGameOver,
+        isPaused: game.isPaused,
       });
     }
-  }, [game.timeLeft, game.isGameOver, isPlaying]);
+  }, [game.timeLeft, game.isGameOver, game.isPaused, isPlaying]);
 
   return null;
 });
@@ -244,6 +246,7 @@ export const SnakeWrapper = forwardRef(({ isPlaying, rows, cols, onScoreUpdate, 
   const boardUpdateRef = useRef(onBoardUpdate);
   const prevScoreRef = useRef(null);
   const prevGameOverRef = useRef(null);
+  const prevPausedRef = useRef(null);
 
   // Lưu game vào ref để luôn lấy được giá trị mới nhất
   const gameRef = useRef(game);
@@ -288,20 +291,25 @@ export const SnakeWrapper = forwardRef(({ isPlaying, rows, cols, onScoreUpdate, 
     }
   }, [game.score, isPlaying]);
 
-  // Gọi onGameStateUpdate khi game state thay đổi
+  // Gọi onGameStateUpdate khi game state thay đổi (isGameOver OR isPaused)
   useEffect(() => {
     if (!isPlaying || !stateCallbackRef.current) return;
 
-    if (prevGameOverRef.current !== game.isGameOver) {
+    const hasChanged = prevGameOverRef.current !== game.isGameOver ||
+      prevPausedRef.current !== game.isPaused;
+
+    if (hasChanged) {
       prevGameOverRef.current = game.isGameOver;
+      prevPausedRef.current = game.isPaused;
       stateCallbackRef.current({
         isGameOver: game.isGameOver,
+        isPaused: game.isPaused,
         resetGame: game.resetGame,
         changeDirection: game.changeDirection,
         direction: game.direction,
       });
     }
-  }, [game.isGameOver, game.resetGame, game.changeDirection, game.direction, isPlaying]);
+  }, [game.isGameOver, game.isPaused, game.resetGame, game.changeDirection, game.direction, isPlaying]);
 
   return null;
 });
