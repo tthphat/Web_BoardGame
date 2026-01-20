@@ -36,7 +36,7 @@ const GameMatrix = forwardRef(({
   botEnabled = false,
   drawingState
 }, ref) => {
-  const { activeConfig } = useSettings();
+  const { activeConfig, match3TimeLimit } = useSettings();
   const defaultConfig = getBoardConfig();
 
   // Use active config from settings if available, otherwise default
@@ -311,6 +311,7 @@ const GameMatrix = forwardRef(({
         <Match3Wrapper
           ref={gameRefs.match3}
           isPlaying={isPlaying && screen === 'MATCH3'}
+          timeLimit={match3TimeLimit}
           onScoreUpdate={screen === 'MATCH3' ? onScoreUpdate : undefined}
           onGameStateUpdate={screen === 'MATCH3' ? onGameStateUpdate : undefined}
           onBoardUpdate={screen === 'MATCH3' ? handleBoardUpdate : undefined}

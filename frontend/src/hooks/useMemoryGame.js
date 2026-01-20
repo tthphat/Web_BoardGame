@@ -4,16 +4,13 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 const ROWS = 4;
 const COLS = 4;
 
-// Thời gian giới hạn (giây)
-const TIME_LIMIT = 30;
-
 // Danh sách các cặp màu/icon (8 cặp)
 const CARD_TYPES = [
   'RED', 'BLUE', 'GREEN', 'YELLOW',
   'PURPLE', 'CYAN', 'ORANGE', 'WHITE'
 ];
 
-export const useMemoryGame = (isPlaying) => {
+export const useMemoryGame = (isPlaying, timeLimit = 30) => {
   // --- STATE ---
   // board: Mảng 16 phần tử, mỗi phần tử lưu { id, type, isFlipped, isMatched }
   const [board, setBoard] = useState([]);
@@ -22,7 +19,7 @@ export const useMemoryGame = (isPlaying) => {
   const [isProcessing, setIsProcessing] = useState(false); // Chặn input khi đang check match
   const [score, setScore] = useState(0);
   const [gameState, setGameState] = useState('idle'); // 'idle', 'playing', 'finished', 'timeout'
-  const [timeLeft, setTimeLeft] = useState(TIME_LIMIT); // Countdown timer
+  const [timeLeft, setTimeLeft] = useState(timeLimit); // Countdown timer
   const [isPaused, setIsPaused] = useState(false); // Paused state for loaded games
 
   const timerRef = useRef(null);
@@ -82,7 +79,7 @@ export const useMemoryGame = (isPlaying) => {
       setCursor(0);
       setFlippedIndices([]);
       setScore(0);
-      setTimeLeft(TIME_LIMIT);
+      setTimeLeft(timeLimit);
       setGameState('playing');
       setIsProcessing(false);
     } else {
@@ -94,7 +91,7 @@ export const useMemoryGame = (isPlaying) => {
       setCursor(0);
       setFlippedIndices([]);
       setScore(0);
-      setTimeLeft(TIME_LIMIT);
+      setTimeLeft(timeLimit);
       setGameState('idle');
       setIsProcessing(false);
     }
@@ -128,10 +125,10 @@ export const useMemoryGame = (isPlaying) => {
     setCursor(0);
     setFlippedIndices([]);
     setScore(0);
-    setTimeLeft(TIME_LIMIT); // Reset timer
+    setTimeLeft(timeLimit); // Reset timer
     setGameState('playing');
     setIsProcessing(false);
-  }, []);
+  }, [timeLimit]);
 
   // --- ACTIONS ---
 
@@ -228,10 +225,10 @@ export const useMemoryGame = (isPlaying) => {
     setCursor(0);
     setFlippedIndices([]);
     setScore(0);
-    setTimeLeft(TIME_LIMIT);
+    setTimeLeft(timeLimit);
     setGameState('idle');
     setIsProcessing(false);
-  }, []);
+  }, [timeLimit]);
 
   // Load game state from saved data
   const loadGameState = useCallback((savedState) => {
@@ -242,13 +239,13 @@ export const useMemoryGame = (isPlaying) => {
       setBoard(savedState.board);
       setCursor(savedState.cursor || 0);
       setScore(savedState.score || 0);
-      setTimeLeft(savedState.timeLeft || TIME_LIMIT);
+      setTimeLeft(savedState.timeLeft || timeLimit);
       setGameState('playing');
       setFlippedIndices([]);
       setIsProcessing(false);
       setIsPaused(true);
     }
-  }, []);
+  }, [timeLimit]);
 
   return {
     board,

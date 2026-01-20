@@ -156,8 +156,8 @@ export const Caro5Wrapper = forwardRef(({ isPlaying, botEnabled, onGameStateUpda
 Caro5Wrapper.displayName = 'Caro5Wrapper';
 
 // ===== MATCH3 WRAPPER =====
-export const Match3Wrapper = forwardRef(({ isPlaying, onScoreUpdate, onGameStateUpdate, onBoardUpdate }, ref) => {
-  const game = useMatch3(isPlaying);
+export const Match3Wrapper = forwardRef(({ isPlaying, timeLimit = 60, onScoreUpdate, onGameStateUpdate, onBoardUpdate }, ref) => {
+  const game = useMatch3(isPlaying, timeLimit);
   const callbackRef = useRef(onScoreUpdate);
   const stateCallbackRef = useRef(onGameStateUpdate);
   const boardUpdateRef = useRef(onBoardUpdate);

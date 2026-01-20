@@ -1,27 +1,39 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useSettings } from '../../contexts/SettingsContext';
-import { Keyboard, Grid, Save, RotateCcw, AlertTriangle } from 'lucide-react';
+import { Keyboard, Timer, Save, RotateCcw, AlertTriangle } from 'lucide-react';
 import { toast } from 'sonner';
 import { useBlocker } from 'react-router-dom';
+
+const TIME_OPTIONS = [15, 30, 45, 60];
 
 const UserSettings = () => {
     const {
         controls,
         setControls,
+        memoryTimeLimit,
+        setMemoryTimeLimit,
+        match3TimeLimit,
+        setMatch3TimeLimit,
     } = useSettings();
 
     // Local state for deferred saving
     const [localControls, setLocalControls] = useState(controls);
+    const [localMemoryTimeLimit, setLocalMemoryTimeLimit] = useState(memoryTimeLimit);
+    const [localMatch3TimeLimit, setLocalMatch3TimeLimit] = useState(match3TimeLimit);
 
     // Sync local state when global state changes (e.g. initial load)
     useEffect(() => {
         setLocalControls(controls);
-    }, [controls]);
+        setLocalMemoryTimeLimit(memoryTimeLimit);
+        setLocalMatch3TimeLimit(match3TimeLimit);
+    }, [controls, memoryTimeLimit, match3TimeLimit]);
 
     // Check for unsaved changes
     const isDirty = useMemo(() => {
-        return localControls !== controls;
-    }, [localControls, controls]);
+        return localControls !== controls ||
+               localMemoryTimeLimit !== memoryTimeLimit ||
+               localMatch3TimeLimit !== match3TimeLimit;
+    }, [localControls, controls, localMemoryTimeLimit, memoryTimeLimit, localMatch3TimeLimit, match3TimeLimit]);
 
     // Block navigation if dirty
     const blocker = useBlocker(
@@ -30,15 +42,16 @@ const UserSettings = () => {
 
     const handleSave = () => {
         setControls(localControls);
+        setMemoryTimeLimit(localMemoryTimeLimit);
+        setMatch3TimeLimit(localMatch3TimeLimit);
         toast.success("Settings saved successfully!");
     };
 
     const handleReset = () => {
         // Reset to defaults
-        const defaultControls = 'ARROWS';
-
-        setLocalControls(defaultControls);
-
+        setLocalControls('ARROWS');
+        setLocalMemoryTimeLimit(30);
+        setLocalMatch3TimeLimit(60);
         toast.info("Settings reset to default. Click Save to apply.");
     };
 
@@ -97,6 +110,47 @@ const UserSettings = () => {
                     </div>
                 </div>
 
+                {/* 2. Game Time Settings */}
+                <div className="bg-[#c0c0c0] p-1 border-2 border-t-white border-l-white border-b-black border-r-black">
+                    <div className="bg-[#e0e0e0] p-4 border-2 border-t-[#808080] border-l-[#808080] border-b-white border-r-white h-full">
+                        <div className="flex items-center gap-2 mb-4 text-[#000080] dark:text-[#000080] font-bold border-b border-gray-400 pb-2">
+                            <Timer size={20} />
+                            <h3>GAME TIME SETTINGS</h3>
+                        </div>
+
+                        <div className="space-y-4">
+                            {/* Memory Time Limit */}
+                            <div>
+                                <label className="block text-black dark:text-black font-bold mb-2">MEMORY TIME LIMIT</label>
+                                <select
+                                    value={localMemoryTimeLimit}
+                                    onChange={(e) => setLocalMemoryTimeLimit(parseInt(e.target.value, 10))}
+                                    className="w-full px-3 py-2 bg-white border-2 border-t-[#808080] border-l-[#808080] border-b-white border-r-white text-black font-mono cursor-pointer focus:outline-none"
+                                >
+                                    {TIME_OPTIONS.map((time) => (
+                                        <option key={time} value={time}>{time} SECONDS</option>
+                                    ))}
+                                </select>
+                                <p className="text-xs text-gray-500 dark:text-gray-500 mt-1">Time limit for Memory game (max 60s)</p>
+                            </div>
+
+                            {/* Match3 Time Limit */}
+                            <div>
+                                <label className="block text-black dark:text-black font-bold mb-2">MATCH3 TIME LIMIT</label>
+                                <select
+                                    value={localMatch3TimeLimit}
+                                    onChange={(e) => setLocalMatch3TimeLimit(parseInt(e.target.value, 10))}
+                                    className="w-full px-3 py-2 bg-white border-2 border-t-[#808080] border-l-[#808080] border-b-white border-r-white text-black font-mono cursor-pointer focus:outline-none"
+                                >
+                                    {TIME_OPTIONS.map((time) => (
+                                        <option key={time} value={time}>{time} SECONDS</option>
+                                    ))}
+                                </select>
+                                <p className="text-xs text-gray-500 dark:text-gray-500 mt-1">Time limit for Match3 game (max 60s)</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
             </div>
 

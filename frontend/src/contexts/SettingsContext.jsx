@@ -13,7 +13,16 @@ export const SettingsProvider = ({ children }) => {
         return saved ? JSON.parse(saved) : 'ARROWS'; // 'ARROWS' or 'WASD'
     });
 
+    // 2. Game Time Limits
+    const [memoryTimeLimit, setMemoryTimeLimit] = useState(() => {
+        const saved = localStorage.getItem('memory_time_limit');
+        return saved ? parseInt(saved, 10) : 30; // Default: 30 seconds
+    });
 
+    const [match3TimeLimit, setMatch3TimeLimit] = useState(() => {
+        const saved = localStorage.getItem('match3_time_limit');
+        return saved ? parseInt(saved, 10) : 60; // Default: 60 seconds
+    });
 
     // 3. Available Board Configs (Fetched from API)
     const [availableConfigs, setAvailableConfigs] = useState([]);
@@ -21,6 +30,14 @@ export const SettingsProvider = ({ children }) => {
     useEffect(() => {
         localStorage.setItem('user_controls', JSON.stringify(controls));
     }, [controls]);
+
+    useEffect(() => {
+        localStorage.setItem('memory_time_limit', memoryTimeLimit.toString());
+    }, [memoryTimeLimit]);
+
+    useEffect(() => {
+        localStorage.setItem('match3_time_limit', match3TimeLimit.toString());
+    }, [match3TimeLimit]);
 
 
 
@@ -44,6 +61,10 @@ export const SettingsProvider = ({ children }) => {
     const value = {
         controls,
         setControls,
+        memoryTimeLimit,
+        setMemoryTimeLimit,
+        match3TimeLimit,
+        setMatch3TimeLimit,
         availableConfigs,
         activeConfig,
     };

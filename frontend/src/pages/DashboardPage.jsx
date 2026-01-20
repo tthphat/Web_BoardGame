@@ -41,8 +41,11 @@ const DashboardPage = () => {
   const currentScreenName = screens[currentScreenIndex] || 'HEART';
   const currentConfig = getGameConfig(currentScreenName);
 
+  // Get time limits from settings
+  const { controls, memoryTimeLimit } = useSettings();
+
   // Hooks cho games cần quản lý ở Dashboard level
-  const memoryGame = useMemoryGame(isPlaying && currentScreenName === 'MEMORY');
+  const memoryGame = useMemoryGame(isPlaying && currentScreenName === 'MEMORY', memoryTimeLimit);
 
   // Game stats hook
   const { recordGameEnd, fetchGameStats, currentStats } = useGameStats(currentConfig?.slug, !!user);
@@ -238,8 +241,7 @@ const DashboardPage = () => {
       GameMatrix sẽ re-render lại. Không dùng useCallback sẽ không crash nhưng GameMatrix sẽ
       re-render liên tục */
 
-  // Keyboard controls cho Snake
-  const { controls } = useSettings();
+  // Keyboard controls cho Snake - controls already imported above
 
   useEffect(() => {
     const handleKeyDown = (e) => {
