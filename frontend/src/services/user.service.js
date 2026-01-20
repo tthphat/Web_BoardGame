@@ -61,7 +61,7 @@ export async function editProfileApi(payload) {
 }
 
 // Get all users
-export async function getAllUsersApi(page = 1, limit = 10, search = "") {
+export async function getAllUsersApi(page = 1, limit = 3, search = "") {
     console.log("Fontend-User-Service: Get all users API input: ", page, limit, search);
 
     const response = await fetch(`${API_BASE}/api/user/all?page=${page}&limit=${limit}&search=${search}`, {
@@ -116,7 +116,7 @@ export async function getAllUsersFriendApi(page, limit, search) {
 }
 
 // Get friend requests
-export async function getFriendRequestsApi(page = 1, limit = 10, search = "") {
+export async function getFriendRequestsApi(page = 1, limit = 3, search = "") {
     console.log("Fontend-User-Service: Get friend requests API input: ", page, limit, search);
 
     const response = await fetch(`${API_BASE}/api/user/friend-requests?page=${page}&limit=${limit}&search=${search}`, {

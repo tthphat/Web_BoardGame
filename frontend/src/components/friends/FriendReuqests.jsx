@@ -10,7 +10,7 @@ function FriendRequests() {
     const [totalPages, setTotalPages] = useState(0);
     const [search, setSearch] = useState("");
     const [page, setPage] = useState(1);
-    const limit = 10;
+    const limit = 3;
 
     const searchRef = useRef("");
 

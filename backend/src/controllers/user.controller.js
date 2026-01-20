@@ -60,7 +60,7 @@ export const UserController = {
     async getAllUsers(req, res, next) {
         try {
             const page = Number(req.query.page) || 1;
-            const limit = Number(req.query.limit) || 10;
+            const limit = Number(req.query.limit) || 3;
             const search = req.query.search || "";
 
             const users = await UserService.getAllUsers(page, limit, search);
@@ -81,7 +81,7 @@ export const UserController = {
     async getAllUsersFriend(req, res, next) {
         try {
             const page = Number(req.query.page) || 1;
-            const limit = Number(req.query.limit) || 10;
+            const limit = Number(req.query.limit) || 3;
             const search = req.query.search || "";
 
             const users = await UserService.getAllUsersFriend(req.user.id, page, limit, search);
@@ -122,7 +122,7 @@ export const UserController = {
     async getFriendRequests(req, res, next) {
         try {
             const page = Number(req.query.page) || 1;
-            const limit = Number(req.query.limit) || 10;
+            const limit = Number(req.query.limit) || 3;
             const search = req.query.search || "";
 
             const friendRequests = await UserService.getFriendRequests(req.user.id, page, limit, search);
@@ -143,7 +143,7 @@ export const UserController = {
     async getMyFriends(req, res, next) {
         try {
             const page = Number(req.query.page) || 1;
-            const limit = Number(req.query.limit) || 10;
+            const limit = Number(req.query.limit) || 3;
             const search = req.query.search || "";
 
             const myFriends = await UserService.getMyFriends(req.user.id, page, limit, search);
@@ -232,7 +232,7 @@ export const UserController = {
     async getAllMyConversations(req, res, next) {
         try {
             const page = Number(req.query.page) || 1;
-            const limit = Number(req.query.limit) || 10;
+            const limit = Number(req.query.limit) || 3;
             const search = req.query.search || "";
 
             const conversations = await UserService.getAllMyConversations(req.user.id, page, limit, search);
