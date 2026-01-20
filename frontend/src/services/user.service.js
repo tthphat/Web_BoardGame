@@ -437,3 +437,26 @@ export async function checkExistConversationApi(userId) {
     return data;
 }
 
+// remove conversation
+export async function removeConversationApi(conversation_id) {
+    console.log("Fontend-User-Service: Remove conversation API input: ", conversation_id);
+
+    const response = await fetch(`/api/user/conversations/${conversation_id}`, {
+        method: "DELETE",
+        credentials: "include",
+        headers: {
+            "Content-Type": "application/json",
+            "x-api-key": import.meta.env.VITE_API_KEY,
+        },
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+        throw new Error(data.message || data.error || "Remove conversation failed");
+    }
+
+    console.log("Fontend-User-Service: Remove conversation API output: ", data);
+    return data;
+}
+

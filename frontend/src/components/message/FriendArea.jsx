@@ -1,8 +1,8 @@
-import { getAllMyConversationsApi, searchUsersApi, checkExistConversationApi } from "@/services/user.service";
+import { getAllMyConversationsApi, searchUsersApi, checkExistConversationApi, removeConversationApi } from "@/services/user.service";
 import { useState, useEffect, useRef } from "react";
 import { PaginationSection } from "@/components/common/PaginationSection";
 import Loading from "@/components/common/Loading";
-import { MessageCircleX, UserRound } from "lucide-react";
+import { MessageCircleX, UserRound, Trash2 } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 
 
@@ -56,6 +56,13 @@ function FriendArea() {
         }
     }
 
+    const handleRemoveConversation = async (conversationId) => {
+        const res = await removeConversationApi(conversationId);
+        if (res.data) {
+            navigate(`/messages`);
+        }
+    }
+
     useEffect(() => {
         const fetchConversations = async () => {
             setLoading(true);
@@ -82,7 +89,7 @@ function FriendArea() {
 
 
     return (
-        <div className="w-full h-full bg-white dark:bg-[#333] flex flex-col">
+        <div className="w-full h-full bg-white dark:bg-[#333] flex flex-col gap-2">
             {/* Search Header */}
             <div className="search-bar flex justify-end">
                 <div className="relative flex w-full items-center gap-2 font-mono">
@@ -173,6 +180,18 @@ function FriendArea() {
                                                 <h3 className="font-semibold text-gray-900 dark:text-gray-100 truncate text-sm">
                                                     {conversation.partner_name}
                                                 </h3>
+
+                                                <button
+                                                    onClick={(e) => {
+                                                        e.preventDefault();
+                                                        e.stopPropagation();
+                                                        handleRemoveConversation(conversation.conversation_id);
+                                                    }}
+                                                    className="text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-full opacity-0 group-hover:opacity-100 transition-all z-10"
+                                                    title="Delete conversation"
+                                                >
+                                                    <Trash2 className="w-4 h-4" />
+                                                </button>
                                             </div>
                                             <div className="flex justify-between items-center gap-2">
                                                 <p className={`text-xs truncate ${conversation.last_message_sender_id !== conversation.partner_id
