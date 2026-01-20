@@ -21,7 +21,12 @@ import { authorize } from "./middlewares/authorize.middleware.js";
 
 const app = express();
 
-app.use(cors());
+// app.use(cors());
+app.use(cors({
+    origin: "https://web-board-game-phi.vercel.app",
+    credentials: true
+}));
+
 app.use(express.json());
 app.use(cookieParser());
 
