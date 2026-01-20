@@ -34,11 +34,12 @@ const DashboardPage = () => {
   // Game state chung cho tất cả games (thay vì nhiều state riêng lẻ)
   const [gameState, setGameState] = useState({});
 
-  // Hooks cho games cần quản lý ở Dashboard level
-  const memoryGame = useMemoryGame();
-
+  // Game config - cần định nghĩa trước các hooks dùng currentScreenName
   const currentScreenName = screens[currentScreenIndex] || 'HEART';
   const currentConfig = getGameConfig(currentScreenName);
+
+  // Hooks cho games cần quản lý ở Dashboard level
+  const memoryGame = useMemoryGame(isPlaying && currentScreenName === 'MEMORY');
 
   // Game stats hook
   const { recordGameEnd, fetchGameStats, currentStats } = useGameStats(currentConfig?.slug, !!user);
@@ -184,10 +185,7 @@ const DashboardPage = () => {
       setGameState(config.initialState);
       setGameEndHandled(false);
 
-      // Memory game cần init riêng
-      if (currentScreenName === 'MEMORY') {
-        memoryGame.initGame();
-      }
+      // Memory game auto-inits via useEffect when isPlaying becomes true
     }
   };
 
@@ -197,6 +195,8 @@ const DashboardPage = () => {
       setIsPlaying(false);
       setScore(0);
       setGameState(currentConfig?.initialState || {});
+      
+      // Memory game auto-resets via useEffect when isPlaying becomes false
     }
   };
 
