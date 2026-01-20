@@ -190,8 +190,13 @@ const DashboardPage = () => {
   };
 
   // Xử lý nút Back (dừng game)
-  const handleBack = () => {
+  const handleBack = async () => {
     if (isPlaying) {
+      // Drawing game: call finishGame on back to record First Play achievement
+      if (currentScreenName === 'DRAWING') {
+        await recordGameEnd({ score: 0, won: false });
+      }
+      
       setIsPlaying(false);
       setScore(0);
       setGameState(currentConfig?.initialState || {});
