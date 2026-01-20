@@ -19,6 +19,9 @@ const GameRating = ({ gameSlug, gameName }) => {
                 </Button>
             </DialogTrigger>
             <DialogContent className="sm:max-w-[600px] bg-[#e0e0e0] dark:bg-[#2d2d2d] border-4 border-black font-mono p-0 overflow-hidden">
+                <DialogHeader>
+                    <DialogTitle>Rate Game</DialogTitle>
+                </DialogHeader>
                 <GameRatingContent gameSlug={gameSlug} gameName={gameName} />
             </DialogContent>
         </Dialog>
