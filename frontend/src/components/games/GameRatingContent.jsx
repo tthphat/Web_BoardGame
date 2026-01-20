@@ -23,11 +23,11 @@ const GameRatingContent = ({ gameSlug, gameName }) => {
     const fetchRatings = async (currentPage = 1) => {
         try {
             setLoading(true);
-            const res = await getGameRatingsApi(gameSlug, currentPage);
+            const res = await getGameRatingsApi(gameSlug, currentPage, 3);
             if (res.success) {
                 setRatings(res.ratings);
                 setStats(res.stats);
-                setTotalPages(Math.ceil(res.stats.count / 10)); // limit 10
+                setTotalPages(Math.ceil(res.stats.count / 3)); // limit 3
             }
         } catch (error) {
             console.error(error);
@@ -85,7 +85,7 @@ const GameRatingContent = ({ gameSlug, gameName }) => {
     // --- PHẦN UI THAY ĐỔI (RETRO STYLE) ---
     return (
         <div className="space-y-6 font-mono text-black">
-            
+
             {/* 1. Header Stats (Bảng điểm số) */}
             <div className="bg-[#c0c0c0] border-2 border-t-white border-l-white border-b-black border-r-black p-4 flex flex-col md:flex-row justify-between items-center gap-4 shadow-sm">
                 <div className="flex items-center gap-4">
@@ -108,7 +108,7 @@ const GameRatingContent = ({ gameSlug, gameName }) => {
             {/* 2. Form Viết Review */}
             <div className="bg-[#c0c0c0] border-2 border-t-white border-l-white border-b-black border-r-black p-1 shadow-md">
                 <div className="bg-[#000080] text-white px-2 py-1 text-xs font-bold flex items-center gap-2 mb-1 uppercase">
-                    <MessageSquare size={12} /> Write_New_Review.exe
+                    <MessageSquare size={12} /> Write_New_Review
                 </div>
 
                 <div className="p-3">
@@ -129,11 +129,10 @@ const GameRatingContent = ({ gameSlug, gameName }) => {
                                         >
                                             <Star
                                                 size={24}
-                                                className={`${
-                                                    star <= (hoverRating || userRating)
+                                                className={`${star <= (hoverRating || userRating)
                                                         ? "fill-yellow-400 text-black drop-shadow-sm"
                                                         : "text-gray-400"
-                                                } stroke-2`}
+                                                    } stroke-2`}
                                             />
                                         </button>
                                     ))}
@@ -189,7 +188,7 @@ const GameRatingContent = ({ gameSlug, gameName }) => {
                             {/* Header Review Item */}
                             <div className="bg-[#a0a0a0] border border-b-white border-r-white border-t-gray-600 border-l-gray-600 px-2 py-1 flex justify-between items-center mb-1">
                                 <div className="flex items-center gap-2">
-                                    <User size={12} className="text-black"/>
+                                    <User size={12} className="text-black" />
                                     <span className="font-bold text-black text-xs uppercase tracking-wider">
                                         [{review.username || 'ANONYMOUS'}]
                                     </span>
@@ -228,7 +227,7 @@ const GameRatingContent = ({ gameSlug, gameName }) => {
                     >
                         &lt; PREV
                     </button>
-                    
+
                     {/* Số trang: Style Sunken */}
                     <div className="flex items-center px-4 text-xs font-bold bg-white border-2 border-t-black border-l-black border-r-white border-b-white">
                         PAGE {page} / {totalPages}
