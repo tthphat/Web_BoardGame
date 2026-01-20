@@ -57,10 +57,14 @@ function FriendArea() {
     }
 
     const handleRemoveConversation = async (conversationId) => {
-        const res = await removeConversationApi(conversationId);
-        if (res.data.data) {
-
-            navigate(`/messages`);
+        try {
+            const res = await removeConversationApi(conversationId);
+            if (res.data) {
+                setConversations((prev) => prev.filter(c => c.conversation_id !== conversationId));
+                navigate(`/messages`);
+            }
+        } catch (error) {
+            console.error("Failed to delete conversation:", error);
         }
     }
 
