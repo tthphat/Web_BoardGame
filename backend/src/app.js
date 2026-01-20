@@ -39,6 +39,9 @@ app.use(cookieParser());
 app.get('/docs-login', swaggerLoginView);
 app.post('/docs-login', swaggerLoginAction);
 
+// ===== Swagger Documentation (Protected - requires Cookie Auth) =====
+app.use("/api-docs", swaggerProtect, swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+
 // Public routes (no auth or api key required)
 app.use("/api/auth", authRoute); // login, register
 app.get("/api/games/enabled", GameController.getEnabledGames); // enabled games list
@@ -56,8 +59,7 @@ app.use("/api/achievements", verifyToken, achievementRoute);
 app.use("/api/games", verifyToken, gameRoute);
 app.use("/api/user", verifyToken, userRoute);
 
-// ===== Swagger Documentation (Protected - requires Cookie Auth) =====
-app.use("/api-docs", swaggerProtect, swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+// app.use("/api-docs", ... ) moved up
 
 app.use(errorHandler);
 
