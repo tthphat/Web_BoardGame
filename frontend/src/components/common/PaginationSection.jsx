@@ -7,7 +7,7 @@ import {
     PaginationPrevious,
 } from "@/components/ui/pagination";
 
-export function PaginationSection({ page, totalPages, setPage, dataLength }) {
+export function PaginationSection({ currentPage: page, totalPages, onPageChange: setPage, dataLength }) {
 
     if (dataLength === 0) return null;
 
