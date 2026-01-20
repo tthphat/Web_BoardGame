@@ -21,10 +21,6 @@ import { authorize } from "./middlewares/authorize.middleware.js";
 
 const app = express();
 
-// ===== Swagger (PUBLIC) =====
-app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
-
-
 // app.use(cors());
 app.use(cors({
     origin: "https://web-board-game-phi.vercel.app",
@@ -54,6 +50,8 @@ app.use("/api/user", verifyToken, userRoute);
 app.use(errorHandler);
 
 // Swagger Documentation
+app.use("/api-docs", verifyToken, swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+
 /**
  * @swagger
  * /api/auth/login:
