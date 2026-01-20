@@ -10,6 +10,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { toast } from 'sonner';
 import { getGameConfig } from '../config/gameRegistry';
 import { useSettings } from '../contexts/SettingsContext';
+import SaveLoadButtons from '../components/games/SaveLoadButtons';
 
 const DashboardPage = () => {
   // Fetch enabled games from backend
@@ -21,6 +22,9 @@ const DashboardPage = () => {
   // Danh sách các màn hình từ backend (filtered)
   const screens = enabledScreens;
 
+  // Ref to GameMatrix for saving state
+  const gameMatrixRef = useRef(null);
+
   // State lưu chỉ số màn hình hiện tại
   const [currentScreenIndex, setCurrentScreenIndex] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -30,11 +34,12 @@ const DashboardPage = () => {
   // Game state chung cho tất cả games (thay vì nhiều state riêng lẻ)
   const [gameState, setGameState] = useState({});
 
-  // Hooks cho games cần quản lý ở Dashboard level
-  const memoryGame = useMemoryGame();
-
+  // Game config - cần định nghĩa trước các hooks dùng currentScreenName
   const currentScreenName = screens[currentScreenIndex] || 'HEART';
   const currentConfig = getGameConfig(currentScreenName);
+
+  // Hooks cho games cần quản lý ở Dashboard level
+  const memoryGame = useMemoryGame(isPlaying && currentScreenName === 'MEMORY');
 
   // Game stats hook
   const { recordGameEnd, fetchGameStats, currentStats } = useGameStats(currentConfig?.slug, !!user);
@@ -126,12 +131,14 @@ const DashboardPage = () => {
 
   // Hàm chuyển màn hình sang TRÁI
   const handlePrevScreen = () => {
+    if (isPlaying) return; // Block navigation when playing
     resetGameState();
     setCurrentScreenIndex((prev) => (prev - 1 + screens.length) % screens.length);
   };
 
   // Hàm chuyển màn hình sang PHẢI
   const handleNextScreen = () => {
+    if (isPlaying) return; // Block navigation when playing
     resetGameState();
     setCurrentScreenIndex((prev) => (prev + 1) % screens.length);
   };
@@ -139,6 +146,11 @@ const DashboardPage = () => {
   // Xử lý nút Enter (bắt đầu/reset game)
   const handleEnter = () => {
     const config = currentConfig;
+
+    // HEART is just a display screen, not a playable game
+    if (currentScreenName === 'HEART') {
+      return;
+    }
 
     if (!config) {
       toast.error("Game chưa được implement!");
@@ -180,10 +192,7 @@ const DashboardPage = () => {
       setGameState(config.initialState);
       setGameEndHandled(false);
 
-      // Memory game cần init riêng
-      if (currentScreenName === 'MEMORY') {
-        memoryGame.initGame();
-      }
+      // Memory game auto-inits via useEffect when isPlaying becomes true
     }
   };
 
@@ -193,6 +202,8 @@ const DashboardPage = () => {
       setIsPlaying(false);
       setScore(0);
       setGameState(currentConfig?.initialState || {});
+      
+      // Memory game auto-resets via useEffect when isPlaying becomes false
     }
   };
 
@@ -220,9 +231,9 @@ const DashboardPage = () => {
   // Callback khi score thay đổi
   const handleScoreUpdate = useCallback((newScore) => {
     setScore(newScore);
-  }, []); /* GameMatrix gọi callback này liên tục. Nếu function đổi reference: 
-  GameMatrix sẽ re-render lại. Không dùng useCallback sẽ không crash nhưng GameMatrix sẽ
-  re-render liên tục */
+  }, []); /* GameMatrix gọi callback này liên tục. Nếu function đổi reference:
+      GameMatrix sẽ re-render lại. Không dùng useCallback sẽ không crash nhưng GameMatrix sẽ
+      re-render liên tục */
 
   // Keyboard controls cho Snake
   const { controls } = useSettings();
@@ -289,6 +300,7 @@ const DashboardPage = () => {
               botEnabled={true}
               onGameStateUpdate={handleGameStateUpdate}
               drawingState={drawingGame}
+              ref={gameMatrixRef}
             />
           </div >
 
@@ -346,6 +358,16 @@ const DashboardPage = () => {
                     </div>
                   )}
                 </div>
+              )}
+
+              {/* Save/Load Logic - Part of feature/SaveGame */}
+              {user && isPlaying && (
+                <SaveLoadButtons
+                  gameMatrixRef={gameMatrixRef}
+                  screens={screens}
+                  currentScreenIndex={currentScreenIndex}
+                  gameEndHandled={gameEndHandled}
+                />
               )}
 
               {/* Game Controls */}

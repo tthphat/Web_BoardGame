@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { getBoardConfig } from '../utils/boardConfig';
 
 // Danh sách màu sắc cho Drawing
@@ -35,6 +35,21 @@ export const useDrawing = (isPlaying) => {
   const [canvas, setCanvas] = useState(createEmptyCanvas);
   const [selectedColor, setSelectedColor] = useState('RED');
   const [isErasing, setIsErasing] = useState(false);
+
+  // Reset canvas when isPlaying changes (like other games)
+  useEffect(() => {
+    if (isPlaying) {
+      // Start with empty canvas
+      setCanvas(createEmptyCanvas());
+      setSelectedColor('RED');
+      setIsErasing(false);
+    } else {
+      // Clear state when back (isPlaying = false)
+      setCanvas(createEmptyCanvas());
+      setSelectedColor('RED');
+      setIsErasing(false);
+    }
+  }, [isPlaying, createEmptyCanvas]);
 
   // Xử lý click vào pixel
   const handlePixelClick = (r, c) => {
@@ -107,5 +122,15 @@ export const useDrawing = (isPlaying) => {
     toggleEraser,
     clearCanvas,
     getPixelColor,
+    getGameState: () => ({
+      canvas,
+      selectedColor,
+      isErasing,
+      config: {
+        type: 'drawing',
+        rows: config.rows,
+        cols: config.cols
+      }
+    }),
   };
 };
