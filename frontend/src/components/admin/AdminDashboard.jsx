@@ -142,7 +142,6 @@ const AdminDashboardMock = () => {
                     <th className="p-2 border-r border-gray-300 dark:border-gray-600">GAME</th>
                     <th className="p-2 border-r border-gray-300 dark:border-gray-600">USER</th>
                     <th className="p-2 border-r border-gray-300 dark:border-gray-600">RESULT</th>
-                    <th className="p-2">STATUS</th>
                   </tr>
                 </thead>
                 <tbody className="font-mono">
@@ -156,9 +155,7 @@ const AdminDashboardMock = () => {
                           <span className="block text-[10px] text-gray-500">Best: {session.best_score}</span>
                           <span className="block text-[10px] text-gray-500">Plays: {session.total_plays}</span>
                         </td>
-                        <td className="p-2">
-                          <span className="px-1 bg-green-100 text-green-800 rounded">ACTIVE</span>
-                        </td>
+                        
                       </tr>
                     ))
                   ) : (
