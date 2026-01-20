@@ -11,6 +11,7 @@
  *   post:
  *     summary: Login user
  *     tags: [Auth]
+ *     security: []
  *     requestBody:
  *       required: true
  *       content:
@@ -36,6 +37,7 @@
  *   post:
  *     summary: Register a new user
  *     tags: [Auth]
+ *     security: []
  *     requestBody:
  *       required: true
  *       content:
@@ -61,6 +63,7 @@
  *   post:
  *     summary: Verify email with OTP
  *     tags: [Auth]
+ *     security: []
  *     requestBody:
  *       required: true
  *       content:
@@ -84,6 +87,7 @@
  *   post:
  *     summary: Resend OTP to email
  *     tags: [Auth]
+ *     security: []
  *     requestBody:
  *       required: true
  *       content:

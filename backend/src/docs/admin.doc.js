@@ -2,16 +2,18 @@
  * @swagger
  * tags:
  *   name: Admin
- *   description: Administrative controls and statistics
+ *   description: Administrative controls and statistics (Requires Admin Role)
  */
 
 /**
  * @swagger
  * /api/admin/dashboard-stats:
  *   get:
- *     summary: Get dashboard overview stats
+ *     summary: Get dashboard overview stats (Admin Only)
  *     tags: [Admin]
+ *     description: Retrieve system-wide statistics. Requires administrative privileges.
  *     security:
+ *       - apiKeyAuth: []
  *       - bearerAuth: []
  *     responses:
  *       200:
@@ -22,9 +24,11 @@
  * @swagger
  * /api/admin/statistics:
  *   get:
- *     summary: Get detailed statistics
+ *     summary: Get detailed statistics (Admin Only)
  *     tags: [Admin]
+ *     description: Retrieve detailed game and user analytics. Requires administrative privileges.
  *     security:
+ *       - apiKeyAuth: []
  *       - bearerAuth: []
  *     responses:
  *       200:
@@ -35,9 +39,11 @@
  * @swagger
  * /api/admin/recent-activities:
  *   get:
- *     summary: Get recent system activities
+ *     summary: Get recent system activities (Admin Only)
  *     tags: [Admin]
+ *     description: List recent logins, game starts, and other vital events. Requires administrative privileges.
  *     security:
+ *       - apiKeyAuth: []
  *       - bearerAuth: []
  *     responses:
  *       200:
@@ -48,9 +54,11 @@
  * @swagger
  * /api/admin/games:
  *   get:
- *     summary: List games for management
+ *     summary: List games for management (Admin Only)
  *     tags: [Admin]
+ *     description: List all games including disabled ones for configuration. Requires administrative privileges.
  *     security:
+ *       - apiKeyAuth: []
  *       - bearerAuth: []
  *     responses:
  *       200:
@@ -61,9 +69,11 @@
  * @swagger
  * /api/admin/games/{id}/state:
  *   patch:
- *     summary: Update game state
+ *     summary: Update game state (Admin Only)
  *     tags: [Admin]
+ *     description: Change the state (active/inactive) or other metadata of a specific game. Requires administrative privileges.
  *     security:
+ *       - apiKeyAuth: []
  *       - bearerAuth: []
  *     parameters:
  *       - in: path
@@ -91,6 +101,7 @@
  *     summary: List board configurations for management
  *     tags: [Admin]
  *     security:
+ *       - apiKeyAuth: []
  *       - bearerAuth: []
  *     responses:
  *       200:
@@ -104,6 +115,7 @@
  *     summary: Update board config
  *     tags: [Admin]
  *     security:
+ *       - apiKeyAuth: []
  *       - bearerAuth: []
  *     parameters:
  *       - in: path
@@ -128,6 +140,7 @@
  *     summary: Activate board config
  *     tags: [Admin]
  *     security:
+ *       - apiKeyAuth: []
  *       - bearerAuth: []
  *     parameters:
  *       - in: path

@@ -12,6 +12,7 @@
  *     summary: Get current authenticated user profile
  *     tags: [User]
  *     security:
+ *       - apiKeyAuth: []
  *       - bearerAuth: []
  *     responses:
  *       200:
@@ -25,6 +26,7 @@
  *     summary: Update user profile
  *     tags: [User]
  *     security:
+ *       - apiKeyAuth: []
  *       - bearerAuth: []
  *     requestBody:
  *       content:
@@ -48,6 +50,7 @@
  *     summary: Get basic info of current user
  *     tags: [User]
  *     security:
+ *       - apiKeyAuth: []
  *       - bearerAuth: []
  *     responses:
  *       200:
@@ -61,6 +64,7 @@
  *     summary: List all users (System)
  *     tags: [User]
  *     security:
+ *       - apiKeyAuth: []
  *       - bearerAuth: []
  *     responses:
  *       200:
@@ -74,6 +78,7 @@
  *     summary: List all users for social features
  *     tags: [User]
  *     security:
+ *       - apiKeyAuth: []
  *       - bearerAuth: []
  *     responses:
  *       200:
@@ -87,6 +92,7 @@
  *     summary: List pending friend requests
  *     tags: [User]
  *     security:
+ *       - apiKeyAuth: []
  *       - bearerAuth: []
  *     responses:
  *       200:
@@ -100,6 +106,7 @@
  *     summary: List all friends of current user
  *     tags: [User]
  *     security:
+ *       - apiKeyAuth: []
  *       - bearerAuth: []
  *     responses:
  *       200:
@@ -113,6 +120,7 @@
  *     summary: Send a friend request
  *     tags: [User]
  *     security:
+ *       - apiKeyAuth: []
  *       - bearerAuth: []
  *     requestBody:
  *       required: true
@@ -136,6 +144,7 @@
  *     summary: Accept a friend request
  *     tags: [User]
  *     security:
+ *       - apiKeyAuth: []
  *       - bearerAuth: []
  *     requestBody:
  *       required: true
@@ -159,6 +168,7 @@
  *     summary: Reject a friend request
  *     tags: [User]
  *     security:
+ *       - apiKeyAuth: []
  *       - bearerAuth: []
  *     requestBody:
  *       required: true
@@ -182,6 +192,7 @@
  *     summary: Remove a friend
  *     tags: [User]
  *     security:
+ *       - apiKeyAuth: []
  *       - bearerAuth: []
  *     requestBody:
  *       required: true
@@ -205,6 +216,7 @@
  *     summary: List all user conversations
  *     tags: [User]
  *     security:
+ *       - apiKeyAuth: []
  *       - bearerAuth: []
  *     responses:
  *       200:
@@ -218,6 +230,7 @@
  *     summary: Get messages in a conversation
  *     tags: [User]
  *     security:
+ *       - apiKeyAuth: []
  *       - bearerAuth: []
  *     parameters:
  *       - in: path
@@ -237,6 +250,7 @@
  *     summary: Send a message in a conversation
  *     tags: [User]
  *     security:
+ *       - apiKeyAuth: []
  *       - bearerAuth: []
  *     parameters:
  *       - in: path
@@ -266,6 +280,7 @@
  *     summary: Search for users
  *     tags: [User]
  *     security:
+ *       - apiKeyAuth: []
  *       - bearerAuth: []
  *     parameters:
  *       - in: query
@@ -274,7 +289,7 @@
  *           type: string
  *     responses:
  *       200:
- *         description: Matching users
+         description: Matching users
  */
 
 /**
@@ -284,6 +299,7 @@
  *     summary: Get details of a specific user
  *     tags: [User]
  *     security:
+ *       - apiKeyAuth: []
  *       - bearerAuth: []
  *     parameters:
  *       - in: path
@@ -303,6 +319,7 @@
  *     summary: Create new conversation
  *     tags: [User]
  *     security:
+ *       - apiKeyAuth: []
  *       - bearerAuth: []
  *     parameters:
  *       - in: path
@@ -322,6 +339,7 @@
  *     summary: Check if conversation exists
  *     tags: [User]
  *     security:
+ *       - apiKeyAuth: []
  *       - bearerAuth: []
  *     parameters:
  *       - in: path
@@ -341,6 +359,7 @@
  *     summary: Delete a conversation
  *     tags: [User]
  *     security:
+ *       - apiKeyAuth: []
  *       - bearerAuth: []
  *     parameters:
  *       - in: path
