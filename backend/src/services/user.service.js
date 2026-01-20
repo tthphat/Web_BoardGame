@@ -254,7 +254,7 @@ export const UserService = {
                 throw new Error("Cannot send friend request to yourself");
             }
 
-            const existed = await UserModel.checkExistedFriendRequest(sender_id, receiver_id);
+            const { data: existed } = await UserModel.checkExistedFriendRequest(sender_id, receiver_id);
             if (existed) {
                 throw new Error("Friend request already exists");
             }
