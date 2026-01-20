@@ -11,6 +11,7 @@
  *   get:
  *     summary: Get list of enabled games
  *     tags: [Games]
+ *     security: []
  *     responses:
  *       200:
  *         description: Enabled games list
@@ -23,6 +24,7 @@
  *     summary: Add game rating
  *     tags: [Games]
  *     security:
+ *       - apiKeyAuth: []
  *       - bearerAuth: []
  *     requestBody:
  *       required: true
@@ -50,6 +52,7 @@
  *     summary: Get ratings for a game
  *     tags: [Games]
  *     security:
+ *       - apiKeyAuth: []
  *       - bearerAuth: []
  *     parameters:
  *       - in: path
@@ -69,6 +72,7 @@
  *     summary: List all games (Admin)
  *     tags: [Games]
  *     security:
+ *       - apiKeyAuth: []
  *       - bearerAuth: []
  *     responses:
  *       200:
@@ -82,6 +86,7 @@
  *     summary: Toggle game enabled status (Admin)
  *     tags: [Games]
  *     security:
+ *       - apiKeyAuth: []
  *       - bearerAuth: []
  *     requestBody:
  *       required: true
@@ -107,6 +112,7 @@
  *     summary: Get current authenticated user stats
  *     tags: [Games]
  *     security:
+ *       - apiKeyAuth: []
  *       - bearerAuth: []
  *     responses:
  *       200:
@@ -120,6 +126,7 @@
  *     summary: Get user stats for a specific game
  *     tags: [Games]
  *     security:
+ *       - apiKeyAuth: []
  *       - bearerAuth: []
  *     parameters:
  *       - in: path
@@ -139,6 +146,7 @@
  *     summary: Finish game and record stats
  *     tags: [Games]
  *     security:
+ *       - apiKeyAuth: []
  *       - bearerAuth: []
  *     requestBody:
  *       required: true
@@ -165,6 +173,7 @@
  *     summary: Get board configurations
  *     tags: [Games]
  *     security:
+ *       - apiKeyAuth: []
  *       - bearerAuth: []
  *     responses:
  *       200:
@@ -178,6 +187,7 @@
  *     summary: Save game session
  *     tags: [Games]
  *     security:
+ *       - apiKeyAuth: []
  *       - bearerAuth: []
  *     requestBody:
  *       required: true
@@ -197,6 +207,7 @@
  *     summary: Load game session
  *     tags: [Games]
  *     security:
+ *       - apiKeyAuth: []
  *       - bearerAuth: []
  *     parameters:
  *       - in: path

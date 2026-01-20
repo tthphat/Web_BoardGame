@@ -12,6 +12,7 @@
  *     summary: Get dashboard overview stats
  *     tags: [Admin]
  *     security:
+ *       - apiKeyAuth: []
  *       - bearerAuth: []
  *     responses:
  *       200:
@@ -25,6 +26,7 @@
  *     summary: Get detailed statistics
  *     tags: [Admin]
  *     security:
+ *       - apiKeyAuth: []
  *       - bearerAuth: []
  *     responses:
  *       200:
@@ -38,6 +40,7 @@
  *     summary: Get recent system activities
  *     tags: [Admin]
  *     security:
+ *       - apiKeyAuth: []
  *       - bearerAuth: []
  *     responses:
  *       200:
@@ -51,6 +54,7 @@
  *     summary: List games for management
  *     tags: [Admin]
  *     security:
+ *       - apiKeyAuth: []
  *       - bearerAuth: []
  *     responses:
  *       200:
@@ -64,6 +68,7 @@
  *     summary: Update game state
  *     tags: [Admin]
  *     security:
+ *       - apiKeyAuth: []
  *       - bearerAuth: []
  *     parameters:
  *       - in: path
@@ -91,6 +96,7 @@
  *     summary: List board configurations for management
  *     tags: [Admin]
  *     security:
+ *       - apiKeyAuth: []
  *       - bearerAuth: []
  *     responses:
  *       200:
@@ -104,6 +110,7 @@
  *     summary: Update board config
  *     tags: [Admin]
  *     security:
+ *       - apiKeyAuth: []
  *       - bearerAuth: []
  *     parameters:
  *       - in: path
@@ -128,6 +135,7 @@
  *     summary: Activate board config
  *     tags: [Admin]
  *     security:
+ *       - apiKeyAuth: []
  *       - bearerAuth: []
  *     parameters:
  *       - in: path

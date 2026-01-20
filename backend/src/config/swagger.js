@@ -24,6 +24,7 @@ const options = {
                     type: 'http',
                     scheme: 'bearer',
                     bearerFormat: 'JWT',
+                    description: 'Bearer "your token"',
                 },
                 apiKeyAuth: {
                     type: 'apiKey',
@@ -33,14 +34,6 @@ const options = {
                 },
             },
         },
-        security: [
-            {
-                bearerAuth: [],
-            },
-            {
-                apiKeyAuth: [],
-            },
-        ],
     },
     apis: ['./src/docs/*.js', './src/app.js'], // Files containing annotations
 };
