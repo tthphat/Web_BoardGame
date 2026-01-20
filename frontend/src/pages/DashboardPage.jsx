@@ -131,12 +131,14 @@ const DashboardPage = () => {
 
   // Hàm chuyển màn hình sang TRÁI
   const handlePrevScreen = () => {
+    if (isPlaying) return; // Block navigation when playing
     resetGameState();
     setCurrentScreenIndex((prev) => (prev - 1 + screens.length) % screens.length);
   };
 
   // Hàm chuyển màn hình sang PHẢI
   const handleNextScreen = () => {
+    if (isPlaying) return; // Block navigation when playing
     resetGameState();
     setCurrentScreenIndex((prev) => (prev + 1) % screens.length);
   };
