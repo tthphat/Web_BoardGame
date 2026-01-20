@@ -247,6 +247,16 @@ export const useCaro = (isPlaying, botEnabled = false, boardRows, boardCols) => 
     };
   };
 
+  // Load game state from saved data
+  const loadGameState = useCallback((savedState) => {
+    if (savedState?.board) {
+      setBoard(savedState.board);
+      setCurrentPlayer('BLUE'); // Reset to player's turn
+      setWinner(null);
+      setWinningLine([]);
+    }
+  }, []);
+
   return {
     board,
     currentPlayer,
@@ -258,5 +268,6 @@ export const useCaro = (isPlaying, botEnabled = false, boardRows, boardCols) => 
     getPixelColor,
     resetGame,
     getGameState,
+    loadGameState,
   };
 };
