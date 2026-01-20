@@ -172,3 +172,19 @@ export async function loadGameSessionApi(slug) {
 
     return data;
 }
+
+// board configs
+export async function getBoardConfigsApi() {
+    const response = await fetch(`${API_BASE}/api/games/board-configs`, {
+        method: "GET",
+        headers: getAuthHeaders(),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+        throw new Error(data.message || data.error || "Failed to fetch board configs");
+    }
+
+    return data;
+}

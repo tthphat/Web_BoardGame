@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { toast } from 'sonner';
+import { getBoardConfigsApi } from "@/services/game.service"
 
 const SettingsContext = createContext();
 
@@ -26,13 +27,8 @@ export const SettingsProvider = ({ children }) => {
     // Fetch Board Configs
     const fetchBoardConfigs = async () => {
         try {
-            const response = await fetch("/api/games/board-configs", {
-                headers: { "x-api-key": import.meta.env.VITE_API_KEY }
-            });
-            const data = await response.json();
-            if (response.ok) {
-                setAvailableConfigs(data.data);
-            }
+            const response = await getBoardConfigsApi();
+            setAvailableConfigs(response.data);
         } catch (error) {
             console.error("Failed to fetch board configs", error);
         }
