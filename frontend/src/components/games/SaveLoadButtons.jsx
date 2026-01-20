@@ -57,8 +57,20 @@ const SaveLoadButtons = ({
             toast.dismiss(loadingToast);
 
             if (data && data.state) {
-                console.log("Loaded Game State:", JSON.parse(data.state));
-                toast.success("Game loaded (check console for data)!");
+                const savedState = JSON.parse(data.state);
+                console.log("Loaded Game State:", savedState);
+
+                // Call loadGameState via gameMatrixRef
+                if (gameMatrixRef.current?.loadGameState) {
+                    const success = gameMatrixRef.current.loadGameState(savedState);
+                    if (success) {
+                        toast.success("Game loaded successfully!");
+                    } else {
+                        toast.error("Failed to restore game state.");
+                    }
+                } else {
+                    toast.error("Unable to restore game state.");
+                }
             } else {
                 toast.warning("No saved game found.");
             }
