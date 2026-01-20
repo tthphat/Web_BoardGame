@@ -50,25 +50,33 @@ app.use("/api/user", verifyToken, userRoute);
 app.use(errorHandler);
 
 // Swagger Documentation
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+app.use("/api-docs", verifyToken, swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 /**
  * @swagger
- * /:
- *   get:
- *     summary: Health check
- *     description: Returns a simple message to verify the server is running
+ * /api/auth/login:
+ *   post:
+ *     summary: Login user
+ *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - email
+ *               - password
+ *             properties:
+ *               email:
+ *                 type: string
+ *               password:
+ *                 type: string
  *     responses:
  *       200:
- *         description: Server is up and running
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: Hello World
+ *         description: Login successful
+ *       401:
+ *         description: Invalid credentials
  */
 app.get('/', (req, res) => {
     res.json({ message: "Hello World" });
