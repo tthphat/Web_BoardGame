@@ -14,14 +14,16 @@ export async function seed(knex) {
       cols: 21,
       rows: 15,
       dot_size: 24,
-      gap: 6
+      gap: 6,
+      is_active: false,
     },
     {
       code: "EXTRA_LARGE",
       cols: 30,
       rows: 18,
       dot_size: 19,
-      gap: 6
+      gap: 6,
+      is_active: false,
     }
   ]).onConflict("code").merge();
 }

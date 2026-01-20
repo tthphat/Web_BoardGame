@@ -5,13 +5,13 @@ export const useSnake = (enabled, rows, cols) => {
     const calcInitialState = useCallback(() => {
         const midR = Math.floor(rows / 2) || 7;
         const midC = Math.floor(cols / 2) || 7;
-        
+
         const initialSnake = [
             { r: midR, c: midC },
             { r: midR, c: midC + 1 },
             { r: midR, c: midC + 2 }
         ];
-        
+
         return {
             snake: initialSnake,
             food: { r: Math.max(1, midR - 3), c: midC },
@@ -20,7 +20,7 @@ export const useSnake = (enabled, rows, cols) => {
             score: 0
         };
     }, [rows, cols]);
-   
+
     const [gameState, setGameState] = useState(() => calcInitialState());
 
     const intervalRef = useRef(null);
@@ -143,7 +143,7 @@ export const useSnake = (enabled, rows, cols) => {
 
     const getPixelColor = (r, c) => {
         const { snake, food, isGameOver } = gameState;
-        if (!snake || snake.length === 0) return 'bg-[#222] opacity-20';
+        if (!snake || snake.length === 0) return 'bg-[#333] opacity-40';
 
         const isHead = snake[0].r === r && snake[0].c === c;
         const isBody = snake.slice(1).some(s => s.r === r && s.c === c);
@@ -157,13 +157,29 @@ export const useSnake = (enabled, rows, cols) => {
         if (isBody) return 'bg-green-600 opacity-90';
         if (isFood) return 'bg-red-500 shadow-[0_0_15px_red] animate-pulse';
 
-        return 'bg-[#222] opacity-20';
+        return 'bg-[#333] opacity-40';
+    };
+
+    // Get serialized game state for saving
+    const getGameState = () => {
+        return {
+            snake: gameState.snake,
+            food: gameState.food,
+            score: gameState.score,
+            isGameOver: gameState.isGameOver,
+            config: {
+                type: 'snake',
+                rows: rows,
+                cols: cols
+            }
+        };
     };
 
     return {
         ...gameState,
         resetGame,
         changeDirection,
-        getPixelColor
+        getPixelColor,
+        getGameState
     };
 };

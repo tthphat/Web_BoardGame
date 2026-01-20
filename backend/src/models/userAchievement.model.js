@@ -39,3 +39,35 @@ export function getUserAchievements(knex, userId, gameSlug = null, searchName = 
 
     return query;
 }
+
+export function getUserAchievementProgress(knex, userId, gameSlug = null, searchName = null) {
+    let query = knex("achievements")
+        .join("games", "achievements.game_id", "games.id")
+        .leftJoin("user_achievements", function () {
+            this.on("achievements.id", "=", "user_achievements.achievement_id")
+                .andOn("user_achievements.user_id", "=", knex.raw("?", [userId]));
+        })
+        .select(
+            "achievements.id",
+            "achievements.code",
+            "achievements.name",
+            "achievements.description",
+            "achievements.icon",
+            "games.slug as game_slug",
+            "games.name as game_name",
+            "user_achievements.earned_at",
+            "user_achievements.meta"
+        )
+        .where("achievements.enabled", true)
+        .orderByRaw("user_achievements.earned_at DESC NULLS LAST, achievements.name ASC");
+
+    if (gameSlug) {
+        query = query.where("games.slug", gameSlug);
+    }
+
+    if (searchName) {
+        query = query.where("achievements.name", "ilike", `%${searchName}%`);
+    }
+
+    return query;
+}

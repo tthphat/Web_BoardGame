@@ -1,0 +1,235 @@
+import { getAllMyConversationsApi, searchUsersApi, checkExistConversationApi, removeConversationApi } from "@/services/user.service";
+import { useState, useEffect, useRef } from "react";
+import { PaginationSection } from "@/components/common/PaginationSection";
+import Loading from "@/components/common/Loading";
+import { MessageCircleX, UserRound, Trash2 } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
+
+
+function FriendArea() {
+    const [conversations, setConversations] = useState([]);
+    const [totalPages, setTotalPages] = useState(0);
+    const [search, setSearch] = useState("");
+    const [page, setPage] = useState(1);
+    const limit = 10;
+    const [loading, setLoading] = useState(false);
+    const [users, setUsers] = useState([]);
+    const searchRef = useRef("");
+    const navigate = useNavigate();
+
+
+    const handleStartNewChat = async (userId) => {
+        const res = await checkExistConversationApi(userId);
+        if (res.data.conversation) {
+            navigate(`/messages/${res.data.conversation.conversation_id}`);
+        } else {
+            navigate(`/messages/new/${userId}`);
+        }
+    };
+
+    const handleSearch = () => {
+        setPage(1);
+        setSearch(searchRef.current.value);
+    };
+
+    const handleClearSearch = () => {
+        searchRef.current.value = ""; // clear UI
+        setPage(1);
+        setSearch("");               // trigger fetch all
+    };
+
+    const handleLastMessageTime = (last_message_at) => { // tính luôn cả phút, giờ, ngày
+        const date = new Date(last_message_at);
+        const now = new Date();
+        const diffTime = Math.abs(now - date);
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        const diffHours = Math.ceil(diffTime / (1000 * 60 * 60));
+        const diffMinutes = Math.ceil(diffTime / (1000 * 60));
+        if (diffDays > 0) {
+            return `${diffDays} days ago`;
+        } else if (diffHours > 0) {
+            return `${diffHours} hours ago`;
+        } else if (diffMinutes > 0) {
+            return `${diffMinutes} minutes ago`;
+        } else {
+            return "Just now";
+        }
+    }
+
+    const handleRemoveConversation = async (conversationId) => {
+        try {
+            const res = await removeConversationApi(conversationId);
+            if (res.data) {
+                setConversations((prev) => prev.filter(c => c.conversation_id !== conversationId));
+                navigate(`/messages`);
+            }
+        } catch (error) {
+            console.error("Failed to delete conversation:", error);
+        }
+    }
+
+    useEffect(() => {
+        const fetchConversations = async () => {
+            setLoading(true);
+            try {
+                const [convRes, userRes] = await Promise.all([
+                    getAllMyConversationsApi(page, limit, search),
+                    searchUsersApi(search)
+                ]);
+
+                setConversations(convRes.data.conversations);
+                setTotalPages(convRes.data.pagination.totalPages);
+
+                setUsers(userRes.data.users);
+            } catch (error) {
+                console.error("Error fetching requests:", error);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchConversations();
+    }, [page, search]);
+
+
+
+
+    return (
+        <div className="w-full h-full bg-white dark:bg-[#333] flex flex-col gap-2">
+            {/* Search Header */}
+            <div className="search-bar flex justify-end">
+                <div className="relative flex w-full items-center gap-2 font-mono">
+                    <input
+                        type="text"
+                        placeholder="Search..."
+                        className="flex-1 p-2 pr-8 border border-gray-600 dark:bg-[#2d2d2d] dark:text-white"
+                        ref={searchRef}
+                        onChange={(e) => {
+                            if (e.target.value === "" && search !== "") {
+                                setPage(1);
+                                setSearch("");
+                            }
+                        }}
+                        onKeyDown={(e) => {
+                            if (e.key === "Enter") {
+                                handleSearch();
+                            }
+                        }}
+                    />
+
+                    {/* Clear button */}
+                    {search && (
+                        <button
+                            onClick={handleClearSearch}
+                            type="button"
+                            className="absolute right-[90px] text-gray-400 hover:text-red-600"
+                        >
+                            ✕
+                        </button>
+                    )}
+
+                    <button
+                        onClick={handleSearch}
+                        className="p-2 border border-gray-600 transition-all hover:bg-blue-800 hover:text-white dark:text-white"
+                    >
+                        Search
+                    </button>
+                </div>
+            </div>
+
+            {/* Conversations list */}
+            <div className="flex-1 overflow-y-auto">
+                {loading ? (
+                    <Loading message="Loading conversations..." />
+                ) : (
+                    <>
+                        {/* Chưa có conversation */}
+                        {conversations.length === 0 && search && (
+                            <div>
+                                {users.map(user => (
+                                    <div
+                                        key={user.id}
+                                        onClick={() => handleStartNewChat(user.id)}
+                                        className={`flex items-center gap-3 p-3 hover:bg-blue-50 cursor-pointer dark:hover:bg-gray-700`}
+                                    >
+                                        <div className="relative flex-shrink-0">
+                                            <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-500">
+                                                <UserRound className="h-6 w-6" />
+                                            </div>
+                                        </div>
+                                        <div className="flex flex-col justify-between">
+                                            <span className="dark:text-white">{user.username}</span>
+                                            <span className="text-xs text-gray-400">Start new chat</span>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+
+                        {/* Đã tồn tại conversation */}
+                        {conversations.length > 0 && (
+                            <div>
+                                {conversations.map((conversation) => (
+                                    <Link to={`/messages/${conversation.conversation_id}`} key={conversation.conversation_id}
+                                        className="flex items-center gap-3 p-3 hover:bg-blue-50 dark:hover:bg-gray-700 cursor-pointer transition-colors group"
+                                    >
+                                        {/* Avatar */}
+                                        <div className="relative flex-shrink-0">
+                                            <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-500">
+                                                <UserRound className="h-6 w-6" />
+                                            </div>
+                                        </div>
+
+                                        {/* Content */}
+                                        <div className="flex-1 min-w-0">
+                                            <div className="flex justify-between items-baseline mb-0.5">
+                                                <h3 className="font-semibold text-gray-900 dark:text-gray-100 truncate text-sm">
+                                                    {conversation.partner_name}
+                                                </h3>
+
+                                                <button
+                                                    onClick={(e) => {
+                                                        e.preventDefault();
+                                                        e.stopPropagation();
+                                                        handleRemoveConversation(conversation.conversation_id);
+                                                    }}
+                                                    className="text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-full opacity-0 group-hover:opacity-100 transition-all z-10"
+                                                    title="Delete conversation"
+                                                >
+                                                    <Trash2 className="w-4 h-4" />
+                                                </button>
+                                            </div>
+                                            <div className="flex justify-between items-center gap-2">
+                                                <p className={`text-xs truncate ${conversation.last_message_sender_id !== conversation.partner_id
+                                                    ? "text-gray-500 dark:text-gray-400"
+                                                    : "text-gray-900 dark:text-gray-200 font-medium"
+                                                    }`}>
+                                                    {conversation.last_message_sender_id !== conversation.partner_id && "You: "}
+                                                    {conversation.last_message}
+                                                </p>
+                                                <p className="text-xs text-gray-500">{handleLastMessageTime(conversation.last_message_at)}</p>
+                                            </div>
+                                        </div>
+                                    </Link>
+                                ))}
+                            </div>
+                        )}
+
+                        {conversations.length === 0 && users.length === 0 && (
+                            <div className="h-full flex flex-col items-center justify-center text-gray-400 p-4 text-center">
+                                <MessageCircleX className="w-12 h-12 mb-2 opacity-50" />
+                                <p className="text-sm">No conversations yet</p>
+                            </div>
+                        )}
+                    </>
+                )}
+            </div>
+
+            {/* Pagination */}
+            <div className="p-2 border-t border-gray-200 dark:border-gray-700">
+                <PaginationSection dataLength={conversations.length} totalPages={totalPages} currentPage={page} onPageChange={setPage} />
+            </div>
+        </div >
+    );
+}
+
+export default FriendArea;

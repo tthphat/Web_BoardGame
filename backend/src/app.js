@@ -12,18 +12,36 @@ import cookieParser from "cookie-parser";
 
 import authRoute from "./routes/auth.route.js";
 import userRoute from "./routes/user.route.js";
+import adminRoute from "./routes/admin.route.js"; // Import route
+
 import { checkApiKey } from "./middlewares/apiKey.middleware.js";
 import { verifyToken } from "./middlewares/auth.middleware.js";
+import { GameController } from "./controllers/game.controller.js";
+import { authorize } from "./middlewares/authorize.middleware.js";
 
 const app = express();
 
-app.use(cors());
+// app.use(cors());
+app.use(cors({
+    origin: "https://web-board-game-phi.vercel.app",
+    credentials: true
+}));
+
 app.use(express.json());
 app.use(cookieParser());
 
-app.use("/api/auth", authRoute); // login, register không cần check api key
+// Public routes (no auth or api key required)
+app.use("/api/auth", authRoute); // login, register
+app.get("/api/games/enabled", GameController.getEnabledGames); // enabled games list
 
 app.use(checkApiKey); // middleware kiểm tra api key
+
+
+// Protected routes (Require Auth)
+app.get("/api/games/leaderboard", verifyToken, GameController.getAllLeaderboards); // ranking for each game
+app.get("/api/games/:slug/leaderboard", verifyToken, GameController.getLeaderboard); // specific game ranking
+
+app.use("/api/admin", verifyToken, authorize("admin"), adminRoute); // Register admin route
 
 app.use("/api/achievements", verifyToken, achievementRoute);
 app.use("/api/games", verifyToken, gameRoute);

@@ -6,7 +6,25 @@ const router = Router();
 
 router.get("/profile", UserController.getProfile);
 router.patch("/profile", UserController.editProfile);
-router.get("/me", UserController.getMe);
 
+router.get("/me", UserController.getMe);
+router.get("/all", UserController.getAllUsers);
+router.patch("/:id/state", UserController.updateUserState);
+
+router.get("/all-users", UserController.getAllUsersFriend);
+router.get("/friend-requests", UserController.getFriendRequests);
+router.get("/my-friends", UserController.getMyFriends);
+router.post("/add-friend", UserController.addFriend);
+router.post("/accept-friend", UserController.acceptFriend);
+router.post("/reject-friend", UserController.rejectFriend);
+router.post("/remove-friend", UserController.removeFriend);
+router.get("/all-my-conversations", UserController.getAllMyConversations);
+router.get("/conversations/:id/messages", UserController.getMessages);
+router.post("/conversations/:id/messages", UserController.sendMessage);
+router.get("/search", UserController.searchUsers);
+router.get("/get-user/:id", UserController.getUser);
+router.post("/conversations/:id/new", UserController.createNewConversation); // new conversation
+router.get("/conversations/:id/exist", UserController.checkExistConversation); // check exist conversation
+router.delete("/conversations/:id", UserController.deleteConversation); // delete conversation
 
 export default router;  

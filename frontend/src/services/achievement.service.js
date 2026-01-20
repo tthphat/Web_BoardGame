@@ -1,0 +1,33 @@
+import { API_BASE } from "@/lib/api";
+
+export async function getUserAchievementsApi(gameSlug = null, search = null, includeUnearned = false) {
+    console.log("Frontend-Achievement-Service: Get achievements API input: ", { gameSlug, search, includeUnearned });
+
+    let url = `${API_BASE}/api/achievements`;
+    const params = new URLSearchParams();
+    if (gameSlug) params.append("gameSlug", gameSlug);
+    if (search) params.append("search", search);
+    if (includeUnearned) params.append("includeUnearned", "true");
+
+    if (params.toString()) {
+        url += `?${params.toString()}`;
+    }
+
+    const response = await fetch(url, {
+        method: "GET",
+        credentials: "include",
+        headers: {
+            "Content-Type": "application/json",
+            "x-api-key": import.meta.env.VITE_API_KEY,
+        },
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+        throw new Error(data.message || data.error || "Failed to fetch achievements");
+    }
+
+    console.log("Frontend-Achievement-Service: Get achievements API output: ", data);
+    return data;
+}

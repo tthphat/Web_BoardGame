@@ -39,7 +39,7 @@ export const UserController = {
     },
 
     // =============
-    // Get User, remember me
+    // Get Me, remember me
     // =============
     async getMe(req, res, next) {
         try {
@@ -47,6 +47,325 @@ export const UserController = {
             res.json({
                 data: {
                     user: user.data.user
+                }
+            });
+        } catch (error) {
+            next(error);
+        }
+    },
+
+    // =============
+    // Get All Users
+    // =============
+    async getAllUsers(req, res, next) {
+        try {
+            const page = Number(req.query.page) || 1;
+            const limit = Number(req.query.limit) || 10;
+            const search = req.query.search || "";
+
+            const users = await UserService.getAllUsers(page, limit, search);
+            res.json({
+                data: {
+                    users: users.data.users,
+                    pagination: users.data.pagination
+                }
+            });
+        } catch (error) {
+            next(error);
+        }
+    },
+
+    // =============
+    // Get All Users Friend
+    // =============
+    async getAllUsersFriend(req, res, next) {
+        try {
+            const page = Number(req.query.page) || 1;
+            const limit = Number(req.query.limit) || 10;
+            const search = req.query.search || "";
+
+            const users = await UserService.getAllUsersFriend(req.user.id, page, limit, search);
+            res.json({
+                data: {
+                    users: users.data.users,
+                    pagination: users.data.pagination
+                }
+            });
+        } catch (error) {
+            next(error);
+        }
+    },
+
+    // =============
+    // Update User State (Block/Unblock)
+    // =============
+    async updateUserState(req, res, next) {
+        try {
+            const { id } = req.params;
+            const { state } = req.body;
+
+            // Basic validation
+            if (!state) {
+                return res.status(400).json({ error: "State is required" });
+            }
+
+            const result = await UserService.updateUserState(id, state);
+            res.json(result);
+        } catch (error) {
+            next(error);
+        }
+    },
+
+    // =============
+    // Get Friend Requests
+    // =============
+    async getFriendRequests(req, res, next) {
+        try {
+            const page = Number(req.query.page) || 1;
+            const limit = Number(req.query.limit) || 10;
+            const search = req.query.search || "";
+
+            const friendRequests = await UserService.getFriendRequests(req.user.id, page, limit, search);
+            res.json({
+                data: {
+                    friendRequests: friendRequests.data.friendRequests,
+                    pagination: friendRequests.data.pagination
+                }
+            });
+        } catch (error) {
+            next(error);
+        }
+    },
+
+    // =============
+    // Get My Friends
+    // =============
+    async getMyFriends(req, res, next) {
+        try {
+            const page = Number(req.query.page) || 1;
+            const limit = Number(req.query.limit) || 10;
+            const search = req.query.search || "";
+
+            const myFriends = await UserService.getMyFriends(req.user.id, page, limit, search);
+            res.json({
+                data: {
+                    myFriends: myFriends.data.myFriends,
+                    pagination: myFriends.data.pagination
+                }
+            });
+        } catch (error) {
+            next(error);
+        }
+    },
+
+    // =============
+    // Add Friend
+    // =============
+    async addFriend(req, res, next) {
+        try {
+            const { user_id } = req.body;
+            const friend = await UserService.addFriend(req.user.id, user_id);
+            res.json({
+                data: {
+                    message: friend.data.message
+                }
+            });
+        } catch (error) {
+            next(error);
+        }
+    },
+
+    // =============
+    // Accept Friend
+    // =============
+    async acceptFriend(req, res, next) {
+        try {
+            const { sender_id } = req.body;
+            const friend = await UserService.acceptFriend(req.user.id, sender_id);
+            res.json({
+                data: {
+                    message: friend.data.message
+                }
+            });
+        } catch (error) {
+            next(error);
+        }
+    },
+
+    // =============
+    // Reject Friend
+    // =============
+    async rejectFriend(req, res, next) {
+        try {
+            const { sender_id } = req.body;
+            const friend = await UserService.rejectFriend(req.user.id, sender_id);
+            res.json({
+                data: {
+                    message: friend.data.message
+                }
+            });
+        } catch (error) {
+            next(error);
+        }
+    },
+
+    // =============
+    // Remove Friend
+    // =============
+    async removeFriend(req, res, next) {
+        try {
+            const { friend_id } = req.body;
+            const friend = await UserService.removeFriend(req.user.id, friend_id);
+            res.json({
+                data: {
+                    message: friend.data.message
+                }
+            });
+        } catch (error) {
+            next(error);
+        }
+    },
+
+    // =============
+    // Get All My Conversations
+    // =============
+    async getAllMyConversations(req, res, next) {
+        try {
+            const page = Number(req.query.page) || 1;
+            const limit = Number(req.query.limit) || 10;
+            const search = req.query.search || "";
+
+            const conversations = await UserService.getAllMyConversations(req.user.id, page, limit, search);
+            res.json({
+                data: {
+                    conversations: conversations.data.conversations,
+                    pagination: conversations.data.pagination
+                }
+            });
+        } catch (error) {
+            next(error);
+        }
+    },
+
+    // =============
+    // Get Messages
+    // =============
+    async getMessages(req, res, next) {
+        try {
+            const { id } = req.params;
+            const { offset, limit } = req.query;
+            const messages = await UserService.getMessages(id, offset, limit, req.user.id);
+            res.json({
+                data: {
+                    messages: messages.data.messages,
+                    partner: messages.data.partner
+                }
+            });
+        } catch (error) {
+            next(error);
+        }
+    },
+
+    // =============
+    // Send Message
+    // =============
+    async sendMessage(req, res, next) {
+        try {
+            const { id } = req.params;
+            const { content } = req.body;
+            console.log("Backend-user.controller.js-sendMessage: ", id, content, req.user.id);
+            const message = await UserService.sendMessage(id, content, req.user.id);
+            res.json({
+                data: {
+                    message: message.data.message
+                }
+            });
+        } catch (error) {
+            next(error);
+        }
+    },
+
+    // =============
+    // Search Users
+    // =============
+    async searchUsers(req, res, next) {
+        try {
+            const { search } = req.query;
+            const users = await UserService.searchUsers(search, req.user.id);
+            res.json({
+                data: {
+                    users: users.data.users
+                }
+            });
+        } catch (error) {
+            next(error);
+        }
+    },
+
+    // =============
+    // Get User
+    // =============
+    async getUser(req, res, next) {
+        try {
+            const { id } = req.params;
+            const user = await UserService.getUser(id);
+            res.json({
+                data: {
+                    user: user.data.user
+                }
+            });
+        } catch (error) {
+            next(error);
+        }
+    },
+
+    // =============
+    // Send First Message
+    // =============
+    async createNewConversation(req, res, next) {
+        try {
+            const { id } = req.params;
+            const { content } = req.body;
+            console.log("Backend-user.controller.js-sendMessage: ", id, content, req.user.id);
+            const message = await UserService.createNewConversation(id, content, req.user.id);
+            res.json({
+                data: {
+                    conversation_id: message.data.conversation_id
+                }
+            });
+        } catch (error) {
+            next(error);
+        }
+    },
+
+    // =============
+    // Check Exist Conversation
+    // =============
+    async checkExistConversation(req, res, next) {
+        try {
+            const { id } = req.params;
+            const conversation = await UserService.checkExistConversation(id, req.user.id);
+            res.json({
+                data: {
+                    conversation: conversation.data.conversation
+                }
+            });
+        } catch (error) {
+            next(error);
+        }
+    },
+
+    // =============
+    // Delete Conversation
+    // =============
+    async deleteConversation(req, res, next) {
+        try {
+            const { id } = req.params;
+            const conversation = await UserService.deleteConversation(id);
+            res.json({
+                data: {
+                    message: conversation.data.message,
+                    data: conversation.data.data
                 }
             });
         } catch (error) {

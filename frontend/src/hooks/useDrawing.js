@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { getBoardConfig } from '../utils/boardConfig';
 
 // Danh sách màu sắc cho Drawing
@@ -26,7 +26,7 @@ const getColorClass = (colorName) => {
 
 export const useDrawing = (isPlaying) => {
   const config = getBoardConfig();
-  
+
   // Khởi tạo canvas rỗng
   const createEmptyCanvas = useCallback(() => {
     return Array(config.rows).fill(null).map(() => Array(config.cols).fill(null));
@@ -36,20 +36,35 @@ export const useDrawing = (isPlaying) => {
   const [selectedColor, setSelectedColor] = useState('RED');
   const [isErasing, setIsErasing] = useState(false);
 
+  // Reset canvas when isPlaying changes (like other games)
+  useEffect(() => {
+    if (isPlaying) {
+      // Start with empty canvas
+      setCanvas(createEmptyCanvas());
+      setSelectedColor('RED');
+      setIsErasing(false);
+    } else {
+      // Clear state when back (isPlaying = false)
+      setCanvas(createEmptyCanvas());
+      setSelectedColor('RED');
+      setIsErasing(false);
+    }
+  }, [isPlaying, createEmptyCanvas]);
+
   // Xử lý click vào pixel
   const handlePixelClick = (r, c) => {
     if (!isPlaying) return;
-    
+
     // Chuyển từ 1-indexed sang 0-indexed
     const canvasR = r - 1;
     const canvasC = c - 1;
-    
+
     // Kiểm tra ngoài phạm vi
     if (canvasR < 0 || canvasR >= config.rows || canvasC < 0 || canvasC >= config.cols) return;
 
     // Cập nhật canvas
     const newCanvas = canvas.map(row => [...row]);
-    
+
     if (isErasing) {
       // Xóa pixel
       newCanvas[canvasR][canvasC] = null;
@@ -57,7 +72,7 @@ export const useDrawing = (isPlaying) => {
       // Tô màu pixel
       newCanvas[canvasR][canvasC] = selectedColor;
     }
-    
+
     setCanvas(newCanvas);
   };
 
@@ -82,18 +97,18 @@ export const useDrawing = (isPlaying) => {
     // Chuyển từ 1-indexed sang 0-indexed
     const canvasR = r - 1;
     const canvasC = c - 1;
-    
+
     // Kiểm tra ngoài phạm vi
     if (canvasR < 0 || canvasR >= config.rows || canvasC < 0 || canvasC >= config.cols) {
       return 'bg-[#333] shadow-none opacity-40';
     }
 
     const cellColor = canvas[canvasR][canvasC];
-    
+
     if (cellColor) {
       return getColorClass(cellColor);
     }
-    
+
     // Ô trống
     return 'bg-[#333] shadow-none opacity-40';
   };
@@ -107,5 +122,15 @@ export const useDrawing = (isPlaying) => {
     toggleEraser,
     clearCanvas,
     getPixelColor,
+    getGameState: () => ({
+      canvas,
+      selectedColor,
+      isErasing,
+      config: {
+        type: 'drawing',
+        rows: config.rows,
+        cols: config.cols
+      }
+    }),
   };
 };

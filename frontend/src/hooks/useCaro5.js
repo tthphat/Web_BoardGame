@@ -24,9 +24,14 @@ const getEmptyCells = (board, rows, cols) => {
   return emptyCells;
 };
 
-export const useCaro5 = (isPlaying, botEnabled = false) => {
-  const config = getBoardConfig(); // { cols, rows, dotSize, gap }
-  
+export const useCaro5 = (isPlaying, botEnabled = false, boardRows, boardCols) => {
+  const defaultConfig = getBoardConfig();
+  const config = {
+    ...defaultConfig,
+    rows: boardRows || defaultConfig.rows,
+    cols: boardCols || defaultConfig.cols
+  };
+
   // Khởi tạo board rỗng
   const createEmptyBoard = useCallback(() => {
     return Array(config.rows).fill(null).map(() => Array(config.cols).fill(null));
@@ -36,10 +41,18 @@ export const useCaro5 = (isPlaying, botEnabled = false) => {
   const [currentPlayer, setCurrentPlayer] = useState('BLUE'); // BLUE đi trước
   const [winner, setWinner] = useState(null);
   const [winningLine, setWinningLine] = useState([]); // [{r, c}, ...]
+  const [score, setScore] = useState(0); // Count player wins
 
-  // Reset game khi bắt đầu chơi
+  // Reset game khi bắt đầu chơi hoặc khi back ra (keep score)
   useEffect(() => {
     if (isPlaying) {
+      setBoard(createEmptyBoard());
+      setCurrentPlayer('BLUE');
+      setWinner(null);
+      setWinningLine([]);
+      // Don't reset score - keep counting wins
+    } else {
+      // Clear state khi back ra (isPlaying = false)
       setBoard(createEmptyBoard());
       setCurrentPlayer('BLUE');
       setWinner(null);
@@ -51,7 +64,7 @@ export const useCaro5 = (isPlaying, botEnabled = false) => {
   const checkWinnerAtPosition = useCallback((boardState, r, c, player) => {
     for (const { dr, dc } of DIRECTIONS) {
       const line = [{ r, c }];
-      
+
       // Đếm theo hướng dương
       let nr = r + dr;
       let nc = c + dc;
@@ -64,7 +77,7 @@ export const useCaro5 = (isPlaying, botEnabled = false) => {
         nr += dr;
         nc += dc;
       }
-      
+
       // Đếm theo hướng âm
       nr = r - dr;
       nc = c - dc;
@@ -77,7 +90,7 @@ export const useCaro5 = (isPlaying, botEnabled = false) => {
         nr -= dr;
         nc -= dc;
       }
-      
+
       // Nếu đủ 5 quân liên tiếp -> thắng
       if (line.length >= WIN_COUNT) {
         return line;
@@ -100,16 +113,17 @@ export const useCaro5 = (isPlaying, botEnabled = false) => {
   const makeBotMove = useCallback((currentBoard) => {
     const emptyCells = getEmptyCells(currentBoard, config.rows, config.cols);
     if (emptyCells.length === 0) return;
-    
+
     // Chọn random một ô trống
     const randomIndex = Math.floor(Math.random() * emptyCells.length);
     const { r: botR, c: botC } = emptyCells[randomIndex];
-    
+    console.log(`[Caro5Bot] Move: ${botR},${botC} in ${config.rows}x${config.cols}`);
+
     // Đặt quân RED
     const newBoard = currentBoard.map(row => [...row]);
     newBoard[botR][botC] = 'RED';
     setBoard(newBoard);
-    
+
     // Kiểm tra thắng
     const winLine = checkWinnerAtPosition(newBoard, botR, botC, 'RED');
     if (winLine) {
@@ -117,13 +131,13 @@ export const useCaro5 = (isPlaying, botEnabled = false) => {
       setWinningLine(winLine);
       return;
     }
-    
+
     // Kiểm tra hòa
     if (checkDraw(newBoard)) {
       setWinner('DRAW');
       return;
     }
-    
+
     // Chuyển lượt về BLUE
     setCurrentPlayer('BLUE');
   }, [config.rows, config.cols, checkWinnerAtPosition, checkDraw]);
@@ -132,26 +146,26 @@ export const useCaro5 = (isPlaying, botEnabled = false) => {
   useEffect(() => {
     if (!isPlaying || !botEnabled || winner) return;
     if (currentPlayer !== 'RED') return;
-    
+
     // Delay 500ms để người chơi thấy rõ nước đi
     const timer = setTimeout(() => {
       makeBotMove(board);
     }, 500);
-    
+
     return () => clearTimeout(timer);
   }, [currentPlayer, isPlaying, botEnabled, winner, board, makeBotMove]);
 
   // Xử lý click vào ô
   const handlePixelClick = (r, c) => {
     if (!isPlaying || winner) return;
-    
+
     // Chuyển từ 1-indexed (từ GameMatrix) sang 0-indexed
     const boardR = r - 1;
     const boardC = c - 1;
-    
+
     // Kiểm tra ngoài phạm vi
     if (boardR < 0 || boardR >= config.rows || boardC < 0 || boardC >= config.cols) return;
-    
+
     // Kiểm tra ô đã có quân chưa
     if (board[boardR][boardC] !== null) return;
 
@@ -165,6 +179,10 @@ export const useCaro5 = (isPlaying, botEnabled = false) => {
     if (winLine) {
       setWinner(currentPlayer);
       setWinningLine(winLine);
+      // Add score when BLUE (player) wins
+      if (currentPlayer === 'BLUE') {
+        setScore(prev => prev + 1);
+      }
       return;
     }
 
@@ -183,7 +201,7 @@ export const useCaro5 = (isPlaying, botEnabled = false) => {
     // Chuyển từ 1-indexed sang 0-indexed
     const boardR = r - 1;
     const boardC = c - 1;
-    
+
     // Kiểm tra ngoài phạm vi
     if (boardR < 0 || boardR >= config.rows || boardC < 0 || boardC >= config.cols) {
       return 'bg-[#333] shadow-none opacity-40';
@@ -199,7 +217,7 @@ export const useCaro5 = (isPlaying, botEnabled = false) => {
     if (cellValue === 'RED') {
       return `bg-red-500 shadow-[0_0_8px_#ef4444] ${pulseClass}`;
     }
-    
+
     // Ô trống
     return 'bg-[#333] shadow-none opacity-40';
   };
@@ -212,13 +230,31 @@ export const useCaro5 = (isPlaying, botEnabled = false) => {
     setWinningLine([]);
   }, [createEmptyBoard]);
 
+  // Get serialized game state for saving
+  const getGameState = () => {
+    return {
+      board: board,
+      // currentPlayer: currentPlayer,
+      // winner: winner,
+      // score: score,
+      config: {
+        type: 'caro-5',
+        rows: config.rows,
+        cols: config.cols
+      }
+    };
+  };
+
   return {
     board,
     currentPlayer,
     winner,
     winningLine,
+    score,
+    totalWins: score, // Alias for score to display wins in UI
     handlePixelClick,
     getPixelColor,
     resetGame,
+    getGameState,
   };
 };
