@@ -1,9 +1,11 @@
+import { API_BASE } from "@/lib/api";
+
 
 // get user after reload, like remember me
 export async function getUserApi() {
     console.log("Fontend-User-Service: Get user API input: ");
 
-    const response = await fetch("/api/user/me", {
+    const response = await fetch(`${API_BASE}/api/user/me`, {
         method: "GET",
         credentials: "include",
         headers: {
@@ -26,7 +28,7 @@ export async function getUserApi() {
 export async function getProfileApi() {
     console.log("Fontend-Auth-Service: Get profile API input: ");
 
-    const response = await fetch("/api/user/profile", {
+    const response = await fetch(`${API_BASE}/api/user/profile`, {
         method: "GET",
         credentials: "include",
         headers: {
@@ -49,7 +51,7 @@ export async function getProfileApi() {
 export async function editProfileApi(payload) {
     console.log("Fontend-Auth-Service: Edit profile API input: ", payload);
 
-    const response = await fetch("/api/user/profile", {
+    const response = await fetch(`${API_BASE}/api/user/profile`, {
         method: "PATCH",
         credentials: "include",
         headers: {
@@ -73,7 +75,7 @@ export async function editProfileApi(payload) {
 export async function getAllUsersApi(page = 1, limit = 10, search = "") {
     console.log("Fontend-User-Service: Get all users API input: ", page, limit, search);
 
-    const response = await fetch(`/api/user/all?page=${page}&limit=${limit}&search=${search}`, {
+    const response = await fetch(`${API_BASE}/api/user/all?page=${page}&limit=${limit}&search=${search}`, {
         method: "GET",
         credentials: "include",
         headers: {
@@ -94,7 +96,7 @@ export async function getAllUsersApi(page = 1, limit = 10, search = "") {
 
 // Update User State
 export async function updateUserStateApi(userId, state) {
-    const response = await fetch(`/api/user/${userId}/state`, {
+    const response = await fetch(`${API_BASE}/api/user/${userId}/state`, {
         method: "PATCH",
         credentials: "include",
         headers: {
@@ -117,7 +119,7 @@ export async function updateUserStateApi(userId, state) {
 export async function getAllUsersFriendApi(page, limit, search) {
     console.log("Fontend-User-Service: Get all users API input: ", page, limit, search);
 
-    const response = await fetch(`/api/user/all-users?page=${page}&limit=${limit}&search=${search}`, {
+    const response = await fetch(`${API_BASE}/api/user/all-users?page=${page}&limit=${limit}&search=${search}`, {
         method: "GET",
         credentials: "include",
         headers: {
@@ -140,7 +142,7 @@ export async function getAllUsersFriendApi(page, limit, search) {
 export async function getFriendRequestsApi(page = 1, limit = 10, search = "") {
     console.log("Fontend-User-Service: Get friend requests API input: ", page, limit, search);
 
-    const response = await fetch(`/api/user/friend-requests?page=${page}&limit=${limit}&search=${search}`, {
+    const response = await fetch(`${API_BASE}/api/user/friend-requests?page=${page}&limit=${limit}&search=${search}`, {
         method: "GET",
         credentials: "include",
         headers: {
@@ -163,7 +165,7 @@ export async function getFriendRequestsApi(page = 1, limit = 10, search = "") {
 export async function getMyFriendsApi(page, limit, search) {
     console.log("Fontend-User-Service: Get my friends API input: ", page, limit, search);
 
-    const response = await fetch(`/api/user/my-friends?page=${page}&limit=${limit}&search=${search}`, {
+    const response = await fetch(`${API_BASE}/api/user/my-friends?page=${page}&limit=${limit}&search=${search}`, {
         method: "GET",
         credentials: "include",
         headers: {
@@ -186,7 +188,7 @@ export async function getMyFriendsApi(page, limit, search) {
 export async function addFriendApi(user_id) {
     console.log("Fontend-User-Service: Add friend API input: ", user_id);
 
-    const response = await fetch(`/api/user/add-friend`, {
+    const response = await fetch(`${API_BASE}/api/user/add-friend`, {
         method: "POST",
         credentials: "include",
         headers: {
@@ -209,7 +211,7 @@ export async function addFriendApi(user_id) {
 export async function acceptFriendApi(sender_id) {
     console.log("Fontend-User-Service: Accept friend API input: ", sender_id);
 
-    const response = await fetch(`/api/user/accept-friend`, {
+    const response = await fetch(`${API_BASE}/api/user/accept-friend`, {
         method: "POST",
         credentials: "include",
         headers: {
@@ -232,7 +234,7 @@ export async function acceptFriendApi(sender_id) {
 export async function rejectFriendApi(sender_id) {
     console.log("Fontend-User-Service: Reject friend API input: ", sender_id);
 
-    const response = await fetch(`/api/user/reject-friend`, {
+    const response = await fetch(`${API_BASE}/api/user/reject-friend`, {
         method: "POST",
         credentials: "include",
         headers: {
@@ -255,7 +257,7 @@ export async function rejectFriendApi(sender_id) {
 export async function removeFriendApi(friend_id) {
     console.log("Fontend-User-Service: Remove friend API input: ", friend_id);
 
-    const response = await fetch(`/api/user/remove-friend`, {
+    const response = await fetch(`${API_BASE}/api/user/remove-friend`, {
         method: "POST",
         credentials: "include",
         headers: {
@@ -278,7 +280,7 @@ export async function removeFriendApi(friend_id) {
 export async function getAllMyConversationsApi(page, limit, search) {
     console.log("Fontend-User-Service: Get all my conversations API input: ", page, limit, search);
 
-    const response = await fetch(`/api/user/all-my-conversations?page=${page}&limit=${limit}&search=${search}`, {
+    const response = await fetch(`${API_BASE}/api/user/all-my-conversations?page=${page}&limit=${limit}&search=${search}`, {
         method: "GET",
         credentials: "include",
         headers: {
@@ -301,7 +303,7 @@ export async function getAllMyConversationsApi(page, limit, search) {
 export async function getMessagesApi(conversation_id, offset, limit) {
     console.log("Fontend-User-Service: Get messages API input: ", conversation_id, offset, limit);
 
-    const response = await fetch(`/api/user/conversations/${conversation_id}/messages?offset=${offset}&limit=${limit}`, {
+    const response = await fetch(`${API_BASE}/api/user/conversations/${conversation_id}/messages?offset=${offset}&limit=${limit}`, {
         method: "GET",
         credentials: "include",
         headers: {
@@ -324,7 +326,7 @@ export async function getMessagesApi(conversation_id, offset, limit) {
 export async function sendMessageApi(conversation_id, message) {
     console.log("Fontend-User-Service: Send message API input: ", conversation_id, message);
 
-    const response = await fetch(`/api/user/conversations/${conversation_id}/messages`, {
+    const response = await fetch(`${API_BASE}/api/user/conversations/${conversation_id}/messages`, {
         method: "POST",
         credentials: "include",
         headers: {
@@ -348,7 +350,7 @@ export async function sendMessageApi(conversation_id, message) {
 export async function searchUsersApi(search) {
     console.log("Fontend-User-Service: Search users API input: ", search);
 
-    const response = await fetch(`/api/user/search?search=${search}`, {
+    const response = await fetch(`${API_BASE}/api/user/search?search=${search}`, {
         method: "GET",
         credentials: "include",
         headers: {
@@ -371,7 +373,7 @@ export async function searchUsersApi(search) {
 export async function fetchUserApi(userId) {
     console.log("Fontend-User-Service: Fetch user API input: ", userId);
 
-    const response = await fetch(`/api/user/get-user/${userId}`, {
+    const response = await fetch(`${API_BASE}/api/user/get-user/${userId}`, {
         method: "GET",
         credentials: "include",
         headers: {
@@ -394,7 +396,7 @@ export async function fetchUserApi(userId) {
 export async function sendFirstMessageApi(userId, message) {
     console.log("Fontend-User-Service: Send first message API input: ", userId, message);
 
-    const response = await fetch(`/api/user/conversations/${userId}/new`, {
+    const response = await fetch(`${API_BASE}/api/user/conversations/${userId}/new`, {
         method: "POST",
         credentials: "include",
         headers: {
@@ -418,7 +420,7 @@ export async function sendFirstMessageApi(userId, message) {
 export async function checkExistConversationApi(userId) {
     console.log("Fontend-User-Service: Check exist conversation API input: ", userId);
 
-    const response = await fetch(`/api/user/conversations/${userId}/exist`, {
+    const response = await fetch(`${API_BASE}/api/user/conversations/${userId}/exist`, {
         method: "GET",
         credentials: "include",
         headers: {
@@ -441,7 +443,7 @@ export async function checkExistConversationApi(userId) {
 export async function removeConversationApi(conversation_id) {
     console.log("Fontend-User-Service: Remove conversation API input: ", conversation_id);
 
-    const response = await fetch(`/api/user/conversations/${conversation_id}`, {
+    const response = await fetch(`${API_BASE}/api/user/conversations/${conversation_id}`, {
         method: "DELETE",
         credentials: "include",
         headers: {

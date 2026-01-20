@@ -1,8 +1,10 @@
+import { API_BASE } from "@/lib/api";
+
 // Login
 export async function loginApi(payload) {
     console.log("Fontend-Auth-Service: Login API input: ", payload);
 
-    const response = await fetch("/api/auth/login", {
+    const response = await fetch(`${API_BASE}/api/auth/login`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
@@ -24,7 +26,7 @@ export async function loginApi(payload) {
 export async function registerApi(payload) {
     console.log("Fontend-Auth-Service: Register API input: ", payload);
 
-    const response = await fetch("/api/auth/register", {
+    const response = await fetch(`${API_BASE}/api/auth/register`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
@@ -46,7 +48,7 @@ export async function registerApi(payload) {
 export async function verifyEmailApi(payload) {
     console.log("Fontend-Auth-Service: Verify email API input: ", payload);
 
-    const response = await fetch("/api/auth/verify-email", {
+    const response = await fetch(`${API_BASE}/api/auth/verify-email`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
@@ -68,7 +70,7 @@ export async function verifyEmailApi(payload) {
 export async function resendOTPApi(email) {
     console.log("Fontend-Auth-Service: Resend OTP API input: ", email);
 
-    const response = await fetch("/api/auth/resend-otp", {
+    const response = await fetch(`${API_BASE}/api/auth/resend-otp`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
@@ -88,7 +90,7 @@ export async function resendOTPApi(email) {
 
 // Log out
 export async function logoutApi() {
-    const response = await fetch("/api/auth/logout", {
+    const response = await fetch(`${API_BASE}/api/auth/logout`, {
         method: "POST",
         credentials: "include",
         headers: {

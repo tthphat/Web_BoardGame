@@ -1,7 +1,9 @@
+import { API_BASE } from "@/lib/api";
+
 export async function getUserAchievementsApi(gameSlug = null, search = null, includeUnearned = false) {
     console.log("Frontend-Achievement-Service: Get achievements API input: ", { gameSlug, search, includeUnearned });
 
-    let url = "/api/achievements";
+    let url = `${API_BASE}/api/achievements`;
     const params = new URLSearchParams();
     if (gameSlug) params.append("gameSlug", gameSlug);
     if (search) params.append("search", search);

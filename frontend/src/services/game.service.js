@@ -1,6 +1,8 @@
+import { API_BASE } from "@/lib/api";
+
 // Get enabled games (public)
 export async function getEnabledGamesApi() {
-    const response = await fetch("/api/games/enabled", {
+    const response = await fetch(`${API_BASE}/api/games/enabled`, {
         method: "GET",
         headers: {
             "Content-Type": "application/json",
@@ -19,7 +21,7 @@ export async function getEnabledGamesApi() {
 
 // Get all games (admin only)
 export async function getAllGamesApi() {
-    const response = await fetch("/api/games/all", {
+    const response = await fetch(`${API_BASE}/api/games/all`, {
         method: "GET",
         credentials: "include",
         headers: {
@@ -39,7 +41,7 @@ export async function getAllGamesApi() {
 
 // Toggle game enabled status (admin only)
 export async function toggleGameApi(gameId, enabled) {
-    const response = await fetch("/api/games/toggle", {
+    const response = await fetch(`${API_BASE}/api/games/toggle`, {
         method: "PUT",
         credentials: "include",
         headers: {
@@ -60,7 +62,7 @@ export async function toggleGameApi(gameId, enabled) {
 
 // Finish game (authenticated user)
 export async function finishGameApi(gameSlug, result) {
-    const response = await fetch("/api/games/finish", {
+    const response = await fetch(`${API_BASE}/api/games/finish`, {
         method: "POST",
         credentials: "include",
         headers: {
@@ -81,7 +83,7 @@ export async function finishGameApi(gameSlug, result) {
 
 // Get leaderboard for a game (protected)
 export async function getLeaderboardApi(gameSlug, limit = 10, options = {}) {
-    let url = `/api/games/${gameSlug}/leaderboard?limit=${limit}`;
+    let url = `${API_BASE}/api/games/${gameSlug}/leaderboard?limit=${limit}`;
     if (options.filter) url += `&filter=${options.filter}`;
     if (options.userId) url += `&userId=${options.userId}`;
     if (options.page) url += `&page=${options.page}`;
@@ -106,7 +108,7 @@ export async function getLeaderboardApi(gameSlug, limit = 10, options = {}) {
 
 // Get all leaderboards (protected)
 export async function getAllLeaderboardsApi(limit = 5, options = {}) {
-    let url = `/api/games/leaderboard?limit=${limit}`;
+    let url = `${API_BASE}/api/games/leaderboard?limit=${limit}`;
     if (options.filter) url += `&filter=${options.filter}`;
     if (options.userId) url += `&userId=${options.userId}`;
 
@@ -130,7 +132,7 @@ export async function getAllLeaderboardsApi(limit = 5, options = {}) {
 
 // Get current user's game stats (authenticated)
 export async function getUserStatsApi() {
-    const response = await fetch("/api/games/my-stats", {
+    const response = await fetch(`${API_BASE}/api/games/my-stats`, {
         method: "GET",
         credentials: "include",
         headers: {
@@ -150,7 +152,7 @@ export async function getUserStatsApi() {
 
 // Get user's stats for a specific game (authenticated)
 export async function getGameStatsApi(gameSlug) {
-    const response = await fetch(`/api/games/my-stats/${gameSlug}`, {
+    const response = await fetch(`${API_BASE}/api/games/my-stats/${gameSlug}`, {
         method: "GET",
         credentials: "include",
         headers: {
@@ -170,7 +172,7 @@ export async function getGameStatsApi(gameSlug) {
 
 // Save game session (authenticated)
 export async function saveGameSessionApi(slug, state) {
-    const response = await fetch("/api/games/save", {
+    const response = await fetch(`${API_BASE}/api/games/save`, {
         method: "POST",
         credentials: "include",
         headers: {
@@ -191,7 +193,7 @@ export async function saveGameSessionApi(slug, state) {
 
 // Load game session (authenticated)
 export async function loadGameSessionApi(slug) {
-    const response = await fetch(`/api/games/load/${slug}`, {
+    const response = await fetch(`${API_BASE}/api/games/load/${slug}`, {
         method: "GET",
         credentials: "include",
         headers: {

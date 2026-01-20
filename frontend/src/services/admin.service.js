@@ -1,6 +1,8 @@
+import { API_BASE } from "@/lib/api";
+
 // Get Dashboard Stats
 export async function getDashboardStatsApi() {
-    const response = await fetch("/api/admin/dashboard-stats", {
+    const response = await fetch(`${API_BASE}/api/admin/dashboard-stats`, {
         method: "GET",
         credentials: "include",
         headers: {
@@ -20,7 +22,7 @@ export async function getDashboardStatsApi() {
 
 // Get Recent Activities
 export async function getRecentActivitiesApi() {
-    const response = await fetch("/api/admin/recent-activities", {
+    const response = await fetch(`${API_BASE}/api/admin/recent-activities`, {
         method: "GET",
         credentials: "include",
         headers: {
@@ -42,7 +44,7 @@ export async function getRecentActivitiesApi() {
 // Game Management
 // =============
 export async function getAllGamesApi() {
-    const response = await fetch("/api/admin/games", {
+    const response = await fetch(`${API_BASE}/api/admin/games`, {
         method: "GET",
         credentials: "include",
         headers: {
@@ -57,7 +59,7 @@ export async function getAllGamesApi() {
 }
 
 export async function updateGameStateApi(id, enabled) {
-    const response = await fetch(`/api/admin/games/${id}/state`, {
+    const response = await fetch(`${API_BASE}/api/admin/games/${id}/state`, {
         method: "PATCH",
         credentials: "include",
         headers: {
@@ -76,7 +78,7 @@ export async function updateGameStateApi(id, enabled) {
 // Board Config Management
 // =============
 export async function getAllBoardConfigsApi() {
-    const response = await fetch("/api/admin/board-configs", {
+    const response = await fetch(`${API_BASE}/api/admin/board-configs`, {
         method: "GET",
         credentials: "include",
         headers: {
@@ -91,7 +93,7 @@ export async function getAllBoardConfigsApi() {
 }
 
 export async function updateBoardConfigApi(id, configData) {
-    const response = await fetch(`/api/admin/board-configs/${id}`, {
+    const response = await fetch(`${API_BASE}/api/admin/board-configs/${id}`, {
         method: "PUT",
         credentials: "include",
         headers: {
@@ -107,7 +109,7 @@ export async function updateBoardConfigApi(id, configData) {
 }
 
 export async function activateBoardConfigApi(id) {
-    const response = await fetch(`/api/admin/board-configs/${id}/activate`, {
+    const response = await fetch(`${API_BASE}/api/admin/board-configs/${id}/activate`, {
         method: "PUT",
         credentials: "include",
         headers: {
@@ -122,7 +124,7 @@ export async function activateBoardConfigApi(id) {
 }
 // Get Detailed Statistics
 export async function getStatisticsApi(period = '30d') {
-    const response = await fetch(`/api/admin/statistics?period=${period}`, {
+    const response = await fetch(`${API_BASE}/api/admin/statistics?period=${period}`, {
         method: "GET",
         credentials: "include",
         headers: {
