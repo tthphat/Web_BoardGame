@@ -73,7 +73,7 @@ const RankingPage = () => {
         const rankValue = (filterMode === 'specific_user' && user.globalRank) ? Number(user.globalRank) : index + 1;
         const isTop3 = rankValue <= 3;
 
-        let rankColor = 'text-gray-600';
+        let rankColor = 'text-gray-600 dark:text-gray-400';
         if (rankValue === 1) rankColor = 'text-yellow-600';
         else if (rankValue === 2) rankColor = 'text-gray-400';
         else if (rankValue === 3) rankColor = 'text-orange-600';
@@ -82,30 +82,30 @@ const RankingPage = () => {
 
         return (
             <tr key={user.userId} className={`
-                ${isTop3 ? 'font-bold bg-white' : 'even:bg-gray-100'} 
-                hover:bg-blue-50 text-xs transition-colors
+                ${isTop3 ? 'font-bold bg-white dark:bg-[#3a3a3a]' : 'even:bg-gray-100 dark:even:bg-[#2a2a2a]'} 
+                hover:bg-blue-50 dark:hover:bg-[#4a4a4a] text-xs transition-colors
             `}>
-                <td className="p-2 text-center border-r border-gray-400">
+                <td className="p-2 text-center border-r border-gray-400 dark:border-[#555]">
                     <span className={`inline-block w-5 text-center ${rankColor}`}>
                         {rankValue === 1 ? '🥇' : rankValue === 2 ? '🥈' : rankValue === 3 ? '🥉' : `#${rankValue}`}
                     </span>
                 </td>
-                <td className="p-2 border-r border-gray-400">
+                <td className="p-2 border-r border-gray-400 dark:border-[#555]">
                     <div className="flex items-center gap-2">
                         <div className="w-5 h-5 bg-gradient-to-tr from-teal-600 to-blue-900 rounded-sm border border-black flex items-center justify-center text-[10px] text-white">
                             {user.username.charAt(0).toUpperCase()}
                         </div>
-                        <span className="truncate max-w-[80px] md:max-w-[120px] text-black">{user.username}</span>
+                        <span className="truncate max-w-[80px] md:max-w-[120px] text-black dark:text-gray-200">{user.username}</span>
                     </div>
                 </td>
 
                 {showTotal && (
-                    <td className="p-2 text-right border-r border-gray-400 text-black">
+                    <td className="p-2 text-right border-r border-gray-400 dark:border-[#555] text-black dark:text-gray-200">
                         {user.totalScore?.toLocaleString() || '-'}
                     </td>
                 )}
 
-                <td className="p-2 text-right text-black">
+                <td className="p-2 text-right text-black dark:text-gray-200">
                     {user.bestScore?.toLocaleString() || '-'}
                 </td>
             </tr>
@@ -120,21 +120,21 @@ const RankingPage = () => {
         const colCount = 2 + (showTotal ? 1 : 0) + 1;
 
         return (
-            <div className="bg-[#c0c0c0] border-2 border-t-white border-l-white border-b-black border-r-black p-1 shadow-sm mb-4">
+            <div className="bg-[#c0c0c0] dark:bg-[#4a4a4a] border-2 border-t-white border-l-white border-b-black border-r-black dark:border-t-[#6a6a6a] dark:border-l-[#6a6a6a] dark:border-b-[#2a2a2a] dark:border-r-[#2a2a2a] p-1 shadow-sm mb-4">
                 {title && (
                     <div className="bg-[#000080] text-white px-2 py-1 text-xs font-bold flex items-center gap-2 mb-1 uppercase">
                         <Gamepad2 className="w-3 h-3" />
                         {title}
                     </div>
                 )}
-                <div className="bg-white border-2 border-t-black border-l-black border-b-white border-r-white overflow-x-auto">
+                <div className="bg-white dark:bg-[#2a2a2a] border-2 border-t-black border-l-black border-b-white border-r-white dark:border-t-[#1a1a1a] dark:border-l-[#1a1a1a] dark:border-b-[#5a5a5a] dark:border-r-[#5a5a5a] overflow-x-auto">
                     <table className="w-full border-collapse text-left">
                         <thead>
-                            <tr className="bg-[#c0c0c0] text-[10px] uppercase text-black">
-                                <th className="p-2 border-b-2 border-gray-500 w-10 text-center">Rank</th>
-                                <th className="p-2 border-b-2 border-gray-500">Player</th>
-                                {showTotal && <th className="p-2 border-b-2 border-gray-500 text-right">Total Score</th>}
-                                <th className="p-2 border-b-2 border-gray-500 text-right">Best Score</th>
+                            <tr className="bg-[#c0c0c0] dark:bg-[#3a3a3a] text-[10px] uppercase text-black dark:text-gray-200">
+                                <th className="p-2 border-b-2 border-gray-500 dark:border-[#555] w-10 text-center">Rank</th>
+                                <th className="p-2 border-b-2 border-gray-500 dark:border-[#555]">Player</th>
+                                {showTotal && <th className="p-2 border-b-2 border-gray-500 dark:border-[#555] text-right">Total Score</th>}
+                                <th className="p-2 border-b-2 border-gray-500 dark:border-[#555] text-right">Best Score</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -142,7 +142,7 @@ const RankingPage = () => {
                                 data.map((user, idx) => renderUserRow(user, idx, type, currentSlug))
                             ) : (
                                 <tr>
-                                    <td colSpan={colCount} className="p-8 text-center text-xs text-gray-500 italic uppercase">
+                                    <td colSpan={colCount} className="p-8 text-center text-xs text-gray-500 dark:text-gray-400 italic uppercase">
                                         No data available.
                                     </td>
                                 </tr>
@@ -155,10 +155,10 @@ const RankingPage = () => {
     };
 
     return (
-        <div className="container mx-auto p-4 max-w-5xl h-full font-mono flex flex-col gap-4 text-black">
+        <div className="container mx-auto p-4 max-w-5xl h-full font-mono flex flex-col gap-4 text-black dark:text-gray-200">
 
             {/* MAIN WINDOW FRAME */}
-            <div className="bg-[#c0c0c0] border-2 border-t-white border-l-white border-b-black border-r-black p-1 shadow-[4px_4px_0px_rgba(0,0,0,0.5)] flex flex-col h-full">
+            <div className="bg-[#c0c0c0] dark:bg-[#4a4a4a] border-2 border-t-white border-l-white border-b-black border-r-black dark:border-t-[#6a6a6a] dark:border-l-[#6a6a6a] dark:border-b-[#2a2a2a] dark:border-r-[#2a2a2a] p-1 shadow-[4px_4px_0px_rgba(0,0,0,0.5)] flex flex-col h-full">
 
                 {/* HEADER BAR */}
                 <div className="bg-[#000080] text-white px-2 py-1 mb-2 font-bold text-lg flex items-center justify-between select-none">
@@ -188,10 +188,10 @@ const RankingPage = () => {
                             }}
                             className={`
                                 px-3 py-1.5 text-xs md:text-sm font-bold uppercase flex items-center transition-none
-                                border-2 border-t-white border-l-white border-r-black truncate
+                                border-2 border-t-white border-l-white border-r-black dark:border-t-[#6a6a6a] dark:border-l-[#6a6a6a] dark:border-r-[#2a2a2a] truncate
                                 ${!selectedGame
-                                    ? 'bg-[#c0c0c0] border-b-[#c0c0c0] pb-2 -mt-1 pt-2.5 relative z-20 text-black'
-                                    : 'bg-[#a0a0a0] border-b-black hover:bg-[#b0b0b0] text-gray-700'
+                                    ? 'bg-[#c0c0c0] dark:bg-[#4a4a4a] border-b-[#c0c0c0] dark:border-b-[#4a4a4a] pb-2 -mt-1 pt-2.5 relative z-20 text-black dark:text-white'
+                                    : 'bg-[#a0a0a0] dark:bg-[#3a3a3a] border-b-black dark:border-b-[#2a2a2a] hover:bg-[#b0b0b0] dark:hover:bg-[#4a4a4a] text-gray-700 dark:text-gray-300'
                                 }
                             `}
                         >
@@ -206,10 +206,10 @@ const RankingPage = () => {
                                 }}
                                 className={`
                                     px-3 py-1.5 text-xs md:text-sm font-bold uppercase flex items-center transition-none
-                                    border-2 border-t-white border-l-white border-r-black truncate
+                                    border-2 border-t-white border-l-white border-r-black dark:border-t-[#6a6a6a] dark:border-l-[#6a6a6a] dark:border-r-[#2a2a2a] truncate
                                     ${selectedGame === gameKey
-                                        ? 'bg-[#c0c0c0] border-b-[#c0c0c0] pb-2 -mt-1 pt-2.5 relative z-20 text-black'
-                                        : 'bg-[#a0a0a0] border-b-black hover:bg-[#b0b0b0] text-gray-700'
+                                        ? 'bg-[#c0c0c0] dark:bg-[#4a4a4a] border-b-[#c0c0c0] dark:border-b-[#4a4a4a] pb-2 -mt-1 pt-2.5 relative z-20 text-black dark:text-white'
+                                        : 'bg-[#a0a0a0] dark:bg-[#3a3a3a] border-b-black dark:border-b-[#2a2a2a] hover:bg-[#b0b0b0] dark:hover:bg-[#4a4a4a] text-gray-700 dark:text-gray-300'
                                     }
                                 `}
                             >
@@ -219,7 +219,7 @@ const RankingPage = () => {
                     </div>
 
                     {/* TOOLBAR */}
-                    <div className="bg-[#c0c0c0] border-2 border-t-white border-l-white border-b-black border-r-black px-3 py-2 flex justify-between items-center relative z-0">
+                    <div className="bg-[#c0c0c0] dark:bg-[#4a4a4a] border-2 border-t-white border-l-white border-b-black border-r-black dark:border-t-[#6a6a6a] dark:border-l-[#6a6a6a] dark:border-b-[#2a2a2a] dark:border-r-[#2a2a2a] px-3 py-2 flex justify-between items-center relative z-0">
                         <div className="flex items-center gap-2">
                             <span className="text-xs font-bold uppercase hidden sm:block">Scope:</span>
                             <select
@@ -246,7 +246,7 @@ const RankingPage = () => {
                                     }
                                     setPage(1);
                                 }}
-                                className="bg-white border-2 border-t-black border-l-black border-b-white border-r-white text-xs py-1 pl-2 pr-6 min-w-[140px] focus:outline-none text-black"
+                                className="bg-white dark:bg-[#2a2a2a] border-2 border-t-black border-l-black border-b-white border-r-white dark:border-t-[#1a1a1a] dark:border-l-[#1a1a1a] dark:border-b-[#5a5a5a] dark:border-r-[#5a5a5a] text-xs py-1 pl-2 pr-6 min-w-[140px] focus:outline-none text-black dark:text-gray-200"
                             >
                                 <option value="global">🌐 Global</option>
                                 <option value="friends_only">👥 Friends</option>
@@ -263,22 +263,22 @@ const RankingPage = () => {
 
                         <button
                             onClick={fetchLeaderboard}
-                            className="px-3 py-1 bg-[#c0c0c0] border-2 border-t-white border-l-white border-b-black border-r-black active:border-t-black active:border-l-black active:border-b-white active:border-r-white text-xs font-bold uppercase flex items-center gap-1 hover:bg-[#d0d0d0] transition-colors active:translate-y-[1px]"
+                            className="px-3 py-1 bg-[#c0c0c0] dark:bg-[#4a4a4a] border-2 border-t-white border-l-white border-b-black border-r-black dark:border-t-[#6a6a6a] dark:border-l-[#6a6a6a] dark:border-b-[#2a2a2a] dark:border-r-[#2a2a2a] active:border-t-black active:border-l-black active:border-b-white active:border-r-white text-xs font-bold uppercase flex items-center gap-1 hover:bg-[#d0d0d0] dark:hover:bg-[#5a5a5a] transition-colors active:translate-y-[1px]"
                         >
                             <RefreshCcw className="w-3 h-3" /> Refresh
                         </button>
                     </div>
 
                     {/* CONTENT CONTAINER */}
-                    <div className="flex-1 bg-[#c0c0c0] border-2 border-t-white border-l-white border-b-black border-r-black p-4 overflow-y-auto relative z-0">
+                    <div className="flex-1 bg-[#c0c0c0] dark:bg-[#4a4a4a] border-2 border-t-white border-l-white border-b-black border-r-black dark:border-t-[#6a6a6a] dark:border-l-[#6a6a6a] dark:border-b-[#2a2a2a] dark:border-r-[#2a2a2a] p-4 overflow-y-auto relative z-0">
                         {loading ? (
                             <div className="h-full flex flex-col items-center justify-center">
-                                <Loader2 className="animate-spin h-10 w-10 text-gray-600 mb-2" />
+                                <Loader2 className="animate-spin h-10 w-10 text-gray-600 dark:text-gray-400 mb-2" />
                                 <span className="text-sm uppercase">Reading Disk...</span>
                             </div>
                         ) : error ? (
                             <div className="h-full flex flex-col items-center justify-center">
-                                <div className="p-4 bg-white border-2 border-t-black border-l-black border-b-white border-r-white text-red-600 flex items-center gap-3">
+                                <div className="p-4 bg-white dark:bg-[#2a2a2a] border-2 border-t-black border-l-black border-b-white border-r-white dark:border-t-[#1a1a1a] dark:border-l-[#1a1a1a] dark:border-b-[#5a5a5a] dark:border-r-[#5a5a5a] text-red-600 flex items-center gap-3">
                                     <ShieldAlert className="w-6 h-6" />
                                     <p className="font-bold uppercase text-xs">Error: {error}</p>
                                 </div>
@@ -311,23 +311,23 @@ const RankingPage = () => {
 
                     {/* Pagination - Only for specific game views */}
                     {selectedGame && !loading && !error && (
-                        <div className="flex justify-center gap-2 py-2 bg-[#c0c0c0]">
+                        <div className="flex justify-center gap-2 py-2 bg-[#c0c0c0] dark:bg-[#4a4a4a]">
                             <button
                                 disabled={page === 1}
                                 onClick={() => setPage(p => Math.max(1, p - 1))}
-                                className="px-3 py-1 bg-[#c0c0c0] border-2 border-t-white border-l-white border-b-black border-r-black active:border-t-black active:border-l-black active:border-b-white active:border-r-white text-xs font-bold uppercase disabled:opacity-50"
+                                className="px-3 py-1 bg-[#c0c0c0] dark:bg-[#4a4a4a] border-2 border-t-white border-l-white border-b-black border-r-black dark:border-t-[#6a6a6a] dark:border-l-[#6a6a6a] dark:border-b-[#2a2a2a] dark:border-r-[#2a2a2a] active:border-t-black active:border-l-black active:border-b-white active:border-r-white text-xs font-bold uppercase disabled:opacity-50"
                             >
                                 ◀ Prev
                             </button>
 
-                            <div className="flex items-center px-4 text-xs font-bold bg-white border-2 border-t-black border-l-black border-b-white border-r-white">
+                            <div className="flex items-center px-4 text-xs font-bold bg-white dark:bg-[#2a2a2a] border-2 border-t-black border-l-black border-b-white border-r-white dark:border-t-[#1a1a1a] dark:border-l-[#1a1a1a] dark:border-b-[#5a5a5a] dark:border-r-[#5a5a5a]">
                                 Page {page} / {totalPages || 1}
                             </div>
 
                             <button
                                 disabled={page >= totalPages}
                                 onClick={() => setPage(p => Math.min(totalPages, p + 1))}
-                                className="px-3 py-1 bg-[#c0c0c0] border-2 border-t-white border-l-white border-b-black border-r-black active:border-t-black active:border-l-black active:border-b-white active:border-r-white text-xs font-bold uppercase disabled:opacity-50"
+                                className="px-3 py-1 bg-[#c0c0c0] dark:bg-[#4a4a4a] border-2 border-t-white border-l-white border-b-black border-r-black dark:border-t-[#6a6a6a] dark:border-l-[#6a6a6a] dark:border-b-[#2a2a2a] dark:border-r-[#2a2a2a] active:border-t-black active:border-l-black active:border-b-white active:border-r-white text-xs font-bold uppercase disabled:opacity-50"
                             >
                                 Next ▶
                             </button>
