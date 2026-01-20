@@ -27,21 +27,40 @@ export const GAME_REGISTRY = {
     externalState: null,
     initialState: {},
     getStatusText: () => '',
+    helpText: {
+      title: 'Welcome',
+      objective: 'Navigate through the game menu',
+      controls: [
+        'Click ← → : Browse games',
+        'Click Enter: Select and start game',
+        'Click Back: Return to menu',
+      ],
+      tips: 'Enjoy playing the game!',
+    },
   },
   SNAKE: {
     name: 'Snake',
     slug: 'snake',
-    refKey: 'snake',  // Changed from null
-    fullboard: true,  // Changed from false - Snake uses full board
-    useFullCoords: true,  // Snake uses full coordinates
+    refKey: 'snake',
+    fullboard: true,
+    useFullCoords: true,
     hideOutsideDots: false,
-    hasWrapper: true,  // Changed from false - now has SnakeWrapper
+    hasWrapper: true,
     externalState: null,
     initialState: { score: 0, isGameOver: false },
     getStatusText: (state, isPlaying) => {
       if (!isPlaying) return '';
       if (state.isGameOver) return '- GAME OVER!';
       return `- Playing`;
+    },
+    helpText: {
+      title: 'Snake',
+      objective: 'Control the snake to eat food and grow longer',
+      controls: [
+        '↑↓←→ or WASD: Move the snake',
+        'Avoid hitting walls and your own body',
+      ],
+      tips: 'The snake grows each time it eats! Plan your path carefully.',
     },
   },
   DRAWING: {
@@ -57,6 +76,17 @@ export const GAME_REGISTRY = {
     getStatusText: (state, isPlaying) => {
       if (!isPlaying) return '';
       return `- ${state?.isErasing ? 'ERASING' : state?.selectedColor || 'Drawing'}`;
+    },
+    helpText: {
+      title: 'Free Draw',
+      objective: 'Express your creativity on the canvas',
+      controls: [
+        'Click: Draw pixels',
+        'Color palette: Select colors',
+        'Eraser: Remove pixels',
+        'Clear: Reset canvas',
+      ],
+      tips: 'Draw your imagination!',
     },
   },
   CARO5: {
@@ -76,6 +106,15 @@ export const GAME_REGISTRY = {
       if (state.winner === 'RED') return '- RED WINS!';
       return `- ${state.currentPlayer === 'BLUE' ? 'BLUE' : 'RED'}'s turn`;
     },
+    helpText: {
+      title: 'Caro 5x5',
+      objective: 'Get 5 pieces in a row to win',
+      controls: [
+        'Click on empty cell: Place your piece',
+        'Blue plays first, then Red',
+      ],
+      tips: 'Block your opponent while building your own line!',
+    },
   },
   CARO4: {
     name: 'Caro 4x4',
@@ -94,6 +133,15 @@ export const GAME_REGISTRY = {
       if (state.winner === 'RED') return '- RED WINS!';
       return `- ${state.currentPlayer === 'BLUE' ? 'BLUE' : 'RED'}'s turn`;
     },
+    helpText: {
+      title: 'Caro 4x4',
+      objective: 'Get 4 pieces in a row to win',
+      controls: [
+        'Click on empty cell: Place your piece',
+        'Blue plays first, then Red',
+      ],
+      tips: 'Think ahead and watch for diagonal wins!',
+    },
   },
   TICTACTOE: {
     name: 'Tic Tac Toe',
@@ -111,6 +159,15 @@ export const GAME_REGISTRY = {
       if (state.winner) return `- ${state.winner} WINS!`;
       return `- ${state.currentPlayer}'s turn`;
     },
+    helpText: {
+      title: 'Tic Tac Toe',
+      objective: 'Get 3 in a row to win',
+      controls: [
+        'Click on empty cell: Place your mark (X or O)',
+        'X plays first, then O',
+      ],
+      tips: 'Control the center and corners for the best chances!',
+    },
   },
   MATCH3: {
     name: 'Candy Rush',
@@ -127,6 +184,15 @@ export const GAME_REGISTRY = {
       if (state.isGameOver) return '- TIME UP!';
       return '- Playing';
     },
+    helpText: {
+      title: 'Candy Rush',
+      objective: 'Match 3 or more same-colored gems to score',
+      controls: [
+        'Click 2 adjacent cells: Swap gems',
+        'Match 3+ gems in a row or column',
+      ],
+      tips: 'Look for chain reactions to get bonus points!',
+    },
   },
   MEMORY: {
     name: 'Memory Card',
@@ -139,6 +205,15 @@ export const GAME_REGISTRY = {
     externalState: 'activeGameState',
     initialState: { score: 0 },
     getStatusText: (state, isPlaying) => isPlaying ? '(PLAYING)' : '',
+    helpText: {
+      title: 'Memory Card',
+      objective: 'Find and match all card pairs',
+      controls: [
+        'Click on card: Flip to reveal',
+        'Match 2 cards with same symbol',
+      ],
+      tips: 'Remember the positions of flipped cards!',
+    },
   },
 };
 
