@@ -83,7 +83,7 @@ function FriendRequests() {
                         <input
                             type="text"
                             placeholder="Search..."
-                            className="w-[300px] p-2 pr-8 border border-gray-600"
+                            className="w-[300px] p-2 pr-8 border border-gray-600 dark:bg-[#2d2d2d] dark:text-white"
                             ref={searchRef}
                             onChange={(e) => {
                                 if (e.target.value === "" && search !== "") {
@@ -111,7 +111,7 @@ function FriendRequests() {
 
                         <button
                             onClick={handleSearch}
-                            className="p-2 border border-gray-600 transition-all hover:bg-blue-800 hover:text-white"
+                            className="p-2 border border-gray-600 transition-all hover:bg-blue-800 hover:text-white dark:text-white"
                         >
                             Search
                         </button>
@@ -119,9 +119,9 @@ function FriendRequests() {
                 </div>
 
                 {/* Users list */}
-                <div className="users-list flex-1 overflow-y-auto min-h-0 mt-4 border-2 border-gray-400 bg-white">
+                <div className="users-list flex-1 overflow-y-auto min-h-0 mt-4 border-2 border-gray-400 bg-white dark:bg-[#333]">
                     <table className="w-full text-left border-collapse">
-                        <thead className="bg-[#c0c0c0] sticky top-0 z-10 shadow-sm">
+                        <thead className="bg-[#c0c0c0] dark:bg-[#2d2d2d] dark:text-white sticky top-0 z-10 shadow-sm">
                             <tr>
                                 <th className="p-3 border-b-2 border-gray-600 font-mono text-sm uppercase tracking-wider">Username</th>
                                 <th className="p-3 border-b-2 border-gray-600 font-mono text-sm uppercase tracking-wider">Email</th>
@@ -134,15 +134,15 @@ function FriendRequests() {
                                 requests.map((request) => (
                                     <tr
                                         key={request.sender_id}
-                                        className="hover:bg-blue-50 transition-colors cursor-default font-mono text-sm group"
+                                        className="hover:bg-blue-50 dark:hover:bg-gray-700 transition-colors cursor-default font-mono text-sm group"
                                     >
                                         <td className="p-3 border-r border-dashed border-gray-300 group-hover:border-blue-200">
-                                            <div className="font-bold text-gray-800">{request.username}</div>
+                                            <div className="font-bold text-gray-800 dark:text-white">{request.username}</div>
                                         </td>
-                                        <td className="p-3 border-r border-dashed border-gray-300 group-hover:border-blue-200 text-gray-600">
+                                        <td className="p-3 border-r border-dashed border-gray-300 group-hover:border-blue-200 text-gray-600 dark:text-gray-300">
                                             {request.email}
                                         </td>
-                                        <td className="p-3 border-r border-dashed border-gray-300 group-hover:border-blue-200 text-gray-600 text-center">
+                                        <td className="p-3 border-r border-dashed border-gray-300 group-hover:border-blue-200 text-gray-600 dark:text-gray-300 text-center">
                                             {handleDateSent(request.created_at)}
                                         </td>
                                         <td className="p-3 text-center">

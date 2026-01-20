@@ -29,7 +29,7 @@ function AcceptRejectFriend({ sender_id, handleRequest }) {
         <div className="flex gap-4 justify-center">
             <button
                 className="
-                px-3 py-1 text-xs border border-green-600 text-green-600 
+                px-3 py-1 text-xs border border-green-600 text-green-600 dark:text-green-400 dark:border-green-400
                 hover:bg-green-600 hover:text-white transition-all
                 active:scale-95 font-bold uppercase
             "
@@ -42,7 +42,7 @@ function AcceptRejectFriend({ sender_id, handleRequest }) {
 
             <button
                 className="
-                    px-3 py-1 text-xs border border-red-600 text-red-600 
+                    px-3 py-1 text-xs border border-red-600 text-red-600 dark:text-red-400 dark:border-red-400
                     hover:bg-red-600 hover:text-white transition-all
                     active:scale-95 font-bold uppercase
                 "

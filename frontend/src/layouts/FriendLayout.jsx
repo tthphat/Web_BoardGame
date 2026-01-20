@@ -39,7 +39,7 @@ function FriendLayout() {
                     </div>
 
                     {/* Content Panel */}
-                    <div className="flex-1 bg-white border-inset border-2 border-gray-600 p-4 shadow-inner overflow-hidden min-h-0 flex flex-col">
+                    <div className="flex-1 dark:bg-[#333] bg-white border-inset border-2 border-gray-600 p-4 shadow-inner overflow-hidden min-h-0 flex flex-col">
                         <Outlet />
                     </div>
 

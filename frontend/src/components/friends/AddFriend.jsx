@@ -18,7 +18,7 @@ function AddFriend({ friend_state, user_id }) {
         } else if (state === "received") {
             return "bg-yellow-600 text-white border-yellow-600";
         } else {
-            return "bg-white text-blue-600 border-blue-600 hover:bg-blue-600 hover:text-white";
+            return "bg-white dark:bg-transparent dark:text-blue-400 dark:border-blue-400 text-blue-600 border-blue-600 hover:bg-blue-600 hover:text-white";
         }
     }
 
