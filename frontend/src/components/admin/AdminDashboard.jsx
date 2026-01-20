@@ -155,7 +155,6 @@ const AdminDashboardMock = () => {
                           <span className="block text-[10px] text-gray-500">Best: {session.best_score}</span>
                           <span className="block text-[10px] text-gray-500">Plays: {session.total_plays}</span>
                         </td>
-                        
                       </tr>
                     ))
                   ) : (
