@@ -1,11 +1,16 @@
 import { Router } from "express";
 import { GameController } from "../controllers/game.controller.js";
+import { RatingController } from "../controllers/rating.controller.js";
 import { verifyToken } from "../middlewares/auth.middleware.js";
 import { authorize } from "../middlewares/authorize.middleware.js";
 
 import { GameSessionController } from "../controllers/gameSession.controller.js";
 
 const router = Router();
+
+// Rating routes
+router.post("/ratings", verifyToken, RatingController.addRating);
+router.get("/:slug/ratings", verifyToken, RatingController.getGameRatings);
 
 // Admin: Get all games (with auth)
 router.get("/all", verifyToken, authorize("admin"), GameController.getAllGames);

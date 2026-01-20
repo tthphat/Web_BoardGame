@@ -1,44 +1,18 @@
-import { AchievementService } from "./achievement.service.js";
+import { AchievementCheckerService } from "./achievementChecker.service.js";
 import { BoardConfigModel } from "../models/boardConfig.model.js";
 import { GameModel } from "../models/game.model.js";
 import { UserGameStatsModel } from "../models/userGameStats.model.js";
-
-const GAME_ACHIEVEMENT_MAPPING = {
-    "tic-tac-toe": "FIRST_PLAY_TIC_TAC_TOE",
-    "caro-4": "FIRST_PLAY_CARO_4",
-    "caro-5": "FIRST_PLAY_CARO_5",
-    "match-3": "FIRST_PLAY_MATCH_3",
-    "snake": "FIRST_PLAY_SNAKE",
-    "memory-card": "FIRST_PLAY_MEMORY_CARD",
-    "free-draw": "FIRST_PLAY_FREE_DRAW"
-};
 
 export class GameService {
     static async finishGame(knex, userId, gameSlug, result) {
         console.log(`Game Finished: User ${userId} played ${gameSlug}. Result:`, result);
 
-        // Logic to grant "First Play" achievement
-        const achievementCode = GAME_ACHIEVEMENT_MAPPING[gameSlug];
-        let earnedAchievement = null;
-
-        if (achievementCode) {
-            earnedAchievement = await AchievementService.grantAchievementService(knex, userId, achievementCode, {
-                gameSlug,
-                result,
-                date: new Date()
-            });
-
-            if (earnedAchievement) {
-                console.log(`Achievement Granted: ${earnedAchievement.name}`);
-            }
-        }
-
         // Get game_id from slug for stats update
         const game = await knex("games").where({ slug: gameSlug }).first();
-        
+
         // Get user info for storing name
         const user = await knex("users").where({ id: userId }).first();
-        
+
         let stats = null;
 
         if (game && result) {
@@ -68,10 +42,24 @@ export class GameService {
             }
         }
 
+        // Build context for achievement checkers
+        const achievementContext = {
+            gameSlug,
+            userId,
+            result,
+            stats
+        };
+
+        // Run all achievement checkers
+        const earnedAchievements = await AchievementCheckerService.checkAndGrantAchievements(
+            knex,
+            achievementContext
+        );
+
         // Return processed data
         return {
             gameSlug,
-            earnedAchievement,
+            earnedAchievements,
             stats
         };
     }
@@ -107,4 +95,3 @@ export class GameService {
         }
     }
 }
-

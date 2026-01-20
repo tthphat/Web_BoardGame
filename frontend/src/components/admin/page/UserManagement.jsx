@@ -16,6 +16,7 @@ const UserManagement = () => {
     const [users, setUsers] = useState([]);
     const [loading, setLoading] = useState(true);
     const [meta, setMeta] = useState({ page: 1, limit: 10, total: 0, totalPages: 0 });
+    const [searchTerm, setSearchTerm] = useState(""); // Search state
 
     // --- STATE CHO MODAL ---
     const [confirmModal, setConfirmModal] = useState({
@@ -25,11 +26,10 @@ const UserManagement = () => {
         currentState: '', // 'active' hoặc 'blocked'
     });
 
-    const fetchUsers = async (page = 1) => {
+    const fetchUsers = async (page = 1, search = searchTerm) => {
         setLoading(true);
         try {
-            const response = await getAllUsersApi(page, meta.limit);
-            setUsers(response.data.users);
+            const response = await getAllUsersApi(page, meta.limit, search);
             setUsers(response.data.users);
             setMeta(response.data.pagination);
         } catch (error) {
@@ -40,8 +40,18 @@ const UserManagement = () => {
     };
 
     useEffect(() => {
-        fetchUsers();
+        fetchUsers(1, ""); // Load initial data without search
     }, []);
+
+    const handleSearch = () => {
+        fetchUsers(1, searchTerm);
+    };
+
+    const handleKeyDown = (e) => {
+        if (e.key === 'Enter') {
+            handleSearch();
+        }
+    };
 
     // 1. Hàm mở Modal khi bấm nút ở bảng
     const openConfirmModal = (user) => {
@@ -95,10 +105,28 @@ const UserManagement = () => {
         <div className="h-full flex flex-col font-mono relative">
             {/* Header Area */}
             <div className="mb-4 flex justify-between items-end shrink-0">
-                <div>
+                <div className="flex flex-col gap-2">
                     {/* <h2 className="text-xl font-bold text-black dark:text-white uppercase tracking-wider">
                         USER_DATABASE.MDB
                     </h2> */}
+                    <div className="flex gap-2 items-center">
+                        <input
+                            type="text"
+                            placeholder="SEARCH_USER..."
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                            onKeyDown={handleKeyDown}
+                            className="bg-white border-2 border-t-[#808080] border-l-[#808080] border-b-white border-r-white px-2 py-1 text-sm font-mono focus:outline-none w-64"
+                        />
+                        <button
+                            onClick={handleSearch}
+                            className="bg-[#c0c0c0] px-3 py-1 border-2 border-t-white border-l-white border-b-black border-r-black active:border-t-black active:border-l-black active:border-b-white active:border-r-white text-xs font-bold uppercase shadow-sm active:translate-y-[1px] active:shadow-none"
+                        >
+                            Search
+                        </button>
+                    </div>
+                </div>
+                <div className="text-right">
                     <p className="text-xs text-gray-500">Total Records: {meta.total}</p>
                 </div>
             </div>

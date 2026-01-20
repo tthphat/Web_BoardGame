@@ -236,5 +236,31 @@ export const UserGameStatsModel = {
             console.error("UserGameStatsModel.getAllLeaderboards error:", error);
             return { data: null, error };
         }
+    },
+    /**
+     * Get recent updates (recently played games)
+     * @param {number} limit
+     */
+    async getRecentUpdates(limit = 10) {
+        try {
+            const recentUpdates = await knex("user_game_stats as ugs")
+                .join("users as u", "ugs.user_id", "u.id")
+                .join("games as g", "ugs.game_id", "g.id")
+                .select(
+                    "ugs.updated_at",
+                    "ugs.best_score",
+                    "ugs.total_plays",
+                    "ugs.total_wins",
+                    "u.username",
+                    "g.name as game_name"
+                )
+                .orderBy("ugs.updated_at", "desc")
+                .limit(limit);
+
+            return { data: recentUpdates, error: null };
+        } catch (error) {
+            console.error("UserGameStatsModel.getRecentUpdates error:", error);
+            return { data: null, error };
+        }
     }
 };

@@ -18,6 +18,7 @@ import RankingPage from "../pages/RankingPage";
 import ConversationLayout from "../layouts/ConversationLayout";
 import ConversationDetail from "../components/message/ConversationDetail";
 import ConversationPlaceholder from "../components/message/ConversationPlaceholder";
+import ReviewPage from "../pages/ReviewPage";
 
 export const router = createBrowserRouter([
     { path: "/login", element: <LoginPage /> },
@@ -101,6 +102,10 @@ export const router = createBrowserRouter([
             {
                 path: "/settings",
                 element: <SettingsPage />
+            },
+            {
+                path: "/reviews",
+                element: <ReviewPage />
             }
         ]
     }
