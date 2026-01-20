@@ -22,15 +22,15 @@ export const AuthController = {
                 httpOnly: true,
                 secure: true,
                 sameSite: "none",
+                path: "/",
                 maxAge: 24 * 60 * 60 * 1000
             });
 
             console.log(user);
 
-            res.json({
-                data: {
-                    user: user.data.user
-                }
+            return res.status(200).json({
+                message: "Login successful",
+                user,
             });
 
         } catch (error) {
@@ -81,15 +81,15 @@ export const AuthController = {
                 httpOnly: true,
                 secure: true,
                 sameSite: "none",
+                path: "/",
                 maxAge: 24 * 60 * 60 * 1000
             });
 
             console.log("Backend-Auth-Controller: Verify Email API output: ", user);
 
-            res.json({
-                data: {
-                    user: user.data.user
-                }
+            return res.status(200).json({
+                message: "Register successful",
+                user,
             });
 
         } catch (error) {
