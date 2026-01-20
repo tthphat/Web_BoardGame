@@ -100,20 +100,6 @@ export async function resendOTPApi(email) {
 
 // Log out
 export async function logoutApi() {
-    const response = await fetch(`${API_BASE}/api/auth/logout`, {
-        method: "POST",
-        credentials: "include",
-        headers: {
-            "Content-Type": "application/json",
-        },
-    });
-
-    const data = await response.json();
-
-    if (!response.ok) {
-        throw new Error(data.message || data.error || "Log out failed");
-    }
-
     // Clear token from localStorage
     localStorage.removeItem('access_token');
 }

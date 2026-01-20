@@ -46,11 +46,7 @@ export async function editProfileApi(payload) {
 
     const response = await fetch(`${API_BASE}/api/user/profile`, {
         method: "PATCH",
-        credentials: "include",
-        headers: {
-            "Content-Type": "application/json",
-            "x-api-key": import.meta.env.VITE_API_KEY,
-        },
+        headers: getAuthHeaders(),
         body: JSON.stringify(payload),
     });
 
@@ -70,11 +66,7 @@ export async function getAllUsersApi(page = 1, limit = 10, search = "") {
 
     const response = await fetch(`${API_BASE}/api/user/all?page=${page}&limit=${limit}&search=${search}`, {
         method: "GET",
-        credentials: "include",
-        headers: {
-            "Content-Type": "application/json",
-            "x-api-key": import.meta.env.VITE_API_KEY,
-        },
+        headers: getAuthHeaders(),
     });
 
     const data = await response.json();
@@ -91,11 +83,7 @@ export async function getAllUsersApi(page = 1, limit = 10, search = "") {
 export async function updateUserStateApi(userId, state) {
     const response = await fetch(`${API_BASE}/api/user/${userId}/state`, {
         method: "PATCH",
-        credentials: "include",
-        headers: {
-            "Content-Type": "application/json",
-            "x-api-key": import.meta.env.VITE_API_KEY,
-        },
+        headers: getAuthHeaders(),
         body: JSON.stringify({ state }),
     });
 
@@ -114,11 +102,7 @@ export async function getAllUsersFriendApi(page, limit, search) {
 
     const response = await fetch(`${API_BASE}/api/user/all-users?page=${page}&limit=${limit}&search=${search}`, {
         method: "GET",
-        credentials: "include",
-        headers: {
-            "Content-Type": "application/json",
-            "x-api-key": import.meta.env.VITE_API_KEY,
-        },
+        headers: getAuthHeaders(),
     });
 
     const data = await response.json();
@@ -137,11 +121,7 @@ export async function getFriendRequestsApi(page = 1, limit = 10, search = "") {
 
     const response = await fetch(`${API_BASE}/api/user/friend-requests?page=${page}&limit=${limit}&search=${search}`, {
         method: "GET",
-        credentials: "include",
-        headers: {
-            "Content-Type": "application/json",
-            "x-api-key": import.meta.env.VITE_API_KEY,
-        },
+        headers: getAuthHeaders(),
     });
 
     const data = await response.json();
@@ -160,11 +140,7 @@ export async function getMyFriendsApi(page, limit, search) {
 
     const response = await fetch(`${API_BASE}/api/user/my-friends?page=${page}&limit=${limit}&search=${search}`, {
         method: "GET",
-        credentials: "include",
-        headers: {
-            "Content-Type": "application/json",
-            "x-api-key": import.meta.env.VITE_API_KEY,
-        },
+        headers: getAuthHeaders(),
     });
 
     const data = await response.json();
@@ -183,11 +159,7 @@ export async function addFriendApi(user_id) {
 
     const response = await fetch(`${API_BASE}/api/user/add-friend`, {
         method: "POST",
-        credentials: "include",
-        headers: {
-            "Content-Type": "application/json",
-            "x-api-key": import.meta.env.VITE_API_KEY,
-        },
+        headers: getAuthHeaders(),
         body: JSON.stringify({ user_id }),
     });
 
@@ -206,11 +178,7 @@ export async function acceptFriendApi(sender_id) {
 
     const response = await fetch(`${API_BASE}/api/user/accept-friend`, {
         method: "POST",
-        credentials: "include",
-        headers: {
-            "Content-Type": "application/json",
-            "x-api-key": import.meta.env.VITE_API_KEY,
-        },
+        headers: getAuthHeaders(),
         body: JSON.stringify({ sender_id }),
     });
 
@@ -229,11 +197,7 @@ export async function rejectFriendApi(sender_id) {
 
     const response = await fetch(`${API_BASE}/api/user/reject-friend`, {
         method: "POST",
-        credentials: "include",
-        headers: {
-            "Content-Type": "application/json",
-            "x-api-key": import.meta.env.VITE_API_KEY,
-        },
+        headers: getAuthHeaders(),
         body: JSON.stringify({ sender_id }),
     });
 
@@ -252,11 +216,7 @@ export async function removeFriendApi(friend_id) {
 
     const response = await fetch(`${API_BASE}/api/user/remove-friend`, {
         method: "POST",
-        credentials: "include",
-        headers: {
-            "Content-Type": "application/json",
-            "x-api-key": import.meta.env.VITE_API_KEY,
-        },
+        headers: getAuthHeaders(),
         body: JSON.stringify({ friend_id }),
     });
 
@@ -275,11 +235,7 @@ export async function getAllMyConversationsApi(page, limit, search) {
 
     const response = await fetch(`${API_BASE}/api/user/all-my-conversations?page=${page}&limit=${limit}&search=${search}`, {
         method: "GET",
-        credentials: "include",
-        headers: {
-            "Content-Type": "application/json",
-            "x-api-key": import.meta.env.VITE_API_KEY,
-        },
+        headers: getAuthHeaders(),
     });
 
     const data = await response.json();
@@ -298,11 +254,7 @@ export async function getMessagesApi(conversation_id, offset, limit) {
 
     const response = await fetch(`${API_BASE}/api/user/conversations/${conversation_id}/messages?offset=${offset}&limit=${limit}`, {
         method: "GET",
-        credentials: "include",
-        headers: {
-            "Content-Type": "application/json",
-            "x-api-key": import.meta.env.VITE_API_KEY,
-        },
+        headers: getAuthHeaders(),
     });
 
     const data = await response.json();
@@ -321,11 +273,7 @@ export async function sendMessageApi(conversation_id, message) {
 
     const response = await fetch(`${API_BASE}/api/user/conversations/${conversation_id}/messages`, {
         method: "POST",
-        credentials: "include",
-        headers: {
-            "Content-Type": "application/json",
-            "x-api-key": import.meta.env.VITE_API_KEY,
-        },
+        headers: getAuthHeaders(),
         body: JSON.stringify({ content: message }),
     });
 
@@ -345,11 +293,7 @@ export async function searchUsersApi(search) {
 
     const response = await fetch(`${API_BASE}/api/user/search?search=${search}`, {
         method: "GET",
-        credentials: "include",
-        headers: {
-            "Content-Type": "application/json",
-            "x-api-key": import.meta.env.VITE_API_KEY,
-        },
+        headers: getAuthHeaders(),
     });
 
     const data = await response.json();
@@ -368,11 +312,7 @@ export async function fetchUserApi(userId) {
 
     const response = await fetch(`${API_BASE}/api/user/get-user/${userId}`, {
         method: "GET",
-        credentials: "include",
-        headers: {
-            "Content-Type": "application/json",
-            "x-api-key": import.meta.env.VITE_API_KEY,
-        },
+        headers: getAuthHeaders(),
     });
 
     const data = await response.json();
@@ -391,11 +331,7 @@ export async function sendFirstMessageApi(userId, message) {
 
     const response = await fetch(`${API_BASE}/api/user/conversations/${userId}/new`, {
         method: "POST",
-        credentials: "include",
-        headers: {
-            "Content-Type": "application/json",
-            "x-api-key": import.meta.env.VITE_API_KEY,
-        },
+        headers: getAuthHeaders(),
         body: JSON.stringify({ content: message }),
     });
 
@@ -415,11 +351,7 @@ export async function checkExistConversationApi(userId) {
 
     const response = await fetch(`${API_BASE}/api/user/conversations/${userId}/exist`, {
         method: "GET",
-        credentials: "include",
-        headers: {
-            "Content-Type": "application/json",
-            "x-api-key": import.meta.env.VITE_API_KEY,
-        },
+        headers: getAuthHeaders(),
     });
 
     const data = await response.json();
@@ -438,11 +370,7 @@ export async function removeConversationApi(conversation_id) {
 
     const response = await fetch(`${API_BASE}/api/user/conversations/${conversation_id}`, {
         method: "DELETE",
-        credentials: "include",
-        headers: {
-            "Content-Type": "application/json",
-            "x-api-key": import.meta.env.VITE_API_KEY,
-        },
+        headers: getAuthHeaders(),
     });
 
     const data = await response.json();

@@ -1,14 +1,11 @@
 import { API_BASE } from "@/lib/api";
+import { getAuthHeaders } from "@/lib/auth-headers";
 
 // Get Dashboard Stats
 export async function getDashboardStatsApi() {
     const response = await fetch(`${API_BASE}/api/admin/dashboard-stats`, {
         method: "GET",
-        credentials: "include",
-        headers: {
-            "Content-Type": "application/json",
-            "x-api-key": import.meta.env.VITE_API_KEY,
-        },
+        headers: getAuthHeaders(),
     });
 
     const data = await response.json();
@@ -24,11 +21,7 @@ export async function getDashboardStatsApi() {
 export async function getRecentActivitiesApi() {
     const response = await fetch(`${API_BASE}/api/admin/recent-activities`, {
         method: "GET",
-        credentials: "include",
-        headers: {
-            "Content-Type": "application/json",
-            "x-api-key": import.meta.env.VITE_API_KEY,
-        },
+        headers: getAuthHeaders(),
     });
 
     const data = await response.json();
@@ -46,11 +39,7 @@ export async function getRecentActivitiesApi() {
 export async function getAllGamesApi() {
     const response = await fetch(`${API_BASE}/api/admin/games`, {
         method: "GET",
-        credentials: "include",
-        headers: {
-            "Content-Type": "application/json",
-            "x-api-key": import.meta.env.VITE_API_KEY,
-        },
+        headers: getAuthHeaders(),
     });
 
     const data = await response.json();
@@ -61,11 +50,7 @@ export async function getAllGamesApi() {
 export async function updateGameStateApi(id, enabled) {
     const response = await fetch(`${API_BASE}/api/admin/games/${id}/state`, {
         method: "PATCH",
-        credentials: "include",
-        headers: {
-            "Content-Type": "application/json",
-            "x-api-key": import.meta.env.VITE_API_KEY,
-        },
+        headers: getAuthHeaders(),
         body: JSON.stringify({ enabled }),
     });
 
@@ -80,11 +65,7 @@ export async function updateGameStateApi(id, enabled) {
 export async function getAllBoardConfigsApi() {
     const response = await fetch(`${API_BASE}/api/admin/board-configs`, {
         method: "GET",
-        credentials: "include",
-        headers: {
-            "Content-Type": "application/json",
-            "x-api-key": import.meta.env.VITE_API_KEY,
-        },
+        headers: getAuthHeaders(),
     });
 
     const data = await response.json();
@@ -95,11 +76,7 @@ export async function getAllBoardConfigsApi() {
 export async function updateBoardConfigApi(id, configData) {
     const response = await fetch(`${API_BASE}/api/admin/board-configs/${id}`, {
         method: "PUT",
-        credentials: "include",
-        headers: {
-            "Content-Type": "application/json",
-            "x-api-key": import.meta.env.VITE_API_KEY,
-        },
+        headers: getAuthHeaders(),
         body: JSON.stringify(configData),
     });
 
@@ -111,11 +88,7 @@ export async function updateBoardConfigApi(id, configData) {
 export async function activateBoardConfigApi(id) {
     const response = await fetch(`${API_BASE}/api/admin/board-configs/${id}/activate`, {
         method: "PUT",
-        credentials: "include",
-        headers: {
-            "Content-Type": "application/json",
-            "x-api-key": import.meta.env.VITE_API_KEY,
-        },
+        headers: getAuthHeaders(),
     });
 
     const data = await response.json();
@@ -126,11 +99,7 @@ export async function activateBoardConfigApi(id) {
 export async function getStatisticsApi(period = '30d') {
     const response = await fetch(`${API_BASE}/api/admin/statistics?period=${period}`, {
         method: "GET",
-        credentials: "include",
-        headers: {
-            "Content-Type": "application/json",
-            "x-api-key": import.meta.env.VITE_API_KEY,
-        },
+        headers: getAuthHeaders(),
     });
 
     const data = await response.json();

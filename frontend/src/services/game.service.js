@@ -1,13 +1,11 @@
 import { API_BASE } from "@/lib/api";
+import { getAuthHeaders } from "@/lib/auth-headers";
 
 // Get enabled games (public)
 export async function getEnabledGamesApi() {
     const response = await fetch(`${API_BASE}/api/games/enabled`, {
         method: "GET",
-        headers: {
-            "Content-Type": "application/json",
-            "x-api-key": import.meta.env.VITE_API_KEY,
-        },
+        headers: getAuthHeaders(),
     });
 
     const data = await response.json();
@@ -23,11 +21,7 @@ export async function getEnabledGamesApi() {
 export async function getAllGamesApi() {
     const response = await fetch(`${API_BASE}/api/games/all`, {
         method: "GET",
-        credentials: "include",
-        headers: {
-            "Content-Type": "application/json",
-            "x-api-key": import.meta.env.VITE_API_KEY,
-        },
+        headers: getAuthHeaders(),
     });
 
     const data = await response.json();
@@ -43,11 +37,7 @@ export async function getAllGamesApi() {
 export async function toggleGameApi(gameId, enabled) {
     const response = await fetch(`${API_BASE}/api/games/toggle`, {
         method: "PUT",
-        credentials: "include",
-        headers: {
-            "Content-Type": "application/json",
-            "x-api-key": import.meta.env.VITE_API_KEY,
-        },
+        headers: getAuthHeaders(),
         body: JSON.stringify({ gameId, enabled }),
     });
 
@@ -64,11 +54,7 @@ export async function toggleGameApi(gameId, enabled) {
 export async function finishGameApi(gameSlug, result) {
     const response = await fetch(`${API_BASE}/api/games/finish`, {
         method: "POST",
-        credentials: "include",
-        headers: {
-            "Content-Type": "application/json",
-            "x-api-key": import.meta.env.VITE_API_KEY,
-        },
+        headers: getAuthHeaders(),
         body: JSON.stringify({ gameSlug, result }),
     });
 
@@ -90,11 +76,7 @@ export async function getLeaderboardApi(gameSlug, limit = 10, options = {}) {
 
     const response = await fetch(url, {
         method: "GET",
-        credentials: "include",
-        headers: {
-            "Content-Type": "application/json",
-            "x-api-key": import.meta.env.VITE_API_KEY,
-        },
+        headers: getAuthHeaders(),
     });
 
     const data = await response.json();
@@ -114,11 +96,7 @@ export async function getAllLeaderboardsApi(limit = 5, options = {}) {
 
     const response = await fetch(url, {
         method: "GET",
-        credentials: "include",
-        headers: {
-            "Content-Type": "application/json",
-            "x-api-key": import.meta.env.VITE_API_KEY,
-        },
+        headers: getAuthHeaders(),
     });
 
     const data = await response.json();
@@ -134,11 +112,7 @@ export async function getAllLeaderboardsApi(limit = 5, options = {}) {
 export async function getUserStatsApi() {
     const response = await fetch(`${API_BASE}/api/games/my-stats`, {
         method: "GET",
-        credentials: "include",
-        headers: {
-            "Content-Type": "application/json",
-            "x-api-key": import.meta.env.VITE_API_KEY,
-        },
+        headers: getAuthHeaders(),
     });
 
     const data = await response.json();
@@ -154,11 +128,7 @@ export async function getUserStatsApi() {
 export async function getGameStatsApi(gameSlug) {
     const response = await fetch(`${API_BASE}/api/games/my-stats/${gameSlug}`, {
         method: "GET",
-        credentials: "include",
-        headers: {
-            "Content-Type": "application/json",
-            "x-api-key": import.meta.env.VITE_API_KEY,
-        },
+        headers: getAuthHeaders(),
     });
 
     const data = await response.json();
@@ -174,11 +144,7 @@ export async function getGameStatsApi(gameSlug) {
 export async function saveGameSessionApi(slug, state) {
     const response = await fetch(`${API_BASE}/api/games/save`, {
         method: "POST",
-        credentials: "include",
-        headers: {
-            "Content-Type": "application/json",
-            "x-api-key": import.meta.env.VITE_API_KEY,
-        },
+        headers: getAuthHeaders(),
         body: JSON.stringify({ slug, state }),
     });
 
@@ -195,11 +161,7 @@ export async function saveGameSessionApi(slug, state) {
 export async function loadGameSessionApi(slug) {
     const response = await fetch(`${API_BASE}/api/games/load/${slug}`, {
         method: "GET",
-        credentials: "include",
-        headers: {
-            "Content-Type": "application/json",
-            "x-api-key": import.meta.env.VITE_API_KEY,
-        },
+        headers: getAuthHeaders(),
     });
 
     const data = await response.json();

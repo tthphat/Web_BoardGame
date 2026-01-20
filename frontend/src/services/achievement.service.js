@@ -1,4 +1,5 @@
 import { API_BASE } from "@/lib/api";
+import { getAuthHeaders } from "@/lib/auth-headers";
 
 export async function getUserAchievementsApi(gameSlug = null, search = null, includeUnearned = false) {
     console.log("Frontend-Achievement-Service: Get achievements API input: ", { gameSlug, search, includeUnearned });
@@ -15,11 +16,7 @@ export async function getUserAchievementsApi(gameSlug = null, search = null, inc
 
     const response = await fetch(url, {
         method: "GET",
-        credentials: "include",
-        headers: {
-            "Content-Type": "application/json",
-            "x-api-key": import.meta.env.VITE_API_KEY,
-        },
+        headers: getAuthHeaders(),
     });
 
     const data = await response.json();
