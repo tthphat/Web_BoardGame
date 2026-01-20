@@ -317,10 +317,19 @@ export const UserService = {
     // =============
     async removeFriend(current_id, friend_id) {
         try {
+            const conversation_id = await UserModel.checkExistConversation(current_id, friend_id);
+            if (conversation_id) {
+                const { error: removeConversationError } = await UserModel.deleteConversation(conversation_id);
+                if (removeConversationError) {
+                    throw new Error("Failed to remove conversation");
+                }
+            }
+
             const { error } = await UserModel.removeFriend(current_id, friend_id);
             if (error) {
                 throw new Error("Failed to remove friend");
             }
+
             return {
                 data: {
                     message: "Remove friend successfully"

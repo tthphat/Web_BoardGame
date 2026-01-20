@@ -639,5 +639,23 @@ export const UserModel = {
             return { data: null, error };
         }
     },
+
+    // remove conversation
+    async deleteConversation(conversation_id) {
+        const trx = await knex.transaction();
+
+        try {
+            await trx("conversations")
+                .where("id", conversation_id)
+                .del();
+
+            await trx.commit();
+            return { data: true, error: null };
+        } catch (error) {
+            await trx.rollback();
+            return { data: null, error };
+        }
+    },
+
 }
 
