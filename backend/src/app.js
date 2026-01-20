@@ -34,18 +34,15 @@ app.use(cookieParser());
 app.use("/api/auth", authRoute); // login, register
 app.get("/api/games/enabled", GameController.getEnabledGames); // enabled games list
 
-app.use(checkApiKey); // middleware kiểm tra api key
-
-
 // Protected routes (Require Auth)
-app.get("/api/games/leaderboard", verifyToken, GameController.getAllLeaderboards); // ranking for each game
-app.get("/api/games/:slug/leaderboard", verifyToken, GameController.getLeaderboard); // specific game ranking
+app.get("/api/games/leaderboard", verifyToken, checkApiKey, GameController.getAllLeaderboards); // ranking for each game
+app.get("/api/games/:slug/leaderboard", verifyToken, checkApiKey, GameController.getLeaderboard); // specific game ranking
 
-app.use("/api/admin", verifyToken, authorize("admin"), adminRoute); // Register admin route
+app.use("/api/admin", verifyToken, authorize("admin"), checkApiKey, adminRoute); // Register admin route
 
-app.use("/api/achievements", verifyToken, achievementRoute);
-app.use("/api/games", verifyToken, gameRoute);
-app.use("/api/user", verifyToken, userRoute);
+app.use("/api/achievements", verifyToken, checkApiKey, achievementRoute);
+app.use("/api/games", verifyToken, checkApiKey, gameRoute);
+app.use("/api/user", verifyToken, checkApiKey, userRoute);
 
 app.use(errorHandler);
 
