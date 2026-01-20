@@ -69,8 +69,9 @@
  * @swagger
  * /api/games/all:
  *   get:
- *     summary: List all games (Admin)
+ *     summary: List all games (Admin Only)
  *     tags: [Games]
+ *     description: Retrieve all games in the system regardless of their status. Requires administrative privileges.
  *     security:
  *       - apiKeyAuth: []
  *       - bearerAuth: []
@@ -83,8 +84,9 @@
  * @swagger
  * /api/games/toggle:
  *   put:
- *     summary: Toggle game enabled status (Admin)
+ *     summary: Toggle game enabled status (Admin Only)
  *     tags: [Games]
+ *     description: Enable or disable a game globally. Requires administrative privileges.
  *     security:
  *       - apiKeyAuth: []
  *       - bearerAuth: []
