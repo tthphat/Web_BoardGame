@@ -25,9 +25,7 @@ export const RatingModel = {
                 .join("users", "ratings.user_id", "users.id")
                 .select(
                     "ratings.*",
-                    "users.username",
-                    "users.full_name",
-                    "users.avatar_url"
+                    "users.username"
                 )
                 .where({ "ratings.game_id": gameId })
                 .orderBy("ratings.created_at", "desc")
