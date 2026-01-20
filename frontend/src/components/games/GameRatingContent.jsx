@@ -10,6 +10,7 @@ const GameRatingContent = ({ gameSlug, gameName }) => {
     const { user } = useAuth();
     const [ratings, setRatings] = useState([]);
     const [stats, setStats] = useState({ average: 0, count: 0 });
+    const [userHasRated, setUserHasRated] = useState(false);
     const [loading, setLoading] = useState(false);
     const [page, setPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
@@ -27,6 +28,7 @@ const GameRatingContent = ({ gameSlug, gameName }) => {
             if (res.success) {
                 setRatings(res.ratings);
                 setStats(res.stats);
+                setUserHasRated(res.userHasRated);
                 setTotalPages(Math.ceil(res.stats.count / 3)); // limit 3
             }
         } catch (error) {
@@ -113,55 +115,61 @@ const GameRatingContent = ({ gameSlug, gameName }) => {
 
                 <div className="p-3">
                     {user ? (
-                        <>
-                            {/* Chọn sao */}
-                            <div className="flex items-center gap-4 mb-3">
-                                <label className="text-xs font-bold bg-[#e0e0e0] px-1 border border-gray-500">RATING:</label>
-                                <div className="flex gap-1">
-                                    {[1, 2, 3, 4, 5].map((star) => (
-                                        <button
-                                            key={star}
-                                            type="button"
-                                            onMouseEnter={() => setHoverRating(star)}
-                                            onMouseLeave={() => setHoverRating(0)}
-                                            onClick={() => setUserRating(star)}
-                                            className="focus:outline-none transition-transform active:scale-90 active:translate-y-1"
-                                        >
-                                            <Star
-                                                size={24}
-                                                className={`${star <= (hoverRating || userRating)
+                        userHasRated ? (
+                            <div className="text-center py-6 border-2 border-dashed border-gray-400 bg-[#e0e0e0] text-blue-800 uppercase text-xs font-bold">
+                                &lt; YOU HAVE ALREADY REVIEWED THIS GAME &gt;
+                            </div>
+                        ) : (
+                            <>
+                                {/* Chọn sao */}
+                                <div className="flex items-center gap-4 mb-3">
+                                    <label className="text-xs font-bold bg-[#e0e0e0] px-1 border border-gray-500">RATING:</label>
+                                    <div className="flex gap-1">
+                                        {[1, 2, 3, 4, 5].map((star) => (
+                                            <button
+                                                key={star}
+                                                type="button"
+                                                onMouseEnter={() => setHoverRating(star)}
+                                                onMouseLeave={() => setHoverRating(0)}
+                                                onClick={() => setUserRating(star)}
+                                                className="focus:outline-none transition-transform active:scale-90 active:translate-y-1"
+                                            >
+                                                <Star
+                                                    size={24}
+                                                    className={`${star <= (hoverRating || userRating)
                                                         ? "fill-yellow-400 text-black drop-shadow-sm"
                                                         : "text-gray-400"
-                                                    } stroke-2`}
-                                            />
-                                        </button>
-                                    ))}
+                                                        } stroke-2`}
+                                                />
+                                            </button>
+                                        ))}
+                                    </div>
+                                    <span className="text-[10px] uppercase font-bold text-blue-800">
+                                        {userRating > 0 ? `[ SELECTED: ${userRating} STARS ]` : '[ SELECT RATING ]'}
+                                    </span>
                                 </div>
-                                <span className="text-[10px] uppercase font-bold text-blue-800">
-                                    {userRating > 0 ? `[ SELECTED: ${userRating} STARS ]` : '[ SELECT RATING ]'}
-                                </span>
-                            </div>
 
-                            {/* Textarea: Style Sunken */}
-                            <textarea
-                                className="w-full bg-white border-2 border-t-[#808080] border-l-[#808080] border-b-white border-r-white p-2 text-sm mb-3 min-h-[80px] focus:outline-none focus:bg-yellow-50 resize-none font-mono shadow-inner placeholder-gray-400 text-black"
-                                placeholder="Share your experience..."
-                                value={comment}
-                                onChange={(e) => setComment(e.target.value)}
-                            />
+                                {/* Textarea: Style Sunken */}
+                                <textarea
+                                    className="w-full bg-white border-2 border-t-[#808080] border-l-[#808080] border-b-white border-r-white p-2 text-sm mb-3 min-h-[80px] focus:outline-none focus:bg-yellow-50 resize-none font-mono shadow-inner placeholder-gray-400 text-black"
+                                    placeholder="Share your experience..."
+                                    value={comment}
+                                    onChange={(e) => setComment(e.target.value)}
+                                />
 
-                            {/* Submit Button: Style Raised */}
-                            <div className="flex justify-end">
-                                <button
-                                    onClick={handleSubmit}
-                                    disabled={submitting || userRating === 0}
-                                    className="flex items-center gap-2 px-4 py-1.5 bg-[#c0c0c0] border-2 border-t-white border-l-white border-b-black border-r-black active:border-t-black active:border-l-black active:border-b-white active:border-r-white font-bold text-xs uppercase shadow-md active:shadow-none active:translate-y-[1px] hover:bg-[#d0d0d0] transition-colors text-black disabled:opacity-50 disabled:cursor-not-allowed"
-                                >
-                                    {submitting ? <Loader2 size={12} className="animate-spin" /> : <Send size={12} />}
-                                    {submitting ? "PROCESSING..." : "POST_TO_BOARD"}
-                                </button>
-                            </div>
-                        </>
+                                {/* Submit Button: Style Raised */}
+                                <div className="flex justify-end">
+                                    <button
+                                        onClick={handleSubmit}
+                                        disabled={submitting || userRating === 0}
+                                        className="flex items-center gap-2 px-4 py-1.5 bg-[#c0c0c0] border-2 border-t-white border-l-white border-b-black border-r-black active:border-t-black active:border-l-black active:border-b-white active:border-r-white font-bold text-xs uppercase shadow-md active:shadow-none active:translate-y-[1px] hover:bg-[#d0d0d0] transition-colors text-black disabled:opacity-50 disabled:cursor-not-allowed"
+                                    >
+                                        {submitting ? <Loader2 size={12} className="animate-spin" /> : <Send size={12} />}
+                                        {submitting ? "PROCESSING..." : "POST_TO_BOARD"}
+                                    </button>
+                                </div>
+                            </>
+                        )
                     ) : (
                         <div className="text-center py-6 border-2 border-dashed border-gray-400 bg-[#e0e0e0] text-gray-500 uppercase text-xs">
                             &lt; ACCESS DENIED: PLEASE LOGIN TO REVIEW &gt;

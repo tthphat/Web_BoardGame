@@ -40,7 +40,8 @@ export const RatingController = {
                 return res.status(404).json({ success: false, message: "Game not found" });
             }
 
-            const result = await RatingService.getGameRatings(game.id, page, limit);
+            const userId = req.user ? req.user.id : null;
+            const result = await RatingService.getGameRatings(game.id, page, limit, userId);
 
             if (result.error) {
                 return res.status(400).json({ success: false, message: result.error });

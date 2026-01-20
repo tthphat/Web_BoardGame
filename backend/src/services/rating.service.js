@@ -23,7 +23,7 @@ export const RatingService = {
         });
     },
 
-    async getGameRatings(gameId, page = 1, limit = 10) {
+    async getGameRatings(gameId, page = 1, limit = 10, userId = null) {
         const offset = (page - 1) * limit;
 
         // Get ratings list
@@ -34,10 +34,19 @@ export const RatingService = {
         const stats = await RatingModel.getStatsByGameId(gameId);
         if (stats.error) return stats;
 
+        let userHasRated = false;
+        if (userId) {
+            const userRating = await RatingModel.findByUserAndGame(userId, gameId);
+            if (userRating.data) {
+                userHasRated = true;
+            }
+        }
+
         return {
             data: {
                 ratings: ratings.data,
                 stats: stats.data,
+                userHasRated, // Add this flag
                 pagination: {
                     page,
                     limit,
@@ -48,3 +57,4 @@ export const RatingService = {
         };
     }
 };
+
