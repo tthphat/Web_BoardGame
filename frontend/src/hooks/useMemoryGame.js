@@ -222,6 +222,19 @@ export const useMemoryGame = (isPlaying) => {
     setIsProcessing(false);
   }, []);
 
+  // Load game state from saved data
+  const loadGameState = useCallback((savedState) => {
+    if (savedState?.board) {
+      setBoard(savedState.board);
+      setCursor(savedState.cursor || 0);
+      setScore(savedState.score || 0);
+      setTimeLeft(savedState.timeLeft || TIME_LIMIT);
+      setGameState('playing');
+      setFlippedIndices([]);
+      setIsProcessing(false);
+    }
+  }, []);
+
   return {
     board,
     cursor,
@@ -230,6 +243,7 @@ export const useMemoryGame = (isPlaying) => {
     timeLeft,
     initGame,
     resetGame,
+    loadGameState,
     moveCursor,
     flipCard,
     handleCardClick,

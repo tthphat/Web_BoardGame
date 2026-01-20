@@ -113,6 +113,15 @@ export const useDrawing = (isPlaying) => {
     return 'bg-[#333] shadow-none opacity-40';
   };
 
+  // Load game state from saved data
+  const loadGameState = useCallback((savedState) => {
+    if (savedState?.canvas) {
+      setCanvas(savedState.canvas);
+      setSelectedColor(savedState.selectedColor || 'RED');
+      setIsErasing(savedState.isErasing || false);
+    }
+  }, []);
+
   return {
     canvas,
     selectedColor,
@@ -122,6 +131,7 @@ export const useDrawing = (isPlaying) => {
     toggleEraser,
     clearCanvas,
     getPixelColor,
+    loadGameState,
     getGameState: () => ({
       canvas,
       selectedColor,
