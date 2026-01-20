@@ -4,6 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { loginSchema } from "@/lib/login.schema";
 import { toast } from "sonner";
 import { apiDocs } from "@/services/apiDocs.service";
+import { Link } from "react-router-dom";
 
 function ApiDocs() {
     const { login } = useAuth();
