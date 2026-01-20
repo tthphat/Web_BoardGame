@@ -73,6 +73,37 @@
 
 /**
  * @swagger
+ * /api/user/{id}/state:
+ *   patch:
+ *     summary: Update user state (Block/Unblock)
+ *     tags: [User]
+ *     security:
+ *       - apiKeyAuth: []
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [state]
+ *             properties:
+ *               state:
+ *                 type: string
+ *                 enum: [active, blocked]
+ *     responses:
+ *       200:
+ *         description: User state updated
+ */
+
+/**
+ * @swagger
  * /api/user/all-users:
  *   get:
  *     summary: List all users for social features
