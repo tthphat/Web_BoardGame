@@ -18,6 +18,11 @@ export async function loginApi(payload) {
         throw new Error(data.message || data.error || "Login failed");
     }
 
+    // Store token in localStorage
+    if (data.data?.token) {
+        localStorage.setItem('access_token', data.data.token);
+    }
+
     console.log("Fontend-Auth-Service: Login API output: ", data);
     return data;
 }
@@ -62,6 +67,11 @@ export async function verifyEmailApi(payload) {
         throw new Error(data.message || data.error || "Verify email failed");
     }
 
+    // Store token in localStorage
+    if (data.data?.token) {
+        localStorage.setItem('access_token', data.data.token);
+    }
+
     console.log("Fontend-Auth-Service: Verify email API output: ", data);
     return data;
 }
@@ -103,4 +113,7 @@ export async function logoutApi() {
     if (!response.ok) {
         throw new Error(data.message || data.error || "Log out failed");
     }
+
+    // Clear token from localStorage
+    localStorage.removeItem('access_token');
 }

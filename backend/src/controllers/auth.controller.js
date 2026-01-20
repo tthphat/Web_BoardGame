@@ -18,20 +18,13 @@ export const AuthController = {
 
             const user = await AuthService.login(email, password);
 
-            res.cookie("access_token", user.data.token, {
-                httpOnly: true,
-                secure: true,
-                sameSite: "none",
-                path: "/",
-                maxAge: 24 * 60 * 60 * 1000
-            });
-
             console.log(user);
 
             return res.status(200).json({
                 message: "Login successful",
                 data: {
-                    user: user.data.user
+                    user: user.data.user,
+                    token: user.data.token
                 }
             });
 
@@ -80,20 +73,13 @@ export const AuthController = {
 
             const user = await AuthService.verifyEmail(email, otp);
 
-            res.cookie("access_token", user.data.token, {
-                httpOnly: true,
-                secure: true,
-                sameSite: "none",
-                path: "/",
-                maxAge: 24 * 60 * 60 * 1000
-            });
-
             console.log("Backend-Auth-Controller: Verify Email API output: ", user);
 
             return res.status(200).json({
                 message: "Register successful",
                 data: {
-                    user: user.data.user
+                    user: user.data.user,
+                    token: user.data.token
                 }
             });
 
@@ -128,7 +114,6 @@ export const AuthController = {
     // =============
     async logout(req, res, next) {
         try {
-            res.clearCookie("access_token");
             res.json({
                 message: "Logout successfully"
             });

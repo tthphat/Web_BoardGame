@@ -1,4 +1,5 @@
 import { API_BASE } from "@/lib/api";
+import { getAuthHeaders } from "@/lib/auth-headers";
 
 
 // get user after reload, like remember me
@@ -7,11 +8,7 @@ export async function getUserApi() {
 
     const response = await fetch(`${API_BASE}/api/user/me`, {
         method: "GET",
-        credentials: "include",
-        headers: {
-            "Content-Type": "application/json",
-            "x-api-key": import.meta.env.VITE_API_KEY,
-        },
+        headers: getAuthHeaders(),
     });
 
     const data = await response.json();
@@ -30,11 +27,7 @@ export async function getProfileApi() {
 
     const response = await fetch(`${API_BASE}/api/user/profile`, {
         method: "GET",
-        credentials: "include",
-        headers: {
-            "Content-Type": "application/json",
-            "x-api-key": import.meta.env.VITE_API_KEY,
-        },
+        headers: getAuthHeaders(),
     });
 
     const data = await response.json();
