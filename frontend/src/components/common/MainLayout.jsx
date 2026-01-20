@@ -37,6 +37,9 @@ const MainLayout = () => {
       case path === 'profile':
         setActiveItem('Profile');
         break;
+      case path === 'reviews':
+        setActiveItem('Reviews');
+        break;
       case path === 'settings':
         setActiveItem('Settings');
         break;
@@ -57,7 +60,9 @@ const MainLayout = () => {
       case 'Messages': path = 'messages'; break;
       case 'Achievements': path = 'trophy'; break;
       case 'Ranking': path = 'ranking'; break;
+      case 'Ranking': path = 'ranking'; break;
       case 'Profile': path = 'profile'; break;
+      case 'Reviews': path = 'reviews'; break;
       case 'Login': path = 'login'; break;
       case 'Register': path = 'register'; break;
       case 'Settings': path = 'settings'; break;

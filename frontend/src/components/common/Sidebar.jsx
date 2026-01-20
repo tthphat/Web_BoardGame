@@ -11,6 +11,7 @@ const Sidebar = ({ activeItem, setActiveItem }) => {
     const menuItems = [
         { id: 'Game', icon: <Gamepad2 size={20} />, label: 'Game Console' },
         { id: 'Profile', icon: <User size={20} />, label: 'Profile' },
+        { id: 'Reviews', icon: <MessageSquare size={20} />, label: 'Reviews' },
         { id: 'Friends', icon: <Users size={20} />, label: 'Friends' },
         { id: 'Messages', icon: <MessageSquare size={20} />, label: 'Messages' },
         { id: 'Achievements', icon: <Trophy size={20} />, label: 'Trophy' },
