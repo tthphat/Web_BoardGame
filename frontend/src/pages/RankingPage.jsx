@@ -7,27 +7,24 @@ import { Trophy, Medal, Clock, Gamepad2, ShieldAlert, RefreshCcw, Users, User, G
 import { useAuth } from '@/contexts/AuthContext';
 
 const RankingPage = () => {
-    const [leaderboardData, setLeaderboardData] = useState(null); // Array or Object depending on view
+    const [leaderboardData, setLeaderboardData] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const [selectedGame, setSelectedGame] = useState(null); // null = All Games
+    const [selectedGame, setSelectedGame] = useState(null);
     const { user } = useAuth();
 
-    // Filter State
     const [friends, setFriends] = useState([]);
-    const [filterMode, setFilterMode] = useState('global'); // 'global', 'friends_only', 'specific_user'
+    const [filterMode, setFilterMode] = useState('global');
     const [targetUserId, setTargetUserId] = useState(null);
     const [page, setPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
 
-    // Hook to get enabled games
     const { enabledScreens } = useEnabledGames();
 
-    // Fetch friends list on mount
     useEffect(() => {
         const fetchFriends = async () => {
             try {
-                const response = await getMyFriendsApi(1, 100); // Get first 100 friends
+                const response = await getMyFriendsApi(1, 100);
                 setFriends(response.data.myFriends || []);
             } catch (err) {
                 console.warn("Failed to fetch friends for filter:", err);
@@ -39,7 +36,6 @@ const RankingPage = () => {
     const fetchLeaderboard = useCallback(async () => {
         setLoading(true);
         try {
-            // Construct options
             const options = {};
             if (filterMode === 'friends_only') {
                 options.filter = 'friends';
@@ -48,18 +44,16 @@ const RankingPage = () => {
             }
 
             if (selectedGame) {
-                // Fetch specific game leaderboard
                 const slug = GAME_REGISTRY[selectedGame]?.slug;
                 if (!slug) throw new Error("Invalid game configuration");
 
-                const response = await getLeaderboardApi(slug, 20, { ...options, page }); // Get top 20
+                const response = await getLeaderboardApi(slug, 20, { ...options, page });
                 setLeaderboardData(response.data);
                 if (response.pagination) {
                     setTotalPages(response.pagination.totalPages);
                 }
             } else {
-                // Fetch all leaderboards (summary)
-                const response = await getAllLeaderboardsApi(5, options); // Get top 5 for summary
+                const response = await getAllLeaderboardsApi(5, options);
                 setLeaderboardData(response.data);
             }
             setError(null);
@@ -75,53 +69,49 @@ const RankingPage = () => {
         fetchLeaderboard();
     }, [fetchLeaderboard]);
 
-    // Helper to render user row
     const renderUserRow = (user, index, type = 'full', slug = null) => {
-        // Correct rank display: Use database-provided "globalRank" if in specific_user mode, otherwise index-based
         const rankValue = (filterMode === 'specific_user' && user.globalRank) ? Number(user.globalRank) : index + 1;
         const isTop3 = rankValue <= 3;
 
-        // Rank color logic based on the actual rank value
         let rankColor = 'text-gray-600 dark:text-gray-400';
         if (rankValue === 1) rankColor = 'text-yellow-600';
         else if (rankValue === 2) rankColor = 'text-gray-400';
         else if (rankValue === 3) rankColor = 'text-orange-600';
 
-        // Dynamic column checks
         const showTotal = !['match-3', 'snake', 'memory-card'].includes(slug);
         const showTime = false;
 
         return (
             <tr key={user.userId} className={`
-                ${isTop3 ? 'font-bold bg-white dark:bg-[#3d3d3d]' : 'even:bg-gray-100 dark:even:bg-[#252525]'} 
-                hover:bg-blue-50 dark:hover:bg-[#4d4d4d] text-xs transition-colors
+                ${isTop3 ? 'font-bold bg-white dark:bg-[#3a3a3a]' : 'even:bg-gray-100 dark:even:bg-[#2a2a2a]'} 
+                hover:bg-blue-50 dark:hover:bg-[#4a4a4a] text-xs transition-colors
             `}>
-                <td className="p-2 text-center border-r border-retro-shadow dark:border-[#555]">
+                <td className="p-2 text-center border-r border-gray-400 dark:border-[#555]">
                     <span className={`inline-block w-5 text-center ${rankColor}`}>
                         {rankValue === 1 ? '🥇' : rankValue === 2 ? '🥈' : rankValue === 3 ? '🥉' : `#${rankValue}`}
                     </span>
                 </td>
-                <td className="p-2 border-r border-retro-shadow dark:border-[#555]">
+                <td className="p-2 border-r border-gray-400 dark:border-[#555]">
                     <div className="flex items-center gap-2">
-                        <div className="w-5 h-5 bg-gradient-to-tr from-retro-teal to-retro-navy rounded-sm border border-black flex items-center justify-center text-[10px] text-white">
+                        <div className="w-5 h-5 bg-gradient-to-tr from-teal-600 to-blue-900 rounded-sm border border-black flex items-center justify-center text-[10px] text-white">
                             {user.username.charAt(0).toUpperCase()}
                         </div>
-                        <span className="truncate max-w-[80px] md:max-w-[120px]">{user.username}</span>
+                        <span className="truncate max-w-[80px] md:max-w-[120px] text-black dark:text-gray-200">{user.username}</span>
                     </div>
                 </td>
 
                 {showTotal && (
-                    <td className="p-2 text-right border-r border-retro-shadow dark:border-[#555]">
+                    <td className="p-2 text-right border-r border-gray-400 dark:border-[#555] text-black dark:text-gray-200">
                         {user.totalScore?.toLocaleString() || '-'}
                     </td>
                 )}
 
-                <td className="p-2 text-right">
+                <td className="p-2 text-right text-black dark:text-gray-200">
                     {user.bestScore?.toLocaleString() || '-'}
                 </td>
 
                 {showTime && (
-                    <td className="p-2 text-right border-l border-retro-shadow dark:border-[#555]">
+                    <td className="p-2 text-right border-l border-gray-400 dark:border-[#555] text-black dark:text-gray-200">
                         {user.bestTimeSeconds ? `${user.bestTimeSeconds}s` : '-'}
                     </td>
                 )}
@@ -129,33 +119,31 @@ const RankingPage = () => {
         );
     };
 
-    // Render a single leaderboard table (Mini or Full)
     const LeaderboardTable = ({ data, title, type = 'full', slug = null }) => {
         const hasData = data && data.length > 0;
         const currentSlug = slug || (selectedGame ? GAME_REGISTRY[selectedGame]?.slug : null);
 
-        // Column Logic
         const showTotal = !['match-3', 'snake', 'memory-card'].includes(currentSlug);
         const showTime = false;
         const colCount = 2 + (showTotal ? 1 : 0) + 1 + (showTime ? 1 : 0);
 
         return (
-            <div className={`bg-retro-silver border-2 border-t-retro-shadow border-l-retro-shadow border-b-retro-highlight border-r-retro-highlight flex flex-col h-full dark:bg-[#2d2d2d] dark:border-t-[#000] dark:border-l-[#000] dark:border-b-[#555] dark:border-r-[#555]`}>
+            <div className="bg-[#c0c0c0] dark:bg-[#4a4a4a] border-2 border-t-white border-l-white border-b-black border-r-black dark:border-t-[#6a6a6a] dark:border-l-[#6a6a6a] dark:border-b-[#2a2a2a] dark:border-r-[#2a2a2a] p-1 shadow-md">
                 {title && (
-                    <div className="bg-retro-navy px-2 py-1 text-white font-bold text-xs flex items-center gap-2 dark:bg-[#000040]">
+                    <div className="bg-[#000080] text-white px-2 py-1 text-xs font-bold flex items-center gap-2 mb-1 uppercase">
                         <Gamepad2 className="w-3 h-3" />
                         {title}
                     </div>
                 )}
-                <div className="overflow-x-auto flex-1">
+                <div className="bg-white dark:bg-[#2a2a2a] border-2 border-t-[#808080] border-l-[#808080] border-b-white border-r-white dark:border-t-[#1a1a1a] dark:border-l-[#1a1a1a] dark:border-b-[#5a5a5a] dark:border-r-[#5a5a5a] overflow-x-auto">
                     <table className="w-full border-collapse text-left">
                         <thead>
-                            <tr className="bg-[#d0d0d0] text-[10px] uppercase dark:bg-[#333] dark:text-gray-300">
-                                <th className="p-2 border-b-2 border-retro-shadow w-10 text-center dark:border-[#555]">Rank</th>
-                                <th className="p-2 border-b-2 border-retro-shadow dark:border-[#555]">Player</th>
-                                {showTotal && <th className="p-2 border-b-2 border-retro-shadow text-right dark:border-[#555]">Total Score</th>}
-                                <th className="p-2 border-b-2 border-retro-shadow text-right dark:border-[#555]">Best Score</th>
-                                {showTime && <th className="p-2 border-b-2 border-retro-shadow text-right dark:border-[#555]">Time</th>}
+                            <tr className="bg-[#a0a0a0] dark:bg-[#3a3a3a] text-[10px] uppercase text-black dark:text-gray-200">
+                                <th className="p-2 border-b-2 border-gray-500 dark:border-[#555] w-10 text-center">Rank</th>
+                                <th className="p-2 border-b-2 border-gray-500 dark:border-[#555]">Player</th>
+                                {showTotal && <th className="p-2 border-b-2 border-gray-500 dark:border-[#555] text-right">Total Score</th>}
+                                <th className="p-2 border-b-2 border-gray-500 dark:border-[#555] text-right">Best Score</th>
+                                {showTime && <th className="p-2 border-b-2 border-gray-500 dark:border-[#555] text-right">Time</th>}
                             </tr>
                         </thead>
                         <tbody>
@@ -163,7 +151,7 @@ const RankingPage = () => {
                                 data.map((user, idx) => renderUserRow(user, idx, type, currentSlug))
                             ) : (
                                 <tr>
-                                    <td colSpan={colCount} className="p-8 text-center text-xs text-gray-400 italic">
+                                    <td colSpan={colCount} className="p-8 text-center text-xs text-gray-500 dark:text-gray-400 italic uppercase">
                                         No data available.
                                     </td>
                                 </tr>
@@ -176,53 +164,54 @@ const RankingPage = () => {
     };
 
     return (
-        <div className="container mx-auto max-w-6xl h-full py-4 px-2 font-mono flex flex-col gap-4">
+        <div className="container mx-auto max-w-6xl h-full py-4 px-2 font-mono flex flex-col gap-4 text-black dark:text-gray-200">
             {/* Title Bar */}
-            <div className="bg-retro-navy px-3 py-1.5 flex justify-between items-center border-b-2 border-b-retro-shadow dark:bg-[#000040]">
-                <div className="flex items-center gap-2">
-                    <Trophy className="w-4 h-4 text-white" />
-                    <span className="text-white font-bold text-xs uppercase tracking-wider">Ranking_System.exe</span>
+            <div className="bg-[#c0c0c0] dark:bg-[#4a4a4a] border-2 border-t-white border-l-white border-b-black border-r-black dark:border-t-[#6a6a6a] dark:border-l-[#6a6a6a] dark:border-b-[#2a2a2a] dark:border-r-[#2a2a2a] p-1 shadow-md">
+                <div className="bg-[#000080] px-3 py-1.5 flex justify-between items-center">
+                    <div className="flex items-center gap-2">
+                        <Trophy className="w-4 h-4 text-white" />
+                        <span className="text-white font-bold text-xs uppercase tracking-wider">RANKING_SYSTEM.EXE</span>
+                    </div>
+                    <div className="flex gap-1">
+                        <button className="w-4 h-4 bg-[#c0c0c0] border border-t-white border-l-white border-b-black border-r-black text-[8px] flex items-center justify-center active:border-t-black active:border-l-black active:border-b-white active:border-r-white">_</button>
+                        <button className="w-4 h-4 bg-[#c0c0c0] border border-t-white border-l-white border-b-black border-r-black text-[8px] flex items-center justify-center active:border-t-black active:border-l-black active:border-b-white active:border-r-white">X</button>
+                    </div>
                 </div>
-                <div className="flex gap-1.5">
-                    <button className="w-5 h-5 bg-retro-silver border-2 border-t-retro-highlight border-l-retro-highlight border-b-black border-r-black text-[10px] flex items-center justify-center active:border-t-black active:border-l-black active:border-b-retro-highlight active:border-r-retro-highlight">_</button>
-                    <button className="w-5 h-5 bg-retro-silver border-2 border-t-retro-highlight border-l-retro-highlight border-b-black border-r-black text-[10px] flex items-center justify-center active:border-t-black active:border-l-black active:border-b-retro-highlight active:border-r-retro-highlight">X</button>
-                </div>
-            </div>
 
-            {/* Game Tabs */}
-            <div className="flex flex-wrap gap-0 px-1">
-                <button
-                    onClick={() => {
-                        setSelectedGame(null);
-                        setPage(1);
-                    }}
-                    className={`px-3 py-1 text-[10px] font-bold uppercase transition-all relative ${!selectedGame
-                        ? 'bg-retro-silver border-2 border-t-retro-shadow border-l-retro-shadow border-b-transparent border-r-retro-shadow z-10 -mb-[2px] pt-1.5 dark:bg-[#2d2d2d] dark:border-t-[#000] dark:border-l-[#000] dark:border-r-[#555]'
-                        : 'bg-[#b0b0b0] border-2 border-t-retro-highlight border-l-retro-highlight border-b-retro-shadow border-r-retro-shadow hover:bg-retro-silver dark:bg-[#1a1a1a] dark:border-t-[#555] dark:border-l-[#555] dark:border-b-[#000] dark:border-r-[#000] dark:hover:bg-[#2d2d2d]'
-                        }`}
-                >
-                    All Games
-                </button>
-                {enabledScreens.filter(key => key !== 'HEART' && key !== 'DRAWING').map((gameKey) => (
+                {/* Game Tabs */}
+                <div className="flex flex-wrap gap-0 p-2 bg-[#c0c0c0] dark:bg-[#4a4a4a]">
                     <button
-                        key={gameKey}
                         onClick={() => {
-                            setSelectedGame(gameKey);
+                            setSelectedGame(null);
                             setPage(1);
                         }}
-                        className={`px-3 py-1 text-[10px] font-bold uppercase transition-all relative ${selectedGame === gameKey
-                            ? 'bg-retro-silver border-2 border-t-retro-shadow border-l-retro-shadow border-b-transparent border-r-retro-shadow z-10 -mb-[2px] pt-1.5 dark:bg-[#2d2d2d] dark:border-t-[#000] dark:border-l-[#000] dark:border-r-[#555]'
-                            : 'bg-[#b0b0b0] border-2 border-t-retro-highlight border-l-retro-highlight border-b-retro-shadow border-r-retro-shadow hover:bg-retro-silver dark:bg-[#1a1a1a] dark:border-t-[#555] dark:border-l-[#555] dark:border-b-[#000] dark:border-r-[#000] dark:hover:bg-[#2d2d2d]'
+                        className={`px-3 py-1 text-[10px] font-bold uppercase transition-all ${!selectedGame
+                            ? 'bg-white dark:bg-[#2a2a2a] border-2 border-t-[#808080] border-l-[#808080] border-b-white border-r-white dark:border-t-[#1a1a1a] dark:border-l-[#1a1a1a] dark:border-b-[#5a5a5a] dark:border-r-[#5a5a5a] text-blue-800 dark:text-blue-400'
+                            : 'bg-[#a0a0a0] dark:bg-[#3a3a3a] border-2 border-t-white border-l-white border-b-black border-r-black dark:border-t-[#6a6a6a] dark:border-l-[#6a6a6a] dark:border-b-[#2a2a2a] dark:border-r-[#2a2a2a] hover:bg-[#b0b0b0] dark:hover:bg-[#4a4a4a]'
                             }`}
                     >
-                        {GAME_REGISTRY[gameKey].name}
+                        All Games
                     </button>
-                ))}
+                    {enabledScreens.filter(key => key !== 'HEART' && key !== 'DRAWING').map((gameKey) => (
+                        <button
+                            key={gameKey}
+                            onClick={() => {
+                                setSelectedGame(gameKey);
+                                setPage(1);
+                            }}
+                            className={`px-3 py-1 text-[10px] font-bold uppercase transition-all ${selectedGame === gameKey
+                                ? 'bg-white dark:bg-[#2a2a2a] border-2 border-t-[#808080] border-l-[#808080] border-b-white border-r-white dark:border-t-[#1a1a1a] dark:border-l-[#1a1a1a] dark:border-b-[#5a5a5a] dark:border-r-[#5a5a5a] text-blue-800 dark:text-blue-400'
+                                : 'bg-[#a0a0a0] dark:bg-[#3a3a3a] border-2 border-t-white border-l-white border-b-black border-r-black dark:border-t-[#6a6a6a] dark:border-l-[#6a6a6a] dark:border-b-[#2a2a2a] dark:border-r-[#2a2a2a] hover:bg-[#b0b0b0] dark:hover:bg-[#4a4a4a]'
+                                }`}
+                        >
+                            {GAME_REGISTRY[gameKey].name}
+                        </button>
+                    ))}
+                </div>
             </div>
 
             {/* Toolbar */}
-            <div className="bg-retro-silver p-3 border-2 border-t-retro-highlight border-l-retro-highlight border-b-retro-shadow border-r-retro-shadow flex justify-between items-center dark:bg-[#2d2d2d] dark:border-t-[#555] dark:border-l-[#555] dark:border-b-[#000] dark:border-r-[#000]">
-                {/* Filter Dropdown */}
+            <div className="bg-[#c0c0c0] dark:bg-[#4a4a4a] border-2 border-t-white border-l-white border-b-black border-r-black dark:border-t-[#6a6a6a] dark:border-l-[#6a6a6a] dark:border-b-[#2a2a2a] dark:border-r-[#2a2a2a] p-3 flex justify-between items-center shadow-md">
                 <div className="flex items-center gap-2">
                     <span className="text-xs font-bold uppercase hidden sm:block">View Scope:</span>
                     <div className="relative">
@@ -250,7 +239,7 @@ const RankingPage = () => {
                                 }
                                 setPage(1);
                             }}
-                            className="bg-white border-2 border-t-retro-shadow border-l-retro-shadow border-b-retro-highlight border-r-retro-highlight text-xs py-1 pl-2 pr-8 min-w-[150px] focus:outline-none dark:bg-[#3d3d3d] dark:border-t-[#000] dark:border-l-[#000] dark:border-b-[#555] dark:border-r-[#555]"
+                            className="bg-white dark:bg-[#2a2a2a] border-2 border-t-[#808080] border-l-[#808080] border-b-white border-r-white dark:border-t-[#1a1a1a] dark:border-l-[#1a1a1a] dark:border-b-[#5a5a5a] dark:border-r-[#5a5a5a] text-xs py-1 pl-2 pr-8 min-w-[150px] focus:outline-none text-black dark:text-gray-200"
                         >
                             <option value="global">🌐 Global Ranking</option>
                             <option value="friends_only">👥 Friends Only</option>
@@ -268,31 +257,30 @@ const RankingPage = () => {
 
                 <button
                     onClick={fetchLeaderboard}
-                    className="px-3 py-1 bg-retro-silver border-2 border-t-retro-highlight border-l-retro-highlight border-b-retro-shadow border-r-retro-shadow active:border-t-retro-shadow active:border-l-retro-shadow active:border-b-retro-highlight active:border-r-retro-highlight active:translate-y-0.5 text-xs font-bold uppercase transition-all flex items-center gap-1 dark:bg-[#3d3d3d] dark:border-t-[#555] dark:border-l-[#555] dark:border-b-[#000] dark:border-r-[#000]"
+                    className="px-3 py-1.5 bg-[#c0c0c0] dark:bg-[#4a4a4a] border-2 border-t-white border-l-white border-b-black border-r-black dark:border-t-[#6a6a6a] dark:border-l-[#6a6a6a] dark:border-b-[#2a2a2a] dark:border-r-[#2a2a2a] active:border-t-black active:border-l-black active:border-b-white active:border-r-white text-xs font-bold uppercase flex items-center gap-1 hover:bg-[#d0d0d0] dark:hover:bg-[#5a5a5a] transition-colors"
                 >
                     <RefreshCcw className="w-3 h-3" /> Refresh
                 </button>
             </div>
 
             {/* Content Area */}
-            <div className="flex-1 bg-retro-silver border-2 border-t-retro-shadow border-l-retro-shadow border-b-retro-highlight border-r-retro-highlight p-4 overflow-y-auto min-h-[400px] dark:bg-[#1a1a1a] dark:border-t-[#000] dark:border-l-[#000] dark:border-b-[#555] dark:border-r-[#555]">
+            <div className="flex-1 bg-[#e0e0e0] dark:bg-[#3a3a3a] border-2 border-t-[#808080] border-l-[#808080] border-b-white border-r-white dark:border-t-[#1a1a1a] dark:border-l-[#1a1a1a] dark:border-b-[#5a5a5a] dark:border-r-[#5a5a5a] p-4 overflow-y-auto min-h-[400px]">
                 {loading ? (
                     <div className="h-full flex flex-col items-center justify-center space-y-2 opacity-70">
-                        <RefreshCcw className="w-8 h-8 animate-spin text-retro-navy dark:text-blue-400" />
-                        <p className="text-sm font-bold uppercase dark:text-gray-300">Loading Data...</p>
+                        <RefreshCcw className="w-8 h-8 animate-spin text-blue-800 dark:text-blue-400" />
+                        <p className="text-sm font-bold uppercase">Reading disk...</p>
                     </div>
                 ) : error ? (
                     <div className="h-full flex flex-col items-center justify-center space-y-4">
-                        <div className="p-4 bg-white border-2 border-t-retro-shadow border-l-retro-shadow border-b-retro-highlight border-r-retro-highlight text-red-600 flex items-center gap-3">
+                        <div className="p-4 bg-white dark:bg-[#2a2a2a] border-2 border-t-[#808080] border-l-[#808080] border-b-white border-r-white dark:border-t-[#1a1a1a] dark:border-l-[#1a1a1a] dark:border-b-[#5a5a5a] dark:border-r-[#5a5a5a] text-red-600 flex items-center gap-3">
                             <ShieldAlert className="w-6 h-6" />
-                            <p className="font-bold">Error: {error}</p>
+                            <p className="font-bold uppercase text-xs">Error: {error}</p>
                         </div>
                     </div>
                 ) : (
                     <>
-                        {/* All Games View */}
                         {!selectedGame && leaderboardData && (
-                            <div className="flex flex-col gap-10 max-w-3xl mx-auto">
+                            <div className="flex flex-col gap-6 max-w-3xl mx-auto">
                                 {Object.values(leaderboardData).map((gameData) => (
                                     <div key={gameData.slug} className="w-full">
                                         <LeaderboardTable
@@ -305,12 +293,11 @@ const RankingPage = () => {
                             </div>
                         )}
 
-                        {/* Single Game View */}
                         {selectedGame && Array.isArray(leaderboardData) && (
                             <div className="h-full">
                                 <LeaderboardTable
                                     data={leaderboardData}
-                                    title={`${GAME_REGISTRY[selectedGame].name} - Top Players`}
+                                    title={`${GAME_REGISTRY[selectedGame].name} - TOP_PLAYERS`}
                                     type="full"
                                 />
                             </div>
@@ -319,36 +306,38 @@ const RankingPage = () => {
                 )}
             </div>
 
-            {/* Pagination Controls - Only for Single Game View */}
-            {selectedGame && !loading && !error && (
-                <div className="flex justify-center items-center gap-4 py-2">
+            {/* Pagination */}
+            {selectedGame && !loading && !error && totalPages > 1 && (
+                <div className="flex justify-center gap-2 pt-2 pb-4">
                     <button
                         disabled={page === 1}
                         onClick={() => setPage(p => Math.max(1, p - 1))}
-                        className="px-3 py-1 bg-retro-silver border-2 border-t-retro-highlight border-l-retro-highlight border-b-retro-shadow border-r-retro-shadow active:border-t-retro-shadow active:border-l-retro-shadow active:border-b-retro-highlight active:border-r-retro-highlight disabled:opacity-50 disabled:grayscale text-xs font-bold uppercase dark:bg-[#3d3d3d] dark:border-t-[#555] dark:border-l-[#555] dark:border-b-[#000] dark:border-r-[#000]"
+                        className="px-3 py-1 bg-[#c0c0c0] dark:bg-[#4a4a4a] border-2 border-t-white border-l-white border-b-black border-r-black dark:border-t-[#6a6a6a] dark:border-l-[#6a6a6a] dark:border-b-[#2a2a2a] dark:border-r-[#2a2a2a] active:border-t-black active:border-l-black active:border-b-white active:border-r-white text-xs font-bold uppercase disabled:opacity-50"
                     >
-                        ◀ Prev
+                        &lt; PREV
                     </button>
-                    <span className="text-xs font-bold uppercase dark:text-gray-300">
-                        Page {page} of {totalPages}
-                    </span>
+
+                    <div className="flex items-center px-4 text-xs font-bold bg-white dark:bg-[#2a2a2a] border-2 border-t-[#808080] border-l-[#808080] border-b-white border-r-white dark:border-t-[#1a1a1a] dark:border-l-[#1a1a1a] dark:border-b-[#5a5a5a] dark:border-r-[#5a5a5a]">
+                        PAGE {page} / {totalPages}
+                    </div>
+
                     <button
                         disabled={page >= totalPages}
                         onClick={() => setPage(p => Math.min(totalPages, p + 1))}
-                        className="px-3 py-1 bg-retro-silver border-2 border-t-retro-highlight border-l-retro-highlight border-b-retro-shadow border-r-retro-shadow active:border-t-retro-shadow active:border-l-retro-shadow active:border-b-retro-highlight active:border-r-retro-highlight disabled:opacity-50 disabled:grayscale text-xs font-bold uppercase dark:bg-[#3d3d3d] dark:border-t-[#555] dark:border-l-[#555] dark:border-b-[#000] dark:border-r-[#000]"
+                        className="px-3 py-1 bg-[#c0c0c0] dark:bg-[#4a4a4a] border-2 border-t-white border-l-white border-b-black border-r-black dark:border-t-[#6a6a6a] dark:border-l-[#6a6a6a] dark:border-b-[#2a2a2a] dark:border-r-[#2a2a2a] active:border-t-black active:border-l-black active:border-b-white active:border-r-white text-xs font-bold uppercase disabled:opacity-50"
                     >
-                        Next ▶
+                        NEXT &gt;
                     </button>
                 </div>
             )}
 
             {/* Status Bar */}
-            <div className="bg-retro-silver border-2 border-t-retro-shadow border-l-retro-shadow border-b-retro-highlight border-r-retro-highlight px-2 py-0.5 flex justify-between text-[10px] font-bold uppercase text-gray-700 dark:bg-[#2d2d2d] dark:border-t-[#555] dark:border-l-[#555] dark:border-b-black dark:border-r-black">
-                <div className="dark:text-gray-200">
+            <div className="bg-[#c0c0c0] dark:bg-[#4a4a4a] border-2 border-t-white border-l-white border-b-black border-r-black dark:border-t-[#6a6a6a] dark:border-l-[#6a6a6a] dark:border-b-[#2a2a2a] dark:border-r-[#2a2a2a] px-2 py-0.5 flex justify-between text-[10px] font-bold uppercase">
+                <div>
                     {selectedGame ? `Viewing: ${GAME_REGISTRY[selectedGame].name}` : 'Viewing: All Games Summary'}
                     <span className="ml-4">Filter: {filterMode === 'global' ? 'Global' : filterMode === 'friends_only' ? 'Friends' : 'Single User'}</span>
                 </div>
-                <div className="dark:text-gray-200">Online</div>
+                <div className="text-green-700 dark:text-green-400">● Online</div>
             </div>
         </div>
     );
