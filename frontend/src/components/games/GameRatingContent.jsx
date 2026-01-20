@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { Star } from 'lucide-react';
+import { Star, Loader2, MessageSquare, User, Send, History } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { addRatingApi, getGameRatingsApi } from '@/services/rating.service';
 import { toast } from 'sonner';
 
-const GameRatingContent = ({ gameSlug, gameName, gameConfig }) => {
+const GameRatingContent = ({ gameSlug, gameName }) => {
+    // --- LOGIC GIỮ NGUYÊN ---
     const { user } = useAuth();
     const [ratings, setRatings] = useState([]);
     const [stats, setStats] = useState({ average: 0, count: 0 });
@@ -43,11 +44,11 @@ const GameRatingContent = ({ gameSlug, gameName, gameConfig }) => {
 
     const handleSubmit = async () => {
         if (!user) {
-            toast.error("Please login to rate!");
+            toast.error("LOGIN REQUIRED", { description: "Please login to rate!" });
             return;
         }
         if (userRating === 0) {
-            toast.error("Please select a star rating!");
+            toast.warning("MISSING RATING", { description: "Please select a star rating!" });
             return;
         }
 
@@ -55,147 +56,193 @@ const GameRatingContent = ({ gameSlug, gameName, gameConfig }) => {
             setSubmitting(true);
             const res = await addRatingApi(gameSlug, userRating, comment);
             if (res.success) {
-                toast.success("Rating submitted successfully!");
+                toast.success("SUCCESS", { description: "Rating submitted successfully!" });
                 setComment("");
                 setUserRating(0);
                 fetchRatings(1); // Refresh
             }
         } catch (error) {
-            toast.error(error.message);
+            toast.error("ERROR", { description: error.message });
         } finally {
             setSubmitting(false);
         }
     };
 
-    const renderStars = (rating) => {
+    const renderStars = (rating, size = 16) => {
         return (
-            <div className="flex gap-1">
+            <div className="flex gap-0.5">
                 {[1, 2, 3, 4, 5].map((star) => (
                     <Star
                         key={star}
-                        size={16}
-                        className={star <= rating ? "fill-yellow-400 text-yellow-400" : "text-gray-400"}
+                        size={size}
+                        className={`${star <= rating ? "fill-yellow-400 text-black" : "text-gray-400"} stroke-[1.5px]`}
                     />
                 ))}
             </div>
         );
     };
 
+    // --- PHẦN UI THAY ĐỔI (RETRO STYLE) ---
     return (
-        <div className="space-y-6">
-            {/* Header Stats */}
-            <div className="flex items-center justify-between bg-black text-white p-3 rounded-t-sm">
-                <span className="font-bold text-lg uppercase">{gameName}</span>
-                <div className="flex items-center gap-2 text-sm text-yellow-400 bg-gray-900 px-3 py-1 rounded-full border border-yellow-600">
-                    <Star className="fill-yellow-400" size={16} />
-                    <span className="font-bold">{parseFloat(stats.average).toFixed(1)} / 5</span>
-                    <span className="text-gray-400">({stats.count} reviews)</span>
+        <div className="space-y-6 font-mono text-black">
+            
+            {/* 1. Header Stats (Bảng điểm số) */}
+            <div className="bg-[#c0c0c0] border-2 border-t-white border-l-white border-b-black border-r-black p-4 flex flex-col md:flex-row justify-between items-center gap-4 shadow-sm">
+                <div className="flex items-center gap-4">
+                    {/* Ô điểm số: Style Sunken (Lõm) */}
+                    <div className="bg-white border-2 border-t-[#808080] border-l-[#808080] border-b-white border-r-white p-2 min-w-[80px] text-center shadow-inner">
+                        <span className="block text-3xl font-bold text-blue-800 leading-none">
+                            {parseFloat(stats.average).toFixed(1)}
+                        </span>
+                    </div>
+                    <div>
+                        <h3 className="font-bold text-lg uppercase text-black tracking-wide">{gameName}</h3>
+                        <div className="flex items-center gap-2 text-sm text-gray-700">
+                            {renderStars(Math.round(stats.average))}
+                            <span className="text-xs font-bold">({stats.count} REVIEWS)</span>
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            <div className="bg-[#e0e0e0] dark:bg-[#333] border-x-4 border-b-4 border-black p-4">
-                {/* Writing a review */}
-                {user ? (
-                    <div className="bg-[#f0f0f0] dark:bg-[#1a1a1a] p-4 border-2 border-gray-400 dark:border-gray-600 rounded-sm mb-6 shadow-inner">
-                        <h3 className="font-bold mb-2 text-sm uppercase tracking-wider border-b border-gray-300 pb-1">Write a Review</h3>
-                        <div className="flex gap-2 mb-3 mt-2">
-                            {[1, 2, 3, 4, 5].map((star) => (
-                                <button
-                                    key={star}
-                                    type="button"
-                                    onMouseEnter={() => setHoverRating(star)}
-                                    onMouseLeave={() => setHoverRating(0)}
-                                    onClick={() => setUserRating(star)}
-                                    className="focus:outline-none transition-transform hover:scale-110"
-                                >
-                                    <Star
-                                        size={24}
-                                        className={`${star <= (hoverRating || userRating)
-                                            ? "fill-yellow-400 text-yellow-400 drop-shadow-md"
-                                            : "text-gray-300 dark:text-gray-600"
-                                            }`}
-                                    />
-                                </button>
-                            ))}
-                        </div>
-                        <textarea
-                            className="w-full bg-white dark:bg-[#252525] border-2 border-gray-300 dark:border-gray-500 p-3 text-sm mb-3 min-h-[100px] focus:outline-none focus:border-blue-500 resize-none font-sans"
-                            placeholder="Share your experience with this game..."
-                            value={comment}
-                            onChange={(e) => setComment(e.target.value)}
-                        />
-                        <div className="flex justify-end">
-                            <Button
-                                onClick={handleSubmit}
-                                disabled={submitting || userRating === 0}
-                                className="bg-blue-600 hover:bg-blue-700 text-white border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-x-[2px] active:translate-y-[2px]"
-                            >
-                                {submitting ? "Submitting..." : "Post Review"}
-                            </Button>
-                        </div>
-                    </div>
-                ) : (
-                    <div className="text-center p-6 bg-gray-200 dark:bg-gray-800 border-2 border-dashed border-gray-400 text-gray-500 mb-6 font-mono">
-                        Login to write a review
-                    </div>
-                )}
+            {/* 2. Form Viết Review */}
+            <div className="bg-[#c0c0c0] border-2 border-t-white border-l-white border-b-black border-r-black p-1 shadow-md">
+                <div className="bg-[#000080] text-white px-2 py-1 text-xs font-bold flex items-center gap-2 mb-1 uppercase">
+                    <MessageSquare size={12} /> Write_New_Review.exe
+                </div>
 
-                {/* Reviews List */}
-                <div className="space-y-4">
-                    {loading ? (
-                        <div className="text-center py-8 font-mono animate-pulse">Loading reviews...</div>
-                    ) : ratings.length > 0 ? (
-                        ratings.map((review) => (
-                            <div key={review.id} className="bg-white dark:bg-[#222] p-4 border-l-4 border-blue-500 shadow-sm hover:bg-gray-50 transition-colors">
-                                <div className="flex justify-between items-start mb-3">
-                                    <div className="flex items-center gap-3">
-                                        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center text-white font-bold text-sm uppercase shadow-sm">
-                                            {review.username?.charAt(0) || 'U'}
-                                        </div>
-                                        <div>
-                                            <div className="font-bold text-sm">{review.username || 'Anonymous'}</div>
-                                            <div className="text-xs text-gray-500">{new Date(review.created_at).toLocaleDateString()}</div>
-                                        </div>
-                                    </div>
-                                    {renderStars(review.rating)}
+                <div className="p-3">
+                    {user ? (
+                        <>
+                            {/* Chọn sao */}
+                            <div className="flex items-center gap-4 mb-3">
+                                <label className="text-xs font-bold bg-[#e0e0e0] px-1 border border-gray-500">RATING:</label>
+                                <div className="flex gap-1">
+                                    {[1, 2, 3, 4, 5].map((star) => (
+                                        <button
+                                            key={star}
+                                            type="button"
+                                            onMouseEnter={() => setHoverRating(star)}
+                                            onMouseLeave={() => setHoverRating(0)}
+                                            onClick={() => setUserRating(star)}
+                                            className="focus:outline-none transition-transform active:scale-90 active:translate-y-1"
+                                        >
+                                            <Star
+                                                size={24}
+                                                className={`${
+                                                    star <= (hoverRating || userRating)
+                                                        ? "fill-yellow-400 text-black drop-shadow-sm"
+                                                        : "text-gray-400"
+                                                } stroke-2`}
+                                            />
+                                        </button>
+                                    ))}
                                 </div>
-                                <p className="text-sm text-gray-700 dark:text-gray-300 pl-14 leading-relaxed font-sans">
-                                    {review.comment}
-                                </p>
+                                <span className="text-[10px] uppercase font-bold text-blue-800">
+                                    {userRating > 0 ? `[ SELECTED: ${userRating} STARS ]` : '[ SELECT RATING ]'}
+                                </span>
                             </div>
-                        ))
+
+                            {/* Textarea: Style Sunken */}
+                            <textarea
+                                className="w-full bg-white border-2 border-t-[#808080] border-l-[#808080] border-b-white border-r-white p-2 text-sm mb-3 min-h-[80px] focus:outline-none focus:bg-yellow-50 resize-none font-mono shadow-inner placeholder-gray-400 text-black"
+                                placeholder="Share your experience..."
+                                value={comment}
+                                onChange={(e) => setComment(e.target.value)}
+                            />
+
+                            {/* Submit Button: Style Raised */}
+                            <div className="flex justify-end">
+                                <button
+                                    onClick={handleSubmit}
+                                    disabled={submitting || userRating === 0}
+                                    className="flex items-center gap-2 px-4 py-1.5 bg-[#c0c0c0] border-2 border-t-white border-l-white border-b-black border-r-black active:border-t-black active:border-l-black active:border-b-white active:border-r-white font-bold text-xs uppercase shadow-md active:shadow-none active:translate-y-[1px] hover:bg-[#d0d0d0] transition-colors text-black disabled:opacity-50 disabled:cursor-not-allowed"
+                                >
+                                    {submitting ? <Loader2 size={12} className="animate-spin" /> : <Send size={12} />}
+                                    {submitting ? "PROCESSING..." : "POST_TO_BOARD"}
+                                </button>
+                            </div>
+                        </>
                     ) : (
-                        <div className="text-center py-12 opacity-50 italic border-2 border-dashed border-gray-300 rounded-lg">
-                            No reviews yet. Be the first to rate!
+                        <div className="text-center py-6 border-2 border-dashed border-gray-400 bg-[#e0e0e0] text-gray-500 uppercase text-xs">
+                            &lt; ACCESS DENIED: PLEASE LOGIN TO REVIEW &gt;
                         </div>
                     )}
                 </div>
+            </div>
 
-                {/* Pagination */}
-                {totalPages > 1 && (
-                    <div className="flex justify-center gap-2 pt-6">
-                        <Button
-                            variant="outline"
-                            size="sm"
-                            disabled={page === 1}
-                            onClick={() => setPage(p => p - 1)}
-                        >
-                            Prev
-                        </Button>
-                        <span className="flex items-center px-4 text-sm font-bold bg-white dark:bg-black border border-gray-300 rounded">
-                            {page} / {totalPages}
-                        </span>
-                        <Button
-                            variant="outline"
-                            size="sm"
-                            disabled={page === totalPages}
-                            onClick={() => setPage(p => p + 1)}
-                        >
-                            Next
-                        </Button>
+            {/* 3. Danh sách Review */}
+            <div className="space-y-3">
+                <div className="flex items-center justify-between border-b-2 border-gray-500 pb-1 mb-2">
+                    <div className="flex items-center gap-2 text-black">
+                        <History size={16} />
+                        <h3 className="font-bold text-sm uppercase">REVIEW_LOGS</h3>
+                    </div>
+                    <span className="text-xs text-gray-600 font-bold">{ratings.length} RECORDS FOUND</span>
+                </div>
+
+                {loading ? (
+                    <div className="text-center py-8 font-mono animate-pulse uppercase text-xs">Reading disk...</div>
+                ) : ratings.length > 0 ? (
+                    ratings.map((review) => (
+                        <div key={review.id} className="bg-[#c0c0c0] border-2 border-t-white border-l-white border-b-black border-r-black p-1 shadow-sm mb-3">
+                            {/* Header Review Item */}
+                            <div className="bg-[#a0a0a0] border border-b-white border-r-white border-t-gray-600 border-l-gray-600 px-2 py-1 flex justify-between items-center mb-1">
+                                <div className="flex items-center gap-2">
+                                    <User size={12} className="text-black"/>
+                                    <span className="font-bold text-black text-xs uppercase tracking-wider">
+                                        [{review.username || 'ANONYMOUS'}]
+                                    </span>
+                                    {/* Sao hiển thị ngay trên header */}
+                                    <div className="flex bg-black px-1 py-0.5 border border-gray-500 ml-2">
+                                        {renderStars(review.rating, 10)}
+                                    </div>
+                                </div>
+                                <span className="text-[10px] text-black font-semibold font-mono">
+                                    {new Date(review.created_at).toLocaleDateString()}
+                                </span>
+                            </div>
+
+                            {/* Nội dung Review: Style Sunken */}
+                            <div className="bg-white border-2 border-t-[#808080] border-l-[#808080] border-b-white border-r-white p-3 min-h-[40px]">
+                                <p className="text-sm text-black break-words whitespace-pre-wrap font-mono leading-relaxed">
+                                    {review.comment}
+                                </p>
+                            </div>
+                        </div>
+                    ))
+                ) : (
+                    <div className="text-center py-8 border-2 border-dashed border-gray-400 bg-[#e0e0e0] text-gray-500 uppercase text-xs">
+                        NO DATA FOUND. BE THE FIRST TO REVIEW!
                     </div>
                 )}
             </div>
+
+            {/* 4. Pagination (Retro Style) */}
+            {totalPages > 1 && (
+                <div className="flex justify-center gap-2 pt-2 pb-4">
+                    <button
+                        disabled={page === 1}
+                        onClick={() => setPage(p => p - 1)}
+                        className="px-3 py-1 bg-[#c0c0c0] border-2 border-t-white border-l-white border-b-black border-r-black active:border-t-black active:border-l-black active:border-b-white active:border-r-white text-xs font-bold uppercase disabled:opacity-50"
+                    >
+                        &lt; PREV
+                    </button>
+                    
+                    {/* Số trang: Style Sunken */}
+                    <div className="flex items-center px-4 text-xs font-bold bg-white border-2 border-t-black border-l-black border-r-white border-b-white">
+                        PAGE {page} / {totalPages}
+                    </div>
+
+                    <button
+                        disabled={page === totalPages}
+                        onClick={() => setPage(p => p + 1)}
+                        className="px-3 py-1 bg-[#c0c0c0] border-2 border-t-white border-l-white border-b-black border-r-black active:border-t-black active:border-l-black active:border-b-white active:border-r-white text-xs font-bold uppercase disabled:opacity-50"
+                    >
+                        NEXT &gt;
+                    </button>
+                </div>
+            )}
         </div>
     );
 };

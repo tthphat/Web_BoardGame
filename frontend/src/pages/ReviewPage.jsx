@@ -34,7 +34,7 @@ const ReviewPage = () => {
                 <div className="bg-[#000080] text-white px-2 py-1 mb-2 font-bold text-lg flex items-center justify-between select-none">
                     {/* Đã bỏ icon MessageSquare, chỉ giữ lại text tên chương trình */}
                     <span className="uppercase tracking-wide truncate pl-1">
-                        GAME_REVIEWS_MANAGER.EXE
+                        GAME_REVIEWS
                     </span>
                     <div className="flex gap-1 ml-2">
                         <button className="w-5 h-5 bg-[#c0c0c0] text-black border-2 border-t-white border-l-white border-b-black border-r-black flex items-center justify-center active:border-t-black active:border-l-black active:border-b-white active:border-r-white active:translate-y-[1px]">
