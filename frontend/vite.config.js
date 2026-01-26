@@ -14,7 +14,7 @@ export default defineConfig({
   // server: {
   //   proxy: {
   //     '/api': {
-  //       target: 'http://localhost:3000', // URL Backend của bạn
+  //       target: 'http://localhost:3000', //
   //       changeOrigin: true,
   //     }
   //   }
