@@ -2,8 +2,6 @@ import { API_BASE } from "@/lib/api";
 
 // Login
 export async function loginApi(payload) {
-    console.log("Fontend-Auth-Service: Login API input: ", payload);
-
     const response = await fetch(`${API_BASE}/api/auth/login`, {
         method: "POST",
         headers: {
@@ -22,15 +20,11 @@ export async function loginApi(payload) {
     if (data.data?.token) {
         localStorage.setItem('access_token', data.data.token);
     }
-
-    console.log("Fontend-Auth-Service: Login API output: ", data);
     return data;
 }
 
 // Register
 export async function registerApi(payload) {
-    console.log("Fontend-Auth-Service: Register API input: ", payload);
-
     const response = await fetch(`${API_BASE}/api/auth/register`, {
         method: "POST",
         headers: {
@@ -45,14 +39,11 @@ export async function registerApi(payload) {
         throw new Error(data.message || data.error || "Register failed");
     }
 
-    console.log("Fontend-Auth-Service: Register API output: ", data);
     return data;
 }
 
 // Verify email
 export async function verifyEmailApi(payload) {
-    console.log("Fontend-Auth-Service: Verify email API input: ", payload);
-
     const response = await fetch(`${API_BASE}/api/auth/verify-email`, {
         method: "POST",
         headers: {
@@ -71,15 +62,11 @@ export async function verifyEmailApi(payload) {
     if (data.data?.token) {
         localStorage.setItem('access_token', data.data.token);
     }
-
-    console.log("Fontend-Auth-Service: Verify email API output: ", data);
     return data;
 }
 
 // Resend OTP
 export async function resendOTPApi(email) {
-    console.log("Fontend-Auth-Service: Resend OTP API input: ", email);
-
     const response = await fetch(`${API_BASE}/api/auth/resend-otp`, {
         method: "POST",
         headers: {
@@ -93,8 +80,6 @@ export async function resendOTPApi(email) {
     if (!response.ok) {
         throw new Error(data.message || data.error || "Resend OTP failed");
     }
-
-    console.log("Fontend-Auth-Service: Resend OTP API output: ", data);
     // return data;
 }
 

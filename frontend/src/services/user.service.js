@@ -4,8 +4,6 @@ import { getAuthHeaders } from "@/lib/auth-headers";
 
 // get user after reload, like remember me
 export async function getUserApi() {
-    console.log("Fontend-User-Service: Get user API input: ");
-
     const response = await fetch(`${API_BASE}/api/user/me`, {
         method: "GET",
         headers: getAuthHeaders(),
@@ -16,8 +14,6 @@ export async function getUserApi() {
     if (!response.ok) {
         throw new Error(data.message || data.error || "Get profile failed");
     }
-
-    console.log("Fontend-User-Service: Get profile API output: ", data);
     return data;
 }
 

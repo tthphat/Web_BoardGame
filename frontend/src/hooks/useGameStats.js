@@ -18,15 +18,12 @@ export function useGameStats(gameSlug, isLoggedIn) {
      */
     const fetchGameStats = useCallback(async () => {
         if (!isLoggedIn || !gameSlug) {
-            console.log('[useGameStats] Skipping fetchGameStats - not logged in or no slug');
             return null;
         }
 
         setLoading(true);
         try {
-            console.log(`[useGameStats] 📊 Fetching stats for: ${gameSlug}`);
             const response = await getGameStatsApi(gameSlug);
-            console.log(`[useGameStats] 📊 Stats from DB:`, response.data);
             setCurrentStats(response.data);
             return response.data;
         } catch (error) {
@@ -43,24 +40,19 @@ export function useGameStats(gameSlug, isLoggedIn) {
      * @returns {Promise<object|null>} Stats info or null if guest
      */
     const recordGameEnd = useCallback(async (result) => {
-        console.log(`[useGameStats] 🎯 recordGameEnd called`, { gameSlug, isLoggedIn, result });
         
         // Skip API call for guests
         if (!isLoggedIn) {
-            console.log('[useGameStats] ⚠️ Guest mode - skipping stats recording');
             return null;
         }
 
         if (!gameSlug) {
-            console.warn('[useGameStats] ⚠️ No gameSlug provided for stats recording');
             return null;
         }
 
         setLoading(true);
         try {
-            console.log(`[useGameStats] 📡 Calling finishGameApi for: ${gameSlug}`, result);
             const response = await finishGameApi(gameSlug, result);
-            console.log(`[useGameStats] ✅ API Success:`, response);
             setLastResult(response.data);
             
             // Update currentStats with new values from response

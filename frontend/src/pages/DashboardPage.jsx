@@ -59,20 +59,15 @@ const DashboardPage = () => {
     if (!isPlaying || gameEndHandled || !currentConfig) return;
 
     const handleGameEnd = async (result) => {
-      console.log(`[GameStats] 🎮 Game End Detected: ${currentScreenName}`, result);
       setGameEndHandled(true);
 
-      console.log(`[GameStats] 📤 Calling API to record stats...`);
       const response = await recordGameEnd(result);
-      console.log(`[GameStats] 📥 API Response:`, response);
 
       if (response?.stats?.newBestScore) {
-        console.log(`[GameStats] 🏆 NEW HIGH SCORE! Best: ${response.stats.bestScore}`);
         toast.success('🎉 New High Score!', {
           description: `Best: ${response.stats.bestScore}`
         });
       } else if (response?.stats?.newBestTime) {
-        console.log(`[GameStats] ⏱️ NEW BEST TIME! Best: ${response.stats.bestTimeSeconds}s`);
         toast.success('⏱️ New Best Time!', {
           description: `Best: ${response.stats.bestTimeSeconds}s`
         });
@@ -82,7 +77,6 @@ const DashboardPage = () => {
     // Check for game end conditions
     // Snake / Match3 game over
     if (['SNAKE', 'MATCH3'].includes(currentScreenName) && gameState.isGameOver) {
-      console.log(`[GameStats] 🐍/💎 ${currentScreenName} Game Over detected! Score: ${score}`);
       handleGameEnd({ score, won: false });
     }
 
@@ -90,7 +84,6 @@ const DashboardPage = () => {
     if (currentScreenName === 'MEMORY' && (memoryGame.gameState === 'finished' || memoryGame.gameState === 'timeout')) {
       const won = memoryGame.gameState === 'finished';
       const timeUsed = 30 - memoryGame.timeLeft; // TIME_LIMIT is 30 seconds
-      console.log(`[GameStats] 🃏 Memory Game ended! State: ${memoryGame.gameState}, Score: ${memoryGame.score}, Time: ${timeUsed}s`);
       handleGameEnd({
         score: memoryGame.score,
         won,
@@ -101,7 +94,6 @@ const DashboardPage = () => {
     // TicTacToe/Caro - winner determined
     if (['TICTACTOE', 'CARO4', 'CARO5'].includes(currentScreenName) && gameState.winner) {
       const won = gameState.winner === 'BLUE' || gameState.winner === 'X';
-      console.log(`[GameStats] ⭕ ${currentScreenName} ended! Winner: ${gameState.winner}, Player won: ${won}`);
       handleGameEnd({
         score: won ? 1 : 0,
         won
