@@ -14,9 +14,32 @@ function Login() {
         handleSubmit,
         formState: { errors, isSubmitting },
         setError,
+        setValue,
+        watch,
     } = useForm({
         resolver: zodResolver(loginSchema),
     });
+
+    // Quick login với tài khoản mẫu
+    const quickLogin = async (email, password) => {
+        setValue("email", email);
+        setValue("password", password);
+        const data = { email, password };
+        try {
+            const response = await login(data);
+            const user = response.data.user;
+            toast.success("Login successfully");
+
+            if (user.role === 'admin') {
+                navigate("/admin");
+            } else {
+                navigate("/");
+            }
+        } catch (error) {
+            toast.error("Login failed");
+            setError("email", { message: error.message });
+        }
+    };
 
     const onSubmit = async (data) => {
         try {
@@ -91,12 +114,12 @@ function Login() {
                         <button
                             type="submit"
                             disabled={isSubmitting}
-                            className="w-full py-2 bg-retro-silver dark:bg-[#404040] 
+                            className="w-full py-2 bg-retro-silver dark:bg-[#404040]
                             text-black dark:text-white font-bold uppercase text-sm
-                            border-2 
-                            border-t-retro-highlight border-l-retro-highlight border-b-retro-shadow border-r-retro-shadow 
+                            border-2
+                            border-t-retro-highlight border-l-retro-highlight border-b-retro-shadow border-r-retro-shadow
                             dark:border-t-[#606060] dark:border-l-[#606060] dark:border-b-black dark:border-r-black
-                            active:border-t-retro-shadow active:border-l-retro-shadow active:border-b-retro-highlight active:border-r-retro-highlight 
+                            active:border-t-retro-shadow active:border-l-retro-shadow active:border-b-retro-highlight active:border-r-retro-highlight
                             active:translate-y-0.5 transition-all
                             disabled:opacity-50
                             hover:bg-retro-navy hover:text-white dark:hover:bg-[#606060] dark:hover:text-yellow-500"
@@ -105,11 +128,53 @@ function Login() {
                         </button>
                     </form>
 
-                    <div className="mt-6 pt-4 border-t border-t-retro-shadow dark:border-t-black text-center text-xs">
+                    {/* Quick Login Demo Accounts */}
+                    <div className="mt-6 pt-4 border-t border-t-retro-shadow dark:border-t-black">
+                        <p className="text-center text-xs text-gray-600 dark:text-gray-400 mb-3 uppercase font-bold">
+                            Quick Login Demo
+                        </p>
+                        <div className="flex gap-2">
+                            <button
+                                type="button"
+                                onClick={() => quickLogin("admin@gmail.com", "123456")}
+                                disabled={isSubmitting}
+                                className="flex-1 py-2 bg-retro-navy dark:bg-[#404040]
+                                text-white dark:text-yellow-500 font-bold text-xs uppercase
+                                border-2
+                                border-t-retro-highlight border-l-retro-highlight border-b-retro-shadow border-r-retro-shadow
+                                dark:border-t-[#606060] dark:border-l-[#606060] dark:border-b-black dark:border-r-black
+                                active:border-t-retro-shadow active:border-l-retro-shadow active:border-b-retro-highlight active:border-r-retro-highlight
+                                active:translate-y-0.5 transition-all
+                                disabled:opacity-50
+                                hover:bg-retro-teal hover:text-black"
+                            >
+                                Admin
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => quickLogin("phat@gmail.com", "123456")}
+                                disabled={isSubmitting}
+                                className="flex-1 py-2 bg-retro-navy dark:bg-[#404040]
+                                text-white dark:text-yellow-500 font-bold text-xs uppercase
+                                border-2
+                                border-t-retro-highlight border-l-retro-highlight border-b-retro-shadow border-r-retro-shadow
+                                dark:border-t-[#606060] dark:border-l-[#606060] dark:border-b-black dark:border-r-black
+                                active:border-t-retro-shadow active:border-l-retro-shadow active:border-b-retro-highlight active:border-r-retro-highlight
+                                active:translate-y-0.5 transition-all
+                                disabled:opacity-50
+                                hover:bg-retro-teal hover:text-black"
+                            >
+                                User
+                            </button>
+                        </div>
+                    </div>
+
+                    <div className="mt-4 text-center text-xs">
                         <span className="text-gray-700 dark:text-gray-400">DON'T HAVE AN ACCOUNT?</span>
                         <br />
                         <a href="/register" className="text-retro-navy dark:text-yellow-500 font-bold hover:underline">REGISTER.EXE</a>
                     </div>
+
                 </div>
             </div>
         </div>
